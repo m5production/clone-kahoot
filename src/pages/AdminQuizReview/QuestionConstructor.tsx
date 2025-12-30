@@ -11,6 +11,7 @@ import { usePutUpdateAcceptedAnswers } from './api/usePutUpdateAcceptedAnswers'
 import { useDeleteQuestion } from './api/useDeleteQuestion'
 import ImgWithPlaceholder from '@/components/ui/ImgWithPlaceholder'
 import { useQuestionContext } from './Question.model'
+import { toast } from 'react-toastify'
 
 type Props = DetailedHTMLProps<
   FormHTMLAttributes<HTMLFormElement>,
@@ -67,7 +68,9 @@ export function QuestionConstructor({
     selectedQuestion?.id
   )
 
-  const { mutate: deleteQuestion } = useDeleteQuestion(() => { })
+  const { mutate: deleteQuestion } = useDeleteQuestion(() => {
+    toast.success('Question deleted successfully')
+  })
 
   useEffect(() => {
     if (question && answers) {
@@ -105,11 +108,19 @@ export function QuestionConstructor({
       id: selectedQuestion.id,
       img: img || null,
       text,
+    }, {
+      onSuccess: () => {
+        toast.success('Question updated successfully')
+      },
     })
 
     updateAcceptedAnswers({
       questionId: selectedQuestion.id,
       newAnswers: answers.map(({ answerText }) => ({ text: answerText, questionId: selectedQuestion.id })),
+    }, {
+      onSuccess: () => {
+        toast.success('Accepted answers updated successfully')
+      },
     })
   }
 
