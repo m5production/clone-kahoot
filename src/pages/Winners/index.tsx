@@ -13,7 +13,7 @@ export function Winners() {
       <WinnersTable players={players} />
       <Link
         className={cn(buttonVariants(), 'absolute right-4 top-4')}
-        to="/clone-kahoot/home"
+        to="/home"
       >
         Home
       </Link>

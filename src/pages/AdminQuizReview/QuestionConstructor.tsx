@@ -10,21 +10,12 @@ import { useGetAcceptedAnswersByQuestionId } from './api/useGetAcceptedAnswersBy
 import { usePutUpdateAcceptedAnswers } from './api/usePutUpdateAcceptedAnswers'
 import { useDeleteQuestion } from './api/useDeleteQuestion'
 import ImgWithPlaceholder from '@/components/ui/ImgWithPlaceholder'
+import { useQuestionContext } from './Question.model'
 
 type Props = DetailedHTMLProps<
   FormHTMLAttributes<HTMLFormElement>,
   HTMLFormElement
 > & {
-  selectedQuestion: { id: string; number: number }
-  setSelectedQuestion: React.Dispatch<
-    React.SetStateAction<
-      | {
-          id: string
-          number: number
-        }
-      | undefined
-    >
-  >
   gameId: string
 }
 
@@ -39,15 +30,12 @@ const defaultValues: Pick<Question, 'text'> & {
 }
 
 export function QuestionConstructor({
-  selectedQuestion,
   gameId,
-  setSelectedQuestion,
   ...props
 }: Props) {
+  const { setSelectedQuestion, selectedQuestion } = useQuestionContext()
   const { mutate: updateQuestion } = usePatchUpdateQuestion()
-  const { mutate: updateAcceptedAnswers } = usePutUpdateAcceptedAnswers(
-    selectedQuestion.id
-  )
+  const { mutate: updateAcceptedAnswers } = usePutUpdateAcceptedAnswers()
 
   const {
     register,
@@ -65,21 +53,21 @@ export function QuestionConstructor({
   const imageUrl = watch('img')
 
   const { data: question } = useGetSingleQuestion(
-    selectedQuestion.id,
+    selectedQuestion?.id,
     (question: Question | undefined) =>
       question
         ? {
-            text: question.text,
-            img: question.img ? question.img : '',
-          }
+          text: question.text,
+          img: question.img ? question.img : '',
+        }
         : undefined
   )
 
   const { data: answers } = useGetAcceptedAnswersByQuestionId(
-    selectedQuestion.id
+    selectedQuestion?.id
   )
 
-  const { mutate: deleteQuestion } = useDeleteQuestion(() => {})
+  const { mutate: deleteQuestion } = useDeleteQuestion(() => { })
 
   useEffect(() => {
     if (question && answers) {
@@ -108,6 +96,10 @@ export function QuestionConstructor({
       return
     }
 
+    if (!selectedQuestion) {
+      return
+    }
+
     updateQuestion({
       gameId,
       id: selectedQuestion.id,
@@ -115,17 +107,23 @@ export function QuestionConstructor({
       text,
     })
 
-    updateAcceptedAnswers(
-      answers.map(({ answerText }) => ({
-        questionId: selectedQuestion.id,
-        text: answerText,
-      }))
-    )
+    updateAcceptedAnswers({
+      questionId: selectedQuestion.id,
+      newAnswers: answers.map(({ answerText }) => ({ text: answerText, questionId: selectedQuestion.id })),
+    })
   }
 
   const handleDelete = () => {
+    if (!selectedQuestion) {
+      return
+    }
+
     deleteQuestion(selectedQuestion.id)
     setSelectedQuestion(undefined)
+  }
+
+  if (!selectedQuestion) {
+    return null
   }
 
   return (

@@ -22,7 +22,7 @@ export function MainWindow() {
 
   const { mutate: postNewGame } = usePostAddNewGame({
     handleSuccess: (id: string) => {
-      navigate(`/clone-kahoot/${id}/admin`)
+      navigate(`/${id}/admin`)
     },
   })
 
@@ -36,7 +36,7 @@ export function MainWindow() {
     try {
       await axiosInstance.get(`/active-game/${gameId}`)
 
-      navigate(`/clone-kahoot/${gameId}/player`)
+      navigate(`/${gameId}/player`)
     } catch (e: any) {
       toast(e.response.data)
     }
@@ -60,7 +60,7 @@ export function MainWindow() {
 
     queryClient.invalidateQueries({ queryKey: ['games'] })
 
-    navigate('/clone-kahoot/')
+    navigate('/')
   }
 
   return (

@@ -66,7 +66,7 @@ export function ActiveQuiz({ gameId }: { gameId: string }) {
                   className={cn(
                     'w-full truncate',
                     activeQuestion?.id === id &&
-                      buttonVariants({ variant: 'secondary' })
+                    buttonVariants({ variant: 'secondary' })
                   )}
                 >
                   Question {index + 1}
@@ -103,7 +103,7 @@ export function ActiveQuiz({ gameId }: { gameId: string }) {
           </Button>
 
           {isShowWinners && (
-            <Link className={cn(buttonVariants())} to="/clone-kahoot/home">
+            <Link className={cn(buttonVariants())} to="/home">
               Home
             </Link>
           )}

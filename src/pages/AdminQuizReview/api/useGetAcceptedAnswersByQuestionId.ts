@@ -4,7 +4,7 @@ import { AcceptedAnswer } from "@/types/AcceptedAnswer"
 import { AxiosError } from "axios"
 import { toast } from "react-toastify"
 
-export const getAcceptedAnswersByQuestionId = async (questionId: string) => {
+const getAcceptedAnswersByQuestionId = async (questionId: string) => {
   try {
     const query = new URLSearchParams({ questionId })
     const questionData = await axiosInstance.get<AcceptedAnswer[]>(
@@ -29,7 +29,7 @@ export const useGetAcceptedAnswersByQuestionId = <T = AcceptedAnswer[]>(
 ) =>
   useQuery({
     enabled: Boolean(questionId),
-    queryKey: ["accepted-answers", questionId!],
+    queryKey: ["accepted-answers", questionId],
     queryFn: () => getAcceptedAnswersByQuestionId(questionId!),
     select,
   })

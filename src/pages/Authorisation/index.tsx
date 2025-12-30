@@ -8,25 +8,21 @@ import {
 } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import { useUserAuthorize } from '@/useUserAuthorize'
 import { useForm } from 'react-hook-form'
 import { useNavigate } from 'react-router'
 
 type UserForm = { name: string; password: string }
 const defaultValues = { name: '', password: '' }
 
-type Props = {
-  updateUserCredentials: (
-    creds: { name: string; password: string },
-    onSuccess?: (args: any) => void
-  ) => Promise<void>
-}
-
-export function Authorisation({ updateUserCredentials }: Props) {
+export function Authorisation() {
   const { register, handleSubmit } = useForm({ defaultValues })
+  const { updateUserCredentials } = useUserAuthorize()
+
   const navigate = useNavigate()
 
   const onSubmit = (data: UserForm) => {
-    updateUserCredentials(data, () => navigate('/clone-kahoot/home'))
+    updateUserCredentials(data, () => navigate('/home'))
   }
 
   return (
@@ -57,7 +53,7 @@ export function Authorisation({ updateUserCredentials }: Props) {
                 {...register('password', { required: true })}
               />
             </Label>
-            <Button>Enter</Button>
+            <Button type="submit">Enter</Button>
           </form>
         </CardContent>
       </Card>

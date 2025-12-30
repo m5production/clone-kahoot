@@ -55,7 +55,7 @@ export const useUserAuthorize = () => {
         return
       }
 
-      navigate('/clone-kahoot/home')
+      navigate('/home')
     }
 
     authUser()

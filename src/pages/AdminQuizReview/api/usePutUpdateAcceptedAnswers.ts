@@ -18,23 +18,21 @@ export const putUpdateAcceptedAnswers = async (
   return questionData.data
 }
 
-export const usePutUpdateAcceptedAnswers = (questionId: string) => {
+type MutateVars = { questionId: string; newAnswers: RawAcceptedAnswer[] }
+
+export const usePutUpdateAcceptedAnswers = () => {
   const queryClient = useQueryClient()
 
-  return useMutation({
-    mutationFn: (updatedAcceptedAnswers: RawAcceptedAnswer[]) =>
-      putUpdateAcceptedAnswers(questionId, updatedAcceptedAnswers),
-    onSuccess: () => {
+  return useMutation<AcceptedAnswer[], AxiosError, MutateVars>({
+    mutationFn: ({ questionId, newAnswers }) =>
+      putUpdateAcceptedAnswers(questionId, newAnswers),
+    onSuccess: (_, { questionId }) => {
       queryClient.invalidateQueries({
         queryKey: ["accepted-answers", questionId],
       })
     },
     onError: (e) => {
-      if (!(e instanceof AxiosError)) {
-        toast(e.message)
-      } else {
-        toast(String(e.response?.data))
-      }
+      toast(String(e.response?.data))
     },
   })
 }
