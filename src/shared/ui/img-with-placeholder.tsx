@@ -1,4 +1,4 @@
-import { memo, useEffect, useState } from "react"
+import { memo, useState } from "react"
 import { cn } from "@/shared/lib"
 
 function ImgWithPlaceholder(
@@ -7,11 +7,10 @@ function ImgWithPlaceholder(
     HTMLImageElement
   >
 ) {
-  const [isShowImg, setIsShowImg] = useState(false)
-
-  useEffect(() => {
-    setIsShowImg(false)
-  }, [props.src])
+  // The loaded source, not a flag: a new `src` shows the placeholder again without an effect
+  // that could run after a fast (cached) image has already loaded and hide it for good
+  const [loadedSrc, setLoadedSrc] = useState<string>()
+  const isShowImg = loadedSrc !== undefined && loadedSrc === props.src
 
   return (
     <>
@@ -28,7 +27,7 @@ function ImgWithPlaceholder(
             props.onLoad(e)
           }
 
-          setIsShowImg(true)
+          setLoadedSrc(props.src)
         }}
         className={cn(props.className, !isShowImg && "hidden")}
       />
