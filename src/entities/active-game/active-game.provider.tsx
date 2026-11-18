@@ -1,5 +1,5 @@
-import { PropsWithChildren, useEffect, useState } from 'react'
-import { getSocket } from '@/shared/api'
+import { PropsWithChildren, useEffect, useRef, useState } from 'react'
+import { createSocket } from '@/shared/api'
 import type { Player, PlayerAnswer } from '@/entities/player' // FSD: cross import
 import type { ActiveGameQuestion } from '@/entities/question' // FSD: cross import
 import { ActiveGameContext } from './active-game.context'
@@ -33,13 +33,13 @@ export function ActiveGameProvider({
     null
   )
 
+  const onWinnersShownRef = useRef(onWinnersShown)
+  onWinnersShownRef.current = onWinnersShown
+
+  // One connection per mounted game screen: a new mount joins the game again, and leaving the
+  // screen disconnects (the backend ends the game when the host disconnects)
   useEffect(() => {
-    const socket = getSocket()
-
-    if (socket.onopen) {
-      return
-    }
-
+    const socket = createSocket()
     const send: SendMessage = (message) => socket.send(JSON.stringify(message))
 
     socket.onopen = () => {
@@ -54,7 +54,7 @@ export function ActiveGameProvider({
 
       switch (message.type) {
         case 'SHOW_WINNERS':
-          if (role === 'player') onWinnersShown?.()
+          if (role === 'player') onWinnersShownRef.current?.()
           return
         case 'SHOW_ANSWERS':
           setPlayerAnswers(message.payload)
@@ -70,7 +70,15 @@ export function ActiveGameProvider({
     socket.onclose = () => {
       console.log('WebSocket closed')
     }
-  }, [])
+
+    return () => {
+      socket.onopen = null
+      socket.onmessage = null
+      socket.onclose = null
+      socket.close()
+      setSendMessage(null)
+    }
+  }, [role, gameId, userId])
 
   useEffect(() => {
     setPlayerAnswers(null)

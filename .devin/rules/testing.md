@@ -58,8 +58,10 @@ Commands: `bun run test` (unit + component), `test:unit`, `test:browser`, `test:
 - Set test data up through `api`, not the UI; the UI flow itself is tested once in its own spec.
 - The backend keeps **one global active game** → live-game specs live in `e2e/live-game/` and run in
   the `live-game` project with `workers: 1`. A test that needs "no game running" goes first in its file.
-- A new question has no accepted answers. The editor form starts with one empty answer field and
-  resets when the question loads — wait for that (answer list count) before typing.
+- The question editor resets when the selected question loads: wait for
+  `question-form` `aria-busy="false"` before typing. A new question shows one empty answer field.
+- Each game screen (`ActiveGameProvider`) opens its own WebSocket and closes it on unmount; the
+  backend ends the game when the host's socket closes (leaving the host page ends the game).
 - Locate elements by `data-testid` (see `test-ids.md`), scoped by container; check texts only where
   the text is the requirement. Web-first assertions only, no `waitForTimeout`.
 

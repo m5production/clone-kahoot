@@ -119,6 +119,55 @@ test.describe('live game', () => {
     await expect(alice.page).toHaveURL('/home')
   })
 
+  test('host and player play a second quiz without reloading the tab', async ({
+    signIn,
+    api,
+  }) => {
+    const host = await signIn('host')
+    const first = await api.createGame(host.user.id)
+    await api.createQuestion(first.id, 'First quiz?', ['1'])
+    const second = await api.createGame(host.user.id)
+    await api.createQuestion(second.id, 'Second quiz?', ['2'])
+    const player = await signIn('player')
+
+    await startGame(host, first.id)
+    await joinGame(player, first.id)
+    await expect(player.page.getByTestId('question-view')).toHaveText('First quiz?')
+    await host.page.getByTestId('show-winners-button').click()
+    await expect(player.page).toHaveURL(`/${first.id}/player/winners`)
+    await host.page.getByTestId('stop-game-button').click()
+
+    // Only in-app navigation from here on: the tab keeps its JavaScript state
+    await host.page.getByTestId('home-link').click()
+    await host.page.getByTestId(`game-item-${second.id}`).getByTestId('game-link').click()
+    await host.page.getByTestId('start-game-link').click()
+    await expect(host.page.getByTestId('question-view')).toHaveText('Second quiz?')
+
+    await player.page.getByTestId('home-link').click()
+    await player.page.getByTestId('join-game-input').fill(second.id)
+    await player.page.getByTestId('join-game-submit-button').click()
+    await expect(player.page).toHaveURL(`/${second.id}/player`)
+    await expect(player.page.getByTestId('question-view')).toHaveText('Second quiz?')
+    await expect(host.page.getByTestId(`player-item-${player.user.id}`)).toBeVisible()
+  })
+
+  test('a host leaving the game page ends the game', async ({ signIn, api }) => {
+    const host = await signIn('host')
+    const game = await api.createGame(host.user.id)
+    await api.createQuestion(game.id, '2+2?', ['4'])
+    await startGame(host, game.id)
+    await expect(host.page.getByTestId('question-view')).toHaveText('2+2?')
+
+    await host.page.goBack()
+    await expect(host.page).toHaveURL(`/${game.id}/admin`)
+
+    const player = await signIn('player')
+    await player.page.goto('/home')
+    await player.page.getByTestId('join-game-input').fill(game.id)
+    await player.page.getByTestId('join-game-submit-button').click()
+    await expect(player.page.getByText('There is no active game at the moment')).toBeVisible()
+  })
+
   test('a player cannot join another quiz while one is running', async ({ signIn, api }) => {
     const host = await signIn('host')
     const running = await api.createGame(host.user.id)
