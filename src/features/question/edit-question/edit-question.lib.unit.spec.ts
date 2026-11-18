@@ -23,11 +23,11 @@ describe('toQuestionFormValues', () => {
     })
   })
 
-  it('uses an empty image field and no answers for a fresh question', () => {
+  it('gives a fresh question an empty image field and one empty answer field', () => {
     expect(toQuestionFormValues({ text: '', img: null }, [])).toEqual({
       text: '',
       img: '',
-      answers: [],
+      answers: [{ answerText: '' }],
     })
   })
 })

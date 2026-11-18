@@ -48,7 +48,8 @@ Keep this list in sync with `src/` — add/rename/remove rows in the same change
 | Shared game UI (entities) | `question-view`, `players-panel` → `players-list` → `player-item-<playerId>`, `player-answers-list` → `player-answer-item-<playerId>`, `winners-table` → `winner-row-<playerId>` |
 | Winners (`pages/winners`) | `winners-table`, `home-link` |
 
-A new question has no accepted answers: the form shows no `accepted-answer-item-*` until
-`add-answer-button` is clicked. Wait for the form data to load before typing — it resets the form.
+`question-form` has `aria-busy="true"` until the selected question is loaded into it — wait for
+`aria-busy="false"` before typing, loading resets the form. A question without accepted answers
+(e.g. a new one) shows one empty `accepted-answer-item-0`.
 
 Pass ids through components as a `data-testid` prop. On rename/removal update all specs in the same change.

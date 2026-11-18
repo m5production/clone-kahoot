@@ -25,13 +25,14 @@ test.describe('quiz editor', () => {
 
     const form = questionForm(page)
     await expect(form.getByRole('heading', { name: 'Question #1' })).toBeVisible()
-    // A new question has no accepted answers yet; wait until the form has loaded it
-    await expect(form.getByTestId('accepted-answers-list').getByRole('listitem')).toHaveCount(0)
+    await expect(form).toHaveAttribute('aria-busy', 'false')
     await expect(questionItems(page)).toHaveCount(1)
+    // A new question comes with one empty answer field
+    await expect(form.getByTestId('accepted-answers-list').getByRole('listitem')).toHaveCount(1)
+    await expect(answerInput(page, 0)).toHaveValue('')
 
     await form.getByTestId('question-image-input').fill(PIXEL)
     await form.getByTestId('question-text-input').fill('Capital of France?')
-    await form.getByTestId('add-answer-button').click()
     await answerInput(page, 0).fill('Paris')
     await form.getByTestId('add-answer-button').click()
     await answerInput(page, 1).fill('paris')
@@ -43,6 +44,7 @@ test.describe('quiz editor', () => {
     await page.reload()
     await questionItems(page).first().click()
 
+    await expect(form).toHaveAttribute('aria-busy', 'false')
     await expect(form.getByTestId('question-text-input')).toHaveValue('Capital of France?')
     await expect(form.getByTestId('question-image-input')).toHaveValue(PIXEL)
     await expect(form.getByRole('img', { name: 'Question illustration' })).toBeVisible()
@@ -57,6 +59,7 @@ test.describe('quiz editor', () => {
     await page.goto(`/${game.id}/admin`)
 
     await page.getByTestId(`question-item-${question.id}`).click()
+    await expect(questionForm(page)).toHaveAttribute('aria-busy', 'false')
     await expect(answerInput(page, 0)).toHaveValue('4')
 
     await questionForm(page).getByTestId('question-text-input').fill('Two plus two?')
@@ -87,15 +90,17 @@ test.describe('quiz editor', () => {
     const question = await api.createQuestion(game.id, '', [])
     await page.goto(`/${game.id}/admin`)
     await page.getByTestId(`question-item-${question.id}`).click()
-    // The empty form starts with one answer field; none means the question has loaded
-    await expect(
-      questionForm(page).getByTestId('accepted-answers-list').getByRole('listitem')
-    ).toHaveCount(0)
+    await expect(questionForm(page)).toHaveAttribute('aria-busy', 'false')
 
     await questionForm(page).getByTestId('save-question-button').click()
     await expect(questionForm(page).getByText('Question text must present')).toBeVisible()
+    await expect(questionForm(page).getByText('Empty answer is not accepted')).toBeVisible()
 
     await questionForm(page).getByTestId('question-text-input').fill('2+2?')
+    await questionForm(page)
+      .getByTestId('accepted-answer-item-0')
+      .getByTestId('remove-answer-button')
+      .click()
     await questionForm(page).getByTestId('save-question-button').click()
     await expect(
       questionForm(page).getByText('There should be at least one correct answer')

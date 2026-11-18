@@ -31,6 +31,7 @@ const renderForm = async (answers: AcceptedAnswer[]) => {
   )
   const form = screen.getByTestId('question-form')
 
+  await expect.element(form).toHaveAttribute('aria-busy', 'false')
   await expect.element(form.getByTestId('question-text-input')).toHaveValue('2+2?')
 
   return form
@@ -68,9 +69,26 @@ describe('EditQuestionForm', () => {
     ])
   })
 
+  it('offers one empty answer field for a question without accepted answers', async () => {
+    vi.mocked(updateQuestion).mockResolvedValue(question)
+    vi.mocked(replaceAcceptedAnswers).mockResolvedValue([])
+    const form = await renderForm([])
+
+    await expect.element(answerInput(form, 0)).toHaveValue('')
+    await expect.element(form.getByTestId('accepted-answer-item-1')).not.toBeInTheDocument()
+
+    await answerInput(form, 0).fill('4')
+    await form.getByTestId('save-question-button').click()
+
+    await expect
+      .poll(() => vi.mocked(replaceAcceptedAnswers).mock.calls)
+      .toEqual([['q1', [{ text: '4', questionId: 'q1' }]]])
+  })
+
   it('requires at least one accepted answer', async () => {
     const form = await renderForm([])
 
+    await form.getByTestId('accepted-answer-item-0').getByTestId('remove-answer-button').click()
     await form.getByTestId('save-question-button').click()
 
     await expect

@@ -16,13 +16,16 @@ export const EMPTY_QUESTION_FORM: QuestionFormValues = {
   answers: [{ answerText: '' }],
 }
 
+/** A question without accepted answers yet (e.g. a new one) gets one empty answer field to fill */
 export const toQuestionFormValues = (
   question: Pick<Question, 'text' | 'img'>,
   answers: Pick<AcceptedAnswer, 'text'>[]
 ): QuestionFormValues => ({
   text: question.text,
   img: question.img ?? '',
-  answers: answers.map(({ text }) => ({ answerText: text })),
+  answers: answers.length
+    ? answers.map(({ text }) => ({ answerText: text }))
+    : EMPTY_QUESTION_FORM.answers,
 })
 
 export const toQuestionPayload = (

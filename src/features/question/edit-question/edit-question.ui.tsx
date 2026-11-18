@@ -1,4 +1,4 @@
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { useFieldArray, useForm } from 'react-hook-form'
 import { useQuery } from '@tanstack/react-query'
 import { toast } from 'react-toastify'
@@ -52,9 +52,13 @@ export function EditQuestionForm({
 
   const imageUrl = watch('img')
 
+  // The question whose data the form shows; until then the form is busy and edits would be lost
+  const [filledQuestionId, setFilledQuestionId] = useState<string>()
+
   useEffect(() => {
     if (question && answers) {
       reset(toQuestionFormValues(question, answers))
+      setFilledQuestionId(question.id)
     }
   }, [question, answers])
 
@@ -91,6 +95,7 @@ export function EditQuestionForm({
   return (
     <form
       data-testid="question-form"
+      aria-busy={filledQuestionId !== questionId}
       {...props}
       onSubmit={handleSubmit(handleSave)}
     >
