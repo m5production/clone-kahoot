@@ -88,5 +88,18 @@ export default tseslint.config(
     rules: {
       "no-restricted-imports": ["error", { patterns: PUBLIC_API_PATTERNS }],
     },
+  },
+  {
+    // Test helpers are never hot-reloaded
+    files: ["src/shared/test/**/*.tsx"],
+    rules: { "react-refresh/only-export-components": "off" },
+  },
+  {
+    // Playwright fixtures: `use` is not a React hook, `{}` is how a fixture declares no dependencies
+    files: ["e2e/**/*.ts"],
+    rules: {
+      "react-hooks/rules-of-hooks": "off",
+      "no-empty-pattern": "off",
+    },
   }
 )

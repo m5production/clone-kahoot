@@ -1,4 +1,5 @@
-export { useActiveGame } from './active-game.context'
+export { ActiveGameContext, useActiveGame } from './active-game.context'
+export { createActiveGameState } from './active-game.fixtures'
 export {
   buildJoinMessage,
   getActiveQuestion,

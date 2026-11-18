@@ -24,3 +24,7 @@ dist-ssr
 *.sw?
 .qodo
 .env
+
+# Tests
+e2e/.tmp
+.vitest
