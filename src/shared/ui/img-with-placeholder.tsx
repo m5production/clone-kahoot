@@ -1,5 +1,5 @@
 import { memo, useEffect, useState } from "react"
-import { cn } from "@/lib/utils"
+import { cn } from "@/shared/lib"
 
 function ImgWithPlaceholder(
   props: React.DetailedHTMLProps<
@@ -36,4 +36,6 @@ function ImgWithPlaceholder(
   )
 }
 
-export default memo(ImgWithPlaceholder)
+const MemoImgWithPlaceholder = memo(ImgWithPlaceholder)
+
+export { MemoImgWithPlaceholder as ImgWithPlaceholder }

@@ -8,7 +8,9 @@
     "build": "tsc -b && vite build",
     "lint": "eslint .",
     "preview": "vite preview",
-    "deploy": "gh-pages -d dist"
+    "deploy": "gh-pages -d dist",
+    "lint:circular": "dpdm --no-warning --no-tree --tsconfig tsconfig.app.json --exit-code circular:1 src/main.tsx",
+    "check": "bun run lint && bun run lint:circular && bun run build"
   },
   "dependencies": {
     "@radix-ui/react-label": "^2.1.2",
@@ -34,6 +36,7 @@
     "@types/react": "^19.0.10",
     "@types/react-dom": "^19.0.4",
     "@vitejs/plugin-react-swc": "^3.8.0",
+    "dpdm": "4.3.0",
     "eslint": "^9.21.0",
     "eslint-plugin-react-hooks": "^5.1.0",
     "eslint-plugin-react-refresh": "^0.4.19",

@@ -1,0 +1,14 @@
+export interface Question {
+  id: string
+  gameId: string
+  text: string
+  img: string | null
+}
+
+export interface RawQuestion {
+  gameId: string
+  text: string
+  img?: string
+}
+
+export type ActiveGameQuestion = Pick<Question, 'id' | 'img' | 'text'>
