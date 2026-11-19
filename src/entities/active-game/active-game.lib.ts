@@ -28,13 +28,13 @@ export const parseServerMessage = (raw: string): ServerMessage | null => {
 }
 
 export const getActiveQuestion = (
-  game: Pick<ActiveGame, 'allQuestions' | 'activeQuestionId'>
+  game: Pick<ActiveGame, 'allQuestions' | 'activeQuestionId'>,
 ): ActiveGameQuestion | null =>
   game.allQuestions.find(({ id }) => id === game.activeQuestionId) ?? null
 
 export const buildJoinMessage = (
   role: ActiveGameRole,
-  gameId: string
+  gameId: string,
 ): ClientMessage =>
   role === 'host'
     ? { type: 'START_GAME', payload: { gameId } }

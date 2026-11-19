@@ -9,5 +9,5 @@ if (!rootElement) throw new Error('Root element #root is missing in index.html')
 createRoot(rootElement).render(
   <StrictMode>
     <App />
-  </StrictMode>
+  </StrictMode>,
 )

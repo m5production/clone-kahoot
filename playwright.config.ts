@@ -1,6 +1,11 @@
 import path from 'node:path'
 import { defineConfig, devices } from '@playwright/test'
-import { E2E_API_URL, E2E_APP_URL, E2E_BACKEND_PORT, E2E_WS_URL } from './e2e/support/urls'
+import {
+  E2E_API_URL,
+  E2E_APP_URL,
+  E2E_BACKEND_PORT,
+  E2E_WS_URL,
+} from './e2e/support/urls'
 
 const BACKEND_DIR = path.resolve(import.meta.dirname, '../backend')
 const E2E_TMP_DIR = path.resolve(import.meta.dirname, 'e2e/.tmp')
@@ -19,7 +24,10 @@ export default defineConfig({
   outputDir: `${E2E_TMP_DIR}/test-results`,
   fullyParallel: true,
   forbidOnly: true,
-  reporter: [['list'], ['html', { outputFolder: `${E2E_TMP_DIR}/report`, open: 'never' }]],
+  reporter: [
+    ['list'],
+    ['html', { outputFolder: `${E2E_TMP_DIR}/report`, open: 'never' }],
+  ],
   use: {
     ...devices['Desktop Chrome'],
     baseURL: E2E_APP_URL,

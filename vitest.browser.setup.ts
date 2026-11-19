@@ -5,7 +5,9 @@ import '@/app/styles/index.css'
 
 beforeEach(() => {
   // Seeded query data is used as is: no background refetch hits the network
-  queryClient.setDefaultOptions({ queries: { staleTime: Infinity, retry: false } })
+  queryClient.setDefaultOptions({
+    queries: { staleTime: Infinity, retry: false },
+  })
 })
 
 afterEach(() => {

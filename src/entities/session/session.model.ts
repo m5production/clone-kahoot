@@ -13,7 +13,8 @@ export const getSessionUserId = () => localStorage.getItem(USER_ID_STORAGE_KEY)
 export const saveSessionUserId = (userId: string) =>
   localStorage.setItem(USER_ID_STORAGE_KEY, userId)
 
-export const clearSessionUserId = () => localStorage.removeItem(USER_ID_STORAGE_KEY)
+export const clearSessionUserId = () =>
+  localStorage.removeItem(USER_ID_STORAGE_KEY)
 
 export const isAuthenticated = () => Boolean(getSessionToken())
 

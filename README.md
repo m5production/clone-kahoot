@@ -54,6 +54,6 @@ In development the app talks to `http://localhost:3000`; production builds use t
 |---|---|
 | `bun run dev` | Start the Vite dev server |
 | `bun run build` | Type-check and build for production |
-| `bun run lint` | Run ESLint |
+| `bun run lint` | Run Biome (lint + format check) |
 | `bun run preview` | Preview the production build |
 | `bun run deploy` | Publish `dist` to GitHub Pages |

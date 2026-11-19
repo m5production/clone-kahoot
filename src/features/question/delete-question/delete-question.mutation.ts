@@ -1,5 +1,4 @@
 import { useMutation } from '@tanstack/react-query'
-import { notifyApiError } from '@/shared/api'
 import {
   ACCEPTED_ANSWERS_QUERY,
   deleteAcceptedAnswers,
@@ -9,6 +8,7 @@ import {
   GAME_QUESTIONS_QUERY,
   QUESTION_QUERY,
 } from '@/entities/question'
+import { notifyApiError } from '@/shared/api'
 
 const deleteQuestionWithAnswers = async (questionId: string) => {
   const [question] = await Promise.all([

@@ -1,7 +1,9 @@
 import { expect, test } from './support/fixtures'
 
 test.describe('games', () => {
-  test('the host creates a quiz and finds it on the home page', async ({ signIn }) => {
+  test('the host creates a quiz and finds it on the home page', async ({
+    signIn,
+  }) => {
     const { page } = await signIn('creator')
     await page.goto('/home')
 
@@ -22,7 +24,10 @@ test.describe('games', () => {
   test('the home page lists only the own quizzes', async ({ signIn, api }) => {
     const owner = await signIn('owner')
     const other = await signIn('other')
-    const ownGames = [await api.createGame(owner.user), await api.createGame(owner.user)]
+    const ownGames = [
+      await api.createGame(owner.user),
+      await api.createGame(owner.user),
+    ]
     const foreignGame = await api.createGame(other.user)
 
     await owner.page.goto('/home')

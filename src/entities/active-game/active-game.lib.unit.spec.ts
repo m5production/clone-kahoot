@@ -18,15 +18,19 @@ const game: ActiveGame = {
 
 describe('parseServerMessage', () => {
   it('parses every known message type', () => {
-    expect(parseServerMessage(JSON.stringify({ type: 'GAME_DATA', payload: game }))).toEqual({
+    expect(
+      parseServerMessage(JSON.stringify({ type: 'GAME_DATA', payload: game })),
+    ).toEqual({
       type: 'GAME_DATA',
       payload: game,
     })
     expect(
-      parseServerMessage('{"type":"SHOW_WINNERS","payload":{"standings":[]}}')
+      parseServerMessage('{"type":"SHOW_WINNERS","payload":{"standings":[]}}'),
     ).toEqual({ type: 'SHOW_WINNERS', payload: { standings: [] } })
     expect(
-      parseServerMessage('{"type":"FAULT","payload":{"code":"X","message":"No game"}}')
+      parseServerMessage(
+        '{"type":"FAULT","payload":{"code":"X","message":"No game"}}',
+      ),
     ).toEqual({
       type: 'FAULT',
       payload: { code: 'X', message: 'No game' },
@@ -52,7 +56,9 @@ describe('getActiveQuestion', () => {
 
   it('returns null when nothing is active or the id is unknown', () => {
     expect(getActiveQuestion({ ...game, activeQuestionId: null })).toBeNull()
-    expect(getActiveQuestion({ ...game, activeQuestionId: 'missing' })).toBeNull()
+    expect(
+      getActiveQuestion({ ...game, activeQuestionId: 'missing' }),
+    ).toBeNull()
   })
 })
 

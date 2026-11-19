@@ -22,7 +22,9 @@ class FakeSocket {
   }
 
   receive(message: ServerMessage) {
-    this.onmessage?.(new MessageEvent('message', { data: JSON.stringify(message) }))
+    this.onmessage?.(
+      new MessageEvent('message', { data: JSON.stringify(message) }),
+    )
   }
 
   sentMessages() {
@@ -44,7 +46,9 @@ const useFakeSockets = () => {
 
 const game: ActiveGame = {
   id: 'g1',
-  players: [{ id: 'u1', name: 'alice', bgColor: '#000', answers: [], connected: true }],
+  players: [
+    { id: 'u1', name: 'alice', bgColor: '#000', answers: [], connected: true },
+  ],
   allQuestions: [{ id: 'q1', text: '2+2?', img: null }],
   activeQuestionId: 'q1',
 }
@@ -63,7 +67,7 @@ const renderProvider = (role: 'host' | 'player', onWinnersShown = vi.fn()) =>
   render(
     <ActiveGameProvider role={role} gameId="g1" onWinnersShown={onWinnersShown}>
       <GameProbe />
-    </ActiveGameProvider>
+    </ActiveGameProvider>,
   )
 
 describe('ActiveGameProvider', () => {
@@ -74,10 +78,14 @@ describe('ActiveGameProvider', () => {
     if (!socket) throw new Error('no socket was created')
 
     socket.open()
-    expect(socket.sentMessages()).toEqual([{ type: 'START_GAME', payload: { gameId: 'g1' } }])
+    expect(socket.sentMessages()).toEqual([
+      { type: 'START_GAME', payload: { gameId: 'g1' } },
+    ])
 
     socket.receive({ type: 'GAME_DATA', payload: game })
-    await expect.element(screen.getByTestId('probe')).toHaveTextContent('2+2? / 1 players')
+    await expect
+      .element(screen.getByTestId('probe'))
+      .toHaveTextContent('2+2? / 1 players')
   })
 
   it('connects a player and reports the winners', async () => {
@@ -108,7 +116,8 @@ describe('ActiveGameProvider', () => {
 
     await renderProvider('host')
     const secondSocket = sockets.at(-1)
-    if (!secondSocket || secondSocket === firstSocket) throw new Error('no new socket was created')
+    if (!secondSocket || secondSocket === firstSocket)
+      throw new Error('no new socket was created')
 
     secondSocket.open()
     expect(secondSocket.sentMessages()).toEqual([

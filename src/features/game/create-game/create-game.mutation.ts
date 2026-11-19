@@ -1,6 +1,6 @@
 import { useMutation } from '@tanstack/react-query'
-import { notifyApiError } from '@/shared/api'
 import { createGame, GAMES_QUERY, type Game } from '@/entities/game'
+import { notifyApiError } from '@/shared/api'
 
 export const useCreateGameMutation = (onCreated: (game: Game) => void) =>
   useMutation({

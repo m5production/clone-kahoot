@@ -11,12 +11,12 @@ export const fetchAcceptedAnswers = async (questionId: string) => {
 
 export const replaceAcceptedAnswers = async (
   questionId: string,
-  answers: RawAcceptedAnswer[]
+  answers: RawAcceptedAnswer[],
 ) => {
   const { data } = await httpClient.put<AcceptedAnswer[]>(
     '/accepted-answers/',
     answers.map(({ text }) => ({ text })),
-    { params: { questionId } }
+    { params: { questionId } },
   )
 
   return data
@@ -25,7 +25,7 @@ export const replaceAcceptedAnswers = async (
 export const deleteAcceptedAnswers = async (questionId: string) => {
   const { data } = await httpClient.delete<{ count: number }>(
     '/accepted-answers',
-    { params: { questionId } }
+    { params: { questionId } },
   )
 
   return data

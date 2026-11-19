@@ -1,11 +1,11 @@
 import { useMutation } from '@tanstack/react-query'
-import { notifyApiError } from '@/shared/api'
 import {
   ACCEPTED_ANSWERS_QUERY,
-  replaceAcceptedAnswers,
   type RawAcceptedAnswer,
+  replaceAcceptedAnswers,
 } from '@/entities/accepted-answer'
 import { QUESTION_QUERY, updateQuestion } from '@/entities/question'
+import { notifyApiError } from '@/shared/api'
 
 export const useUpdateQuestionMutation = () =>
   useMutation({

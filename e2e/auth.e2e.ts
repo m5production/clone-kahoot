@@ -23,7 +23,11 @@ test.describe('authorisation', () => {
     await expect(page.getByTestId('games-empty')).toBeVisible()
   })
 
-  test('an existing user logs in with the right password', async ({ page, api, uniqueName }) => {
+  test('an existing user logs in with the right password', async ({
+    page,
+    api,
+    uniqueName,
+  }) => {
     const user = await api.createUser(uniqueName('returning'), 'right')
 
     await page.goto('/')
@@ -43,7 +47,9 @@ test.describe('authorisation', () => {
     await page.goto('/')
     await submitLogin(page, user.name, 'wrong')
 
-    await expect(page.getByText('There is a user with such a name')).toBeVisible()
+    await expect(
+      page.getByText('There is a user with such a name'),
+    ).toBeVisible()
     await expect(page).toHaveURL('/')
   })
 
@@ -64,7 +70,9 @@ test.describe('authorisation', () => {
     await expect(page.getByTestId('user-avatar')).toHaveText(user.name)
   })
 
-  test('pages behind the login redirect a guest to the login page', async ({ page }) => {
+  test('pages behind the login redirect a guest to the login page', async ({
+    page,
+  }) => {
     for (const path of ['/home', '/some-game/admin', '/some-game/player']) {
       await page.goto(path)
       await expect(page.getByTestId('login-form')).toBeVisible()

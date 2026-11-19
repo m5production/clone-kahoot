@@ -17,14 +17,20 @@ describe('QuestionView', () => {
     const screen = await render(<QuestionView text="Whose flag?" img={PIXEL} />)
 
     await expect
-      .element(screen.getByRole('img', { name: 'Image illustrating the question: Whose flag?' }))
+      .element(
+        screen.getByRole('img', {
+          name: 'Image illustrating the question: Whose flag?',
+        }),
+      )
       .toBeVisible()
-    await expect.element(screen.getByText('Image is loading...')).not.toBeInTheDocument()
+    await expect
+      .element(screen.getByText('Image is loading...'))
+      .not.toBeInTheDocument()
   })
 
   it('keeps the placeholder while the image is loading', async () => {
     const screen = await render(
-      <QuestionView text="Slow" img="http://127.0.0.1:9/never-loads.png" />
+      <QuestionView text="Slow" img="http://127.0.0.1:9/never-loads.png" />,
     )
 
     await expect.element(screen.getByText('Image is loading...')).toBeVisible()

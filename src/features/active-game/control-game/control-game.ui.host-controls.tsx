@@ -1,8 +1,8 @@
 import { useState } from 'react'
 import { Link } from 'react-router'
+import { useActiveGame } from '@/entities/active-game'
 import { cn } from '@/shared/lib'
 import { Button, buttonVariants } from '@/shared/ui'
-import { useActiveGame } from '@/entities/active-game'
 
 const COPY_CONFIRMATION_MS = 3000
 
@@ -12,7 +12,11 @@ type Props = {
   onWinnersShown: () => void
 }
 
-export function HostControls({ gameId, isWinnersShown, onWinnersShown }: Props) {
+export function HostControls({
+  gameId,
+  isWinnersShown,
+  onWinnersShown,
+}: Props) {
   const { sendMessage, activeQuestion } = useActiveGame()
   const [isCopyConfirmationShown, setIsCopyConfirmationShown] = useState(false)
 
@@ -81,7 +85,11 @@ export function HostControls({ gameId, isWinnersShown, onWinnersShown }: Props) 
       </Button>
 
       {isWinnersShown && (
-        <Link data-testid="home-link" className={cn(buttonVariants())} to="/home">
+        <Link
+          data-testid="home-link"
+          className={cn(buttonVariants())}
+          to="/home"
+        >
           Home
         </Link>
       )}

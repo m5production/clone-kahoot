@@ -1,8 +1,8 @@
-import { PropsWithChildren, useEffect, useRef, useState } from 'react'
+import { type PropsWithChildren, useEffect, useRef, useState } from 'react'
 import { toast } from 'react-toastify'
-import { createSocket, getApiErrorMessage } from '@/shared/api'
 import type { Player, PlayerAnswer, PlayerScore } from '@/entities/player' // FSD: cross import
 import type { ActiveGameQuestion } from '@/entities/question' // FSD: cross import
+import { createSocket, getApiErrorMessage } from '@/shared/api'
 import { ActiveGameContext } from './active-game.context'
 import {
   buildJoinMessage,
@@ -29,7 +29,7 @@ export function ActiveGameProvider({
     useState<ActiveGameQuestion | null>(null)
   const [sendMessage, setSendMessage] = useState<SendMessage | null>(null)
   const [playerAnswers, setPlayerAnswers] = useState<PlayerAnswer[] | null>(
-    null
+    null,
   )
   const [standings, setStandings] = useState<PlayerScore[] | null>(null)
 

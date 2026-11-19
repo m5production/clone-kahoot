@@ -1,4 +1,5 @@
 import { useNavigate } from 'react-router'
+import { LoginForm } from '@/features/session/login'
 import {
   Card,
   CardContent,
@@ -6,7 +7,6 @@ import {
   CardHeader,
   CardTitle,
 } from '@/shared/ui'
-import { LoginForm } from '@/features/session/login'
 
 export function LoginPage() {
   const navigate = useNavigate()

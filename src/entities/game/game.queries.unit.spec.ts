@@ -1,6 +1,6 @@
-import { afterEach, describe, expect, it, vi } from 'vitest'
 import { AxiosError } from 'axios'
 import { toast } from 'react-toastify'
+import { afterEach, describe, expect, it, vi } from 'vitest'
 import { queryClient } from '@/shared/api'
 import { fetchGames } from './game.api'
 import { GAMES_QUERY } from './game.queries'
@@ -17,13 +17,17 @@ describe('GAMES_QUERY', () => {
     const games = [{ id: 'g1', adminId: 'u1' }]
     vi.mocked(fetchGames).mockResolvedValue(games)
 
-    await expect(queryClient.fetchQuery(GAMES_QUERY.queryOptions())).resolves.toEqual(games)
+    await expect(
+      queryClient.fetchQuery(GAMES_QUERY.queryOptions()),
+    ).resolves.toEqual(games)
   })
 
   it('shows an API error and falls back to an empty list', async () => {
     vi.mocked(fetchGames).mockRejectedValue(new AxiosError('Network Error'))
 
-    await expect(queryClient.fetchQuery(GAMES_QUERY.queryOptions())).resolves.toEqual([])
+    await expect(
+      queryClient.fetchQuery(GAMES_QUERY.queryOptions()),
+    ).resolves.toEqual([])
     expect(toast).toHaveBeenCalledWith('Network Error')
   })
 
@@ -31,7 +35,7 @@ describe('GAMES_QUERY', () => {
     vi.mocked(fetchGames).mockRejectedValue(new TypeError('bug'))
 
     await expect(
-      queryClient.fetchQuery({ ...GAMES_QUERY.queryOptions(), retry: false })
+      queryClient.fetchQuery({ ...GAMES_QUERY.queryOptions(), retry: false }),
     ).rejects.toThrow('bug')
   })
 })

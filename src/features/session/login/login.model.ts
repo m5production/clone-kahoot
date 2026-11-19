@@ -1,5 +1,4 @@
 import { useEffect } from 'react'
-import { notifyApiError } from '@/shared/api'
 import {
   clearSession,
   getSessionToken,
@@ -7,6 +6,7 @@ import {
   saveSessionUserId,
 } from '@/entities/session'
 import type { UserCredentials } from '@/entities/user'
+import { notifyApiError } from '@/shared/api'
 import { fetchSessionUser, loginOrRegister } from './login.service'
 
 export const useLogin = (onLoggedIn: () => void) => {

@@ -18,7 +18,10 @@ export const fetchCurrentUser = async () => {
 }
 
 export const authenticateUser = async (credentials: UserCredentials) => {
-  const { data } = await httpClient.post<AuthResponse>('/users/auth', credentials)
+  const { data } = await httpClient.post<AuthResponse>(
+    '/users/auth',
+    credentials,
+  )
 
   return data
 }

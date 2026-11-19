@@ -9,7 +9,7 @@ Backend lives in the sibling repo `../backend` (NestJS + WebSocket + Prisma/Post
 
 - `bun run dev` — Vite dev server on :5173 (backend must run on `http://localhost:3000`; its CORS allows only `http://localhost:5173`)
 - `bun run build` — `tsc -b && vite build`
-- `bun run lint` — ESLint, including FSD import rules (layers, public API, no `../` across slices)
+- `bun run lint` — Biome (`biome check`: lint + format + import sorting), including FSD import rules (layers, public API, no `../` across slices); `bun run lint:fix` applies fixes
 - `bun run lint:circular` — dpdm, fails on circular imports
 - `bun run test` — unit + component tests (Vitest); `test:unit`, `test:browser`, `test:watch`
 - `bun run test:e2e` — Playwright e2e; starts its own backend (:3101, fresh DB) and Vite (:5174); `test:e2e:ui` for the UI mode
@@ -38,4 +38,4 @@ Three tiers, local only, no CI yet — rules: `.devin/rules/testing.md`, test id
 One-time setup: `bunx playwright install chromium` and backend deps in `../backend` (see above).
 Playwright **>= 1.65** is required on this machine (Ubuntu 26.04); 1.57 can't install Chromium here.
 
-Keep the current stack (react-router, ESLint, React Context/TanStack Query). Do not introduce TanStack Router, Jotai, Biome, Storybook, MSW, Sentry or i18n without an explicit decision.
+Keep the current stack (react-router, Biome, React Context/TanStack Query). Do not introduce TanStack Router, Jotai, ESLint/Prettier, Storybook, MSW, Sentry or i18n without an explicit decision.

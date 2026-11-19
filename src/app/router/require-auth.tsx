@@ -1,4 +1,4 @@
-import { JSX, useEffect, useState } from 'react'
+import { type JSX, useEffect, useState } from 'react'
 import { Navigate } from 'react-router'
 import { isAuthenticated } from '@/entities/session'
 

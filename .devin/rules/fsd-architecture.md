@@ -30,7 +30,7 @@ Imports go **downward only**: `app → pages → widgets → features → entiti
 - No import cycles.
 - Inside a slice use relative `./` imports; across slices use `@/` (no `../`).
 
-Enforced by `bun run lint` (`no-restricted-imports` per layer in `eslint.config.js`) and
+Enforced by `bun run lint` (`noRestrictedImports` per layer in `biome.json`) and
 `bun run lint:circular` (dpdm). The one-way rule for entity cross-imports is checked by dpdm only.
 
 ## Public API

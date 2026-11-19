@@ -16,7 +16,7 @@ export function UserAvatar({ userId, className, ...props }: Props) {
       title={user?.name}
       className={cn(
         'fixed top-4 left-4 border-3 px-2 max-w-40 truncate bg-white rounded-xl',
-        className
+        className,
       )}
     >
       {user?.name}

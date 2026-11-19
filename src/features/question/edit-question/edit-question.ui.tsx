@@ -1,16 +1,16 @@
+import { useQuery } from '@tanstack/react-query'
 import { useEffect, useState } from 'react'
 import { useFieldArray, useForm } from 'react-hook-form'
-import { useQuery } from '@tanstack/react-query'
 import { toast } from 'react-toastify'
-import { Button, ImgWithPlaceholder, Input, Label } from '@/shared/ui'
 import { ACCEPTED_ANSWERS_QUERY } from '@/entities/accepted-answer'
 import { QUESTION_QUERY } from '@/entities/question'
+import { Button, ImgWithPlaceholder, Input, Label } from '@/shared/ui'
 import {
   EMPTY_QUESTION_FORM,
+  type QuestionFormValues,
   toAcceptedAnswersPayload,
   toQuestionFormValues,
   toQuestionPayload,
-  type QuestionFormValues,
 } from './edit-question.lib'
 import {
   useReplaceAcceptedAnswersMutation,
@@ -32,7 +32,7 @@ export function EditQuestionForm({
 
   const { data: question } = useQuery(QUESTION_QUERY.queryOptions(questionId))
   const { data: answers } = useQuery(
-    ACCEPTED_ANSWERS_QUERY.queryOptions(questionId)
+    ACCEPTED_ANSWERS_QUERY.queryOptions(questionId),
   )
 
   const {
@@ -81,7 +81,7 @@ export function EditQuestionForm({
         onSuccess: () => {
           toast.success('Accepted answers updated successfully')
         },
-      }
+      },
     )
   }
 

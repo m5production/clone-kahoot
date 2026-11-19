@@ -1,9 +1,9 @@
 import { useEffect, useRef, useState } from 'react'
 import { useForm } from 'react-hook-form'
-import { Button, Input } from '@/shared/ui'
 import { useActiveGame } from '@/entities/active-game'
 import { findPlayerAnswer } from '@/entities/player'
 import { getSessionUserId } from '@/entities/session'
+import { Button, Input } from '@/shared/ui'
 
 interface AnswerValues {
   answer: string
@@ -35,7 +35,9 @@ export function SubmitAnswerForm() {
     const currentAnswer = activeQuestion
       ? findPlayerAnswer(currentPlayer, activeQuestion.id)
       : undefined
-    const remembered = activeQuestion ? (myAnswers.current.get(activeQuestion.id) ?? '') : ''
+    const remembered = activeQuestion
+      ? (myAnswers.current.get(activeQuestion.id) ?? '')
+      : ''
 
     reset({ answer: remembered })
     setIsQuestionAnswered(Boolean(currentAnswer ?? remembered))

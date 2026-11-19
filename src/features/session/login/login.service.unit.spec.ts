@@ -1,6 +1,6 @@
-import { describe, expect, it, vi } from 'vitest'
 import { AxiosError, AxiosHeaders } from 'axios'
 import { toast } from 'react-toastify'
+import { describe, expect, it, vi } from 'vitest'
 import { authenticateUser, createUser, fetchCurrentUser } from '@/entities/user'
 import { fetchSessionUser, loginOrRegister } from './login.service'
 
@@ -32,7 +32,9 @@ describe('loginOrRegister', () => {
   })
 
   it('registers the user when the credentials are rejected', async () => {
-    vi.mocked(authenticateUser).mockRejectedValue(httpError(401, 'Invalid name or password'))
+    vi.mocked(authenticateUser).mockRejectedValue(
+      httpError(401, 'Invalid name or password'),
+    )
     vi.mocked(createUser).mockResolvedValue(alice)
 
     await expect(loginOrRegister(credentials)).resolves.toEqual(alice)
@@ -65,7 +67,9 @@ describe('fetchSessionUser', () => {
   })
 
   it('returns null when the session is invalid', async () => {
-    vi.mocked(fetchCurrentUser).mockRejectedValue(httpError(401, 'Authentication required'))
+    vi.mocked(fetchCurrentUser).mockRejectedValue(
+      httpError(401, 'Authentication required'),
+    )
 
     await expect(fetchSessionUser()).resolves.toBeNull()
   })

@@ -1,5 +1,5 @@
-import { test as base, type BrowserContext, type Page } from '@playwright/test'
-import { createApi, type Api, type TestUser } from './api'
+import { type BrowserContext, test as base, type Page } from '@playwright/test'
+import { type Api, createApi, type TestUser } from './api'
 
 export interface Actor {
   user: TestUser
@@ -24,7 +24,9 @@ export const test = base.extend<Fixtures>({
   uniqueName: async ({}, use, testInfo) => {
     const runId = Date.now().toString(36)
 
-    await use((prefix) => `${prefix}-${runId}-${testInfo.workerIndex}-${++nameCounter}`)
+    await use(
+      (prefix) => `${prefix}-${runId}-${testInfo.workerIndex}-${++nameCounter}`,
+    )
   },
 
   signIn: async ({ browser, api, uniqueName }, use) => {
@@ -37,12 +39,15 @@ export const test = base.extend<Fixtures>({
 
       // The app's session: the bearer token and the remembered user id (seeded once per
       // tab, so a logout inside the test is not undone by the next navigation)
-      await context.addInitScript(([userId, token]) => {
-        if (sessionStorage.getItem('e2e-session-seeded')) return
-        localStorage.setItem('userId', userId)
-        localStorage.setItem('sessionToken', token)
-        sessionStorage.setItem('e2e-session-seeded', 'true')
-      }, [user.id, user.token])
+      await context.addInitScript(
+        ([userId, token]) => {
+          if (sessionStorage.getItem('e2e-session-seeded')) return
+          localStorage.setItem('userId', userId)
+          localStorage.setItem('sessionToken', token)
+          sessionStorage.setItem('e2e-session-seeded', 'true')
+        },
+        [user.id, user.token],
+      )
 
       return { user, page: await context.newPage() }
     })

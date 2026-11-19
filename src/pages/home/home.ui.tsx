@@ -1,12 +1,12 @@
 import { useQuery } from '@tanstack/react-query'
 import { Link } from 'react-router'
-import { Card } from '@/shared/ui'
 import { GAMES_QUERY } from '@/entities/game'
 import { getSessionUserId } from '@/entities/session'
 import { UserAvatar } from '@/entities/user'
 import { CreateGameButton } from '@/features/game/create-game'
 import { JoinGameForm } from '@/features/game/join-game'
 import { LogoutButton } from '@/features/session/logout'
+import { Card } from '@/shared/ui'
 
 export function HomePage() {
   const { data: games } = useQuery(GAMES_QUERY.queryOptions())

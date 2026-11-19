@@ -2,8 +2,8 @@ import { describe, expect, it, vi } from 'vitest'
 import { render } from 'vitest-browser-react'
 import {
   ActiveGameContext,
-  createActiveGameState,
   type ActiveGameState,
+  createActiveGameState,
 } from '@/entities/active-game'
 import { saveSessionUserId } from '@/entities/session'
 import { SubmitAnswerForm } from './submit-answer.ui'
@@ -12,7 +12,7 @@ const renderForm = (state: ActiveGameState) =>
   render(
     <ActiveGameContext.Provider value={state}>
       <SubmitAnswerForm />
-    </ActiveGameContext.Provider>
+    </ActiveGameContext.Provider>,
   )
 
 describe('SubmitAnswerForm', () => {
@@ -41,7 +41,9 @@ describe('SubmitAnswerForm', () => {
     await expect
       .element(screen.getByText(/It is not allowed to submit empty answer/))
       .toBeVisible()
-    await expect.element(screen.getByTestId('answer-input')).toHaveAttribute('aria-invalid', 'true')
+    await expect
+      .element(screen.getByTestId('answer-input'))
+      .toHaveAttribute('aria-invalid', 'true')
     expect(sendMessage).not.toHaveBeenCalled()
   })
 
@@ -58,10 +60,12 @@ describe('SubmitAnswerForm', () => {
             connected: true,
           },
         ],
-      })
+      }),
     )
 
     await expect.element(screen.getByTestId('answer-input')).toBeDisabled()
-    await expect.element(screen.getByTestId('submit-answer-button')).toBeDisabled()
+    await expect
+      .element(screen.getByTestId('submit-answer-button'))
+      .toBeDisabled()
   })
 })

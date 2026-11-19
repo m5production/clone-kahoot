@@ -1,16 +1,16 @@
 import { describe, expect, it, vi } from 'vitest'
-import { renderWithProviders } from '@/shared/test'
 import {
   ActiveGameContext,
-  createActiveGameState,
   type ActiveGameState,
+  createActiveGameState,
 } from '@/entities/active-game'
+import { renderWithProviders } from '@/shared/test'
 import { HostControls } from './control-game.ui.host-controls'
 import { QuestionSwitcher } from './control-game.ui.question-switcher'
 
 const renderInGame = (state: ActiveGameState, ui: React.ReactNode) =>
   renderWithProviders(
-    <ActiveGameContext.Provider value={state}>{ui}</ActiveGameContext.Provider>
+    <ActiveGameContext.Provider value={state}>{ui}</ActiveGameContext.Provider>,
   )
 
 describe('QuestionSwitcher', () => {
@@ -18,11 +18,15 @@ describe('QuestionSwitcher', () => {
     const sendMessage = vi.fn()
     const screen = await renderInGame(
       createActiveGameState({ sendMessage }),
-      <QuestionSwitcher />
+      <QuestionSwitcher />,
     )
 
-    const first = screen.getByTestId('host-question-item-q1').getByTestId('switch-question-button')
-    const second = screen.getByTestId('host-question-item-q2').getByTestId('switch-question-button')
+    const first = screen
+      .getByTestId('host-question-item-q1')
+      .getByTestId('switch-question-button')
+    const second = screen
+      .getByTestId('host-question-item-q2')
+      .getByTestId('switch-question-button')
 
     await expect.element(first).toHaveAttribute('aria-current', 'true')
     await expect.element(second).toHaveTextContent('Question 2')
@@ -46,7 +50,7 @@ describe('HostControls', () => {
         gameId="g1"
         isWinnersShown={isWinnersShown}
         onWinnersShown={onWinnersShown}
-      />
+      />,
     )
 
     return { screen, sendMessage, onWinnersShown }
@@ -69,19 +73,29 @@ describe('HostControls', () => {
     await expect.element(screen.getByTestId('stop-game-button')).toBeDisabled()
     await screen.getByTestId('show-winners-button').click()
 
-    expect(sendMessage).toHaveBeenCalledWith({ type: 'SHOW_WINNERS', payload: null })
+    expect(sendMessage).toHaveBeenCalledWith({
+      type: 'SHOW_WINNERS',
+      payload: null,
+    })
     expect(onWinnersShown).toHaveBeenCalledOnce()
   })
 
   it('lets the host stop the game and go home after the winners', async () => {
     const { screen, sendMessage } = await renderControls(true)
 
-    await expect.element(screen.getByTestId('show-winners-button')).toBeDisabled()
+    await expect
+      .element(screen.getByTestId('show-winners-button'))
+      .toBeDisabled()
     await screen.getByTestId('stop-game-button').click()
 
-    expect(sendMessage).toHaveBeenCalledWith({ type: 'END_GAME', payload: null })
+    expect(sendMessage).toHaveBeenCalledWith({
+      type: 'END_GAME',
+      payload: null,
+    })
 
     await screen.getByTestId('home-link').click()
-    await expect.element(screen.getByTestId('test-location')).toHaveTextContent('/home')
+    await expect
+      .element(screen.getByTestId('test-location'))
+      .toHaveTextContent('/home')
   })
 })

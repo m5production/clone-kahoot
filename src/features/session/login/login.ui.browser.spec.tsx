@@ -22,7 +22,11 @@ const renderForm = async () => {
 
 describe('LoginForm', () => {
   it('logs in, remembers the user and reports success', async () => {
-    vi.mocked(loginOrRegister).mockResolvedValue({ id: 'u1', name: 'alice', token: 't1' })
+    vi.mocked(loginOrRegister).mockResolvedValue({
+      id: 'u1',
+      name: 'alice',
+      token: 't1',
+    })
     const { screen, onLoggedIn } = await renderForm()
 
     await screen.getByTestId('login-name-input').fill('alice')
@@ -30,7 +34,10 @@ describe('LoginForm', () => {
     await screen.getByTestId('login-submit-button').click()
 
     await expect.poll(() => onLoggedIn.mock.calls.length).toBe(1)
-    expect(loginOrRegister).toHaveBeenCalledWith({ name: 'alice', password: 'secret' })
+    expect(loginOrRegister).toHaveBeenCalledWith({
+      name: 'alice',
+      password: 'secret',
+    })
     expect(getSessionUserId()).toBe('u1')
     expect(getSessionToken()).toBe('t1')
   })
@@ -42,7 +49,9 @@ describe('LoginForm', () => {
     await screen.getByTestId('login-submit-button').click()
 
     // react-hook-form focuses the first invalid field once validation has failed
-    await expect.element(screen.getByTestId('login-password-input')).toHaveFocus()
+    await expect
+      .element(screen.getByTestId('login-password-input'))
+      .toHaveFocus()
     expect(loginOrRegister).not.toHaveBeenCalled()
     expect(onLoggedIn).not.toHaveBeenCalled()
   })

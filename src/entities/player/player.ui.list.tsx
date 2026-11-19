@@ -24,7 +24,7 @@ export function Players({
               data-testid={`player-answer-item-${playerId}`}
               className={cn(
                 'rounded-full px-2 border-2 border-current bg-red-300',
-                playerAnswer?.isCorrect && 'bg-green-400'
+                playerAnswer?.isCorrect && 'bg-green-400',
               )}
             >
               <span className="font-semibold">{playerName}:</span>{' '}
@@ -44,7 +44,7 @@ export function Players({
                   'rounded-xl p-2 text-white',
                   activeQuestionId &&
                     hasAnsweredQuestion(player, activeQuestionId) &&
-                    'ring-amber-400 ring-8'
+                    'ring-amber-400 ring-8',
                 )}
                 style={{ backgroundColor: player.bgColor }}
               >

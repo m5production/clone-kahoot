@@ -1,5 +1,5 @@
-import { Button } from '@/shared/ui'
 import type { Question } from '@/entities/question'
+import { Button } from '@/shared/ui'
 import { useCreateQuestionMutation } from './create-question.mutation'
 
 type Props = {

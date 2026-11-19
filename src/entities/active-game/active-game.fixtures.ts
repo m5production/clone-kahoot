@@ -1,7 +1,7 @@
 import type { ActiveGameState } from './active-game.types'
 
 export const createActiveGameState = (
-  overrides: Partial<ActiveGameState> = {}
+  overrides: Partial<ActiveGameState> = {},
 ): ActiveGameState => ({
   players: [],
   allQuestions: [

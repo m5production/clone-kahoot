@@ -1,4 +1,3 @@
-import { isUnauthorizedError, notifyApiError } from '@/shared/api'
 import {
   authenticateUser,
   createUser,
@@ -6,6 +5,7 @@ import {
   type User,
   type UserCredentials,
 } from '@/entities/user'
+import { isUnauthorizedError, notifyApiError } from '@/shared/api'
 
 const authenticateOrNull = async (credentials: UserCredentials) => {
   try {

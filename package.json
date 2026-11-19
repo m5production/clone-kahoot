@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
-    "lint": "eslint .",
+    "lint": "biome check",
     "preview": "vite preview",
     "deploy": "gh-pages -d dist",
     "lint:circular": "dpdm --no-warning --no-tree --tsconfig tsconfig.app.json --exit-code circular:1 src/main.tsx",
@@ -17,7 +17,8 @@
     "test:watch": "vitest",
     "test:e2e": "playwright test",
     "test:e2e:ui": "playwright test --ui",
-    "test:all": "vitest run && playwright test"
+    "test:all": "vitest run && playwright test",
+    "lint:fix": "biome check --write"
   },
   "dependencies": {
     "@radix-ui/react-label": "^2.1.2",
@@ -38,7 +39,7 @@
     "tw-animate-css": "^1.2.4"
   },
   "devDependencies": {
-    "@eslint/js": "^9.21.0",
+    "@biomejs/biome": "2.6.7",
     "@playwright/test": "1.65.0",
     "@types/node": "^22.13.13",
     "@types/react": "^19.0.10",
@@ -47,15 +48,10 @@
     "@vitest/browser": "5.1.0",
     "@vitest/browser-playwright": "5.1.0",
     "dpdm": "4.3.0",
-    "eslint": "^9.21.0",
-    "eslint-plugin-react-hooks": "^5.1.0",
-    "eslint-plugin-react-refresh": "^0.4.19",
     "gh-pages": "^6.3.0",
-    "globals": "^15.15.0",
     "happy-dom": "21.0.4",
     "playwright": "1.65.0",
     "typescript": "~5.7.2",
-    "typescript-eslint": "^8.24.1",
     "vite": "^6.2.0",
     "vitest": "5.1.0",
     "vitest-browser-react": "2.3.0"

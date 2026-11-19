@@ -1,0 +1,332 @@
+{
+  "$schema": "https://biomejs.dev/schemas/2.6.7/schema.json",
+  "vcs": {
+    "enabled": true,
+    "clientKind": "git",
+    "useIgnoreFile": true
+  },
+  "files": {
+    "includes": [
+      "**",
+      "!dist",
+      "!e2e/.tmp",
+      "!.vitest",
+      "!managed_context",
+      "!**/*.md"
+    ]
+  },
+  "formatter": {
+    "enabled": true,
+    "indentStyle": "space",
+    "indentWidth": 2,
+    "lineWidth": 80
+  },
+  "javascript": {
+    "formatter": {
+      "quoteStyle": "single",
+      "jsxQuoteStyle": "double",
+      "semicolons": "asNeeded",
+      "trailingCommas": "all"
+    }
+  },
+  "css": {
+    "parser": {
+      "tailwindDirectives": true
+    },
+    "formatter": {
+      "quoteStyle": "single"
+    }
+  },
+  "linter": {
+    "enabled": true,
+    "rules": {
+      "preset": "recommended",
+      "a11y": {
+        "useValidAriaRole": {
+          "level": "error",
+          "options": { "ignoreNonDom": true }
+        }
+      },
+      "correctness": {
+        "useExhaustiveDependencies": "off",
+        "useHookAtTopLevel": "error"
+      },
+      "style": {
+        "useComponentExportOnlyModules": {
+          "level": "warn",
+          "options": { "allowConstantExport": true }
+        }
+      },
+      "suspicious": {
+        "noExplicitAny": "off"
+      }
+    }
+  },
+  "assist": {
+    "enabled": true,
+    "actions": {
+      "source": {
+        "organizeImports": "on"
+      }
+    }
+  },
+  "overrides": [
+    {
+      "includes": ["src/app/**/*.ts", "src/app/**/*.tsx"],
+      "linter": {
+        "rules": {
+          "style": {
+            "noRestrictedImports": {
+              "level": "error",
+              "options": {
+                "patterns": [
+                  {
+                    "group": [
+                      "@/pages/*/*",
+                      "@/widgets/*/*",
+                      "@/features/*/*/*",
+                      "@/entities/*/*",
+                      "@/shared/*/*"
+                    ],
+                    "message": "Import a slice through its public API (index.ts)."
+                  },
+                  {
+                    "group": ["../**"],
+                    "message": "Use the @/ alias to import from another slice."
+                  }
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "includes": ["src/pages/**/*.ts", "src/pages/**/*.tsx"],
+      "linter": {
+        "rules": {
+          "style": {
+            "noRestrictedImports": {
+              "level": "error",
+              "options": {
+                "patterns": [
+                  {
+                    "group": [
+                      "@/pages/*/*",
+                      "@/widgets/*/*",
+                      "@/features/*/*/*",
+                      "@/entities/*/*",
+                      "@/shared/*/*"
+                    ],
+                    "message": "Import a slice through its public API (index.ts)."
+                  },
+                  {
+                    "group": ["../**"],
+                    "message": "Use the @/ alias to import from another slice."
+                  },
+                  {
+                    "group": ["@/app", "@/app/**", "@/pages", "@/pages/**"],
+                    "message": "FSD: \"pages\" may import only from the layers below it."
+                  }
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "includes": ["src/widgets/**/*.ts", "src/widgets/**/*.tsx"],
+      "linter": {
+        "rules": {
+          "style": {
+            "noRestrictedImports": {
+              "level": "error",
+              "options": {
+                "patterns": [
+                  {
+                    "group": [
+                      "@/pages/*/*",
+                      "@/widgets/*/*",
+                      "@/features/*/*/*",
+                      "@/entities/*/*",
+                      "@/shared/*/*"
+                    ],
+                    "message": "Import a slice through its public API (index.ts)."
+                  },
+                  {
+                    "group": ["../**"],
+                    "message": "Use the @/ alias to import from another slice."
+                  },
+                  {
+                    "group": [
+                      "@/app",
+                      "@/app/**",
+                      "@/pages",
+                      "@/pages/**",
+                      "@/widgets",
+                      "@/widgets/**"
+                    ],
+                    "message": "FSD: \"widgets\" may import only from the layers below it."
+                  }
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "includes": ["src/features/**/*.ts", "src/features/**/*.tsx"],
+      "linter": {
+        "rules": {
+          "style": {
+            "noRestrictedImports": {
+              "level": "error",
+              "options": {
+                "patterns": [
+                  {
+                    "group": [
+                      "@/pages/*/*",
+                      "@/widgets/*/*",
+                      "@/features/*/*/*",
+                      "@/entities/*/*",
+                      "@/shared/*/*"
+                    ],
+                    "message": "Import a slice through its public API (index.ts)."
+                  },
+                  {
+                    "group": ["../**"],
+                    "message": "Use the @/ alias to import from another slice."
+                  },
+                  {
+                    "group": [
+                      "@/app",
+                      "@/app/**",
+                      "@/pages",
+                      "@/pages/**",
+                      "@/widgets",
+                      "@/widgets/**",
+                      "@/features",
+                      "@/features/**"
+                    ],
+                    "message": "FSD: \"features\" may import only from the layers below it."
+                  }
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "includes": ["src/entities/**/*.ts", "src/entities/**/*.tsx"],
+      "linter": {
+        "rules": {
+          "style": {
+            "noRestrictedImports": {
+              "level": "error",
+              "options": {
+                "patterns": [
+                  {
+                    "group": [
+                      "@/pages/*/*",
+                      "@/widgets/*/*",
+                      "@/features/*/*/*",
+                      "@/entities/*/*",
+                      "@/shared/*/*"
+                    ],
+                    "message": "Import a slice through its public API (index.ts)."
+                  },
+                  {
+                    "group": ["../**"],
+                    "message": "Use the @/ alias to import from another slice."
+                  },
+                  {
+                    "group": [
+                      "@/app",
+                      "@/app/**",
+                      "@/pages",
+                      "@/pages/**",
+                      "@/widgets",
+                      "@/widgets/**",
+                      "@/features",
+                      "@/features/**"
+                    ],
+                    "message": "FSD: \"entities\" may import only from the layers below it."
+                  }
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "includes": ["src/shared/**/*.ts", "src/shared/**/*.tsx"],
+      "linter": {
+        "rules": {
+          "style": {
+            "noRestrictedImports": {
+              "level": "error",
+              "options": {
+                "patterns": [
+                  {
+                    "group": [
+                      "@/pages/*/*",
+                      "@/widgets/*/*",
+                      "@/features/*/*/*",
+                      "@/entities/*/*",
+                      "@/shared/*/*"
+                    ],
+                    "message": "Import a slice through its public API (index.ts)."
+                  },
+                  {
+                    "group": ["../**"],
+                    "message": "Use the @/ alias to import from another slice."
+                  },
+                  {
+                    "group": [
+                      "@/app",
+                      "@/app/**",
+                      "@/pages",
+                      "@/pages/**",
+                      "@/widgets",
+                      "@/widgets/**",
+                      "@/features",
+                      "@/features/**",
+                      "@/entities",
+                      "@/entities/**"
+                    ],
+                    "message": "FSD: \"shared\" may import only from the layers below it."
+                  }
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "includes": ["src/shared/test/**/*.tsx"],
+      "linter": {
+        "rules": {
+          "style": {
+            "useComponentExportOnlyModules": "off"
+          }
+        }
+      }
+    },
+    {
+      "includes": ["e2e/**/*.ts"],
+      "linter": {
+        "rules": {
+          "correctness": {
+            "noEmptyPattern": "off",
+            "useHookAtTopLevel": "off"
+          }
+        }
+      }
+    }
+  ]
+}

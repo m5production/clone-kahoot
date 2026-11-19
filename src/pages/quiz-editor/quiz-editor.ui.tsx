@@ -1,11 +1,11 @@
 import { useState } from 'react'
 import { Link, useParams } from 'react-router'
-import { cn } from '@/shared/lib'
-import { Button, buttonVariants } from '@/shared/ui'
 import { DeleteQuestionButton } from '@/features/question/delete-question'
 import { EditQuestionForm } from '@/features/question/edit-question'
-import { QuestionsSidebar } from './quiz-editor.ui.questions-sidebar'
+import { cn } from '@/shared/lib'
+import { Button, buttonVariants } from '@/shared/ui'
 import type { SelectedQuestion } from './quiz-editor.types'
+import { QuestionsSidebar } from './quiz-editor.ui.questions-sidebar'
 
 export function QuizEditorPage() {
   const { gameId } = useParams()

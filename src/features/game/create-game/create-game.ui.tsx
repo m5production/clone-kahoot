@@ -5,7 +5,7 @@ import { useCreateGameMutation } from './create-game.mutation'
 export function CreateGameButton() {
   const navigate = useNavigate()
   const { mutate: createGame } = useCreateGameMutation(({ id }) =>
-    navigate(`/${id}/admin`)
+    navigate(`/${id}/admin`),
   )
 
   return (

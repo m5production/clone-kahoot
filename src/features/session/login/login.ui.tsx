@@ -1,6 +1,6 @@
 import { useForm } from 'react-hook-form'
-import { Button, Input, Label } from '@/shared/ui'
 import type { UserCredentials } from '@/entities/user'
+import { Button, Input, Label } from '@/shared/ui'
 import { useLogin } from './login.model'
 
 const defaultValues: UserCredentials = { name: '', password: '' }

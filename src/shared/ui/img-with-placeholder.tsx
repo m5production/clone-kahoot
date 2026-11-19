@@ -1,11 +1,11 @@
-import { memo, useState } from "react"
-import { cn } from "@/shared/lib"
+import { memo, useState } from 'react'
+import { cn } from '@/shared/lib'
 
 function ImgWithPlaceholder(
   props: React.DetailedHTMLProps<
     React.ImgHTMLAttributes<HTMLImageElement>,
     HTMLImageElement
-  >
+  >,
 ) {
   // The loaded source, not a flag: a new `src` shows the placeholder again without an effect
   // that could run after a fast (cached) image has already loaded and hide it for good
@@ -20,6 +20,7 @@ function ImgWithPlaceholder(
         </div>
       )}
 
+      {/* biome-ignore lint/a11y/useAltText: alt is forwarded via {...props} */}
       <img
         {...props}
         onLoad={(e) => {
@@ -29,7 +30,7 @@ function ImgWithPlaceholder(
 
           setLoadedSrc(props.src)
         }}
-        className={cn(props.className, !isShowImg && "hidden")}
+        className={cn(props.className, !isShowImg && 'hidden')}
       />
     </>
   )

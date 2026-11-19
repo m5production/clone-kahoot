@@ -1,8 +1,8 @@
 import { useForm } from 'react-hook-form'
 import { useNavigate } from 'react-router'
+import { checkActiveGame } from '@/entities/game'
 import { notifyApiError } from '@/shared/api'
 import { Button, Input } from '@/shared/ui'
-import { checkActiveGame } from '@/entities/game'
 
 interface JoinGameValues {
   gameId: string
@@ -43,9 +43,7 @@ export function JoinGameForm() {
         </Button>
       </form>
 
-      {errors.gameId && (
-        <p className="text-red-300">{errors.gameId.message}</p>
-      )}
+      {errors.gameId && <p className="text-red-300">{errors.gameId.message}</p>}
     </>
   )
 }

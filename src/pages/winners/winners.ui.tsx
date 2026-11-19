@@ -1,8 +1,8 @@
 import { Link } from 'react-router'
-import { cn } from '@/shared/lib'
-import { buttonVariants } from '@/shared/ui'
 import { useActiveGame } from '@/entities/active-game'
 import { WinnersTable } from '@/entities/player'
+import { cn } from '@/shared/lib'
+import { buttonVariants } from '@/shared/ui'
 
 export function WinnersPage() {
   const { standings } = useActiveGame()

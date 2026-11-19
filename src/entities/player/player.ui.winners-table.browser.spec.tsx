@@ -11,7 +11,7 @@ describe('WinnersTable', () => {
           { id: 'c', name: 'Cid', score: 1 },
           { id: 'a', name: 'Ann', score: 0 },
         ]}
-      />
+      />,
     )
 
     const rows = screen.getByTestId('winners-table').getByRole('listitem')

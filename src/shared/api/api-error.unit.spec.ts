@@ -1,7 +1,11 @@
-import { describe, expect, it, vi } from 'vitest'
 import { AxiosError, AxiosHeaders } from 'axios'
 import { toast } from 'react-toastify'
-import { getApiErrorMessage, isNotFoundError, notifyApiError } from './api-error'
+import { describe, expect, it, vi } from 'vitest'
+import {
+  getApiErrorMessage,
+  isNotFoundError,
+  notifyApiError,
+} from './api-error'
 
 vi.mock('react-toastify', () => ({ toast: vi.fn() }))
 
@@ -19,7 +23,7 @@ const createAxiosError = (status?: number, data?: unknown) =>
           data,
           headers: {},
           config: { headers: new AxiosHeaders() },
-        }
+        },
   )
 
 describe('getApiErrorMessage', () => {
@@ -30,14 +34,14 @@ describe('getApiErrorMessage', () => {
           code: 'NOT_FOUND',
           message: 'User not found',
           requestId: 'r1',
-        })
-      )
+        }),
+      ),
     ).toBe('User not found')
   })
 
   it('handles a plain string body', () => {
     expect(getApiErrorMessage(createAxiosError(404, 'User not found'))).toBe(
-      'User not found'
+      'User not found',
     )
   })
 
@@ -63,7 +67,9 @@ describe('isNotFoundError', () => {
 
 describe('notifyApiError', () => {
   it('shows the error message in a toast', () => {
-    notifyApiError(createAxiosError(403, 'No game with id x is currently running'))
+    notifyApiError(
+      createAxiosError(403, 'No game with id x is currently running'),
+    )
 
     expect(toast).toHaveBeenCalledWith('No game with id x is currently running')
   })

@@ -1,9 +1,9 @@
 import { describe, expect, it } from 'vitest'
 import {
+  type QuestionFormValues,
   toAcceptedAnswersPayload,
   toQuestionFormValues,
   toQuestionPayload,
-  type QuestionFormValues,
 } from './edit-question.lib'
 
 const values: QuestionFormValues = {
@@ -15,7 +15,10 @@ const values: QuestionFormValues = {
 describe('toQuestionFormValues', () => {
   it('maps a question and its accepted answers to form values', () => {
     expect(
-      toQuestionFormValues({ text: 'Q', img: 'https://img' }, [{ text: 'A' }, { text: 'B' }])
+      toQuestionFormValues({ text: 'Q', img: 'https://img' }, [
+        { text: 'A' },
+        { text: 'B' },
+      ]),
     ).toEqual({
       text: 'Q',
       img: 'https://img',
@@ -43,7 +46,7 @@ describe('toQuestionPayload', () => {
 
   it('keeps an image url', () => {
     expect(
-      toQuestionPayload({ ...values, img: 'https://img' }, { id: 'q1' }).img
+      toQuestionPayload({ ...values, img: 'https://img' }, { id: 'q1' }).img,
     ).toBe('https://img')
   })
 })

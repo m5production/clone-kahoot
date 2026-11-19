@@ -1,4 +1,4 @@
-import { expect, type APIRequestContext } from '@playwright/test'
+import { type APIRequestContext, expect } from '@playwright/test'
 import { E2E_API_URL } from './urls'
 
 export interface TestUser {
@@ -40,7 +40,7 @@ export const createApi = (request: APIRequestContext) => ({
     user: TestUser,
     gameId: string,
     text: string,
-    acceptedAnswers: string[]
+    acceptedAnswers: string[],
   ): Promise<TestQuestion> => {
     const response = await request.post(`${E2E_API_URL}/questions`, {
       headers: authHeaders(user.token),
