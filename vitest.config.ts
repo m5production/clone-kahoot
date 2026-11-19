@@ -1,6 +1,9 @@
 import { playwright } from '@vitest/browser-playwright'
 import { defineConfig, mergeConfig } from 'vitest/config'
-import viteConfig from './vite.config'
+import viteConfigFn from './vite.config'
+
+// vite.config exports a config function so `base` can differ between dev and build
+const viteConfig = await viteConfigFn({ command: 'serve', mode: 'test' })
 
 export default mergeConfig(
   viteConfig,

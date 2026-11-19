@@ -8,7 +8,7 @@ import './styles/app.css'
 
 export function App() {
   return (
-    <BrowserRouter>
+    <BrowserRouter basename={import.meta.env.BASE_URL}>
       <QueryClientProvider client={queryClient}>
         <AppRouter />
         <ToastContainer />
