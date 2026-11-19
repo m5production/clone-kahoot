@@ -44,16 +44,16 @@ Prisma ORM → SQLite
 2. Install dependencies and start the dev server:
 
 ```bash
-npm install
-npm run dev
+bun install
+bun run dev
 ```
 
 In development the app talks to `http://localhost:3000`; production builds use the deployed backend (see `src/constants.ts`).
 
 | Script | Description |
 |---|---|
-| `npm run dev` | Start the Vite dev server |
-| `npm run build` | Type-check and build for production |
-| `npm run lint` | Run ESLint |
-| `npm run preview` | Preview the production build |
-| `npm run deploy` | Publish `dist` to GitHub Pages |
+| `bun run dev` | Start the Vite dev server |
+| `bun run build` | Type-check and build for production |
+| `bun run lint` | Run ESLint |
+| `bun run preview` | Preview the production build |
+| `bun run deploy` | Publish `dist` to GitHub Pages |
