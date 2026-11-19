@@ -2,7 +2,7 @@
 
 A real-time quiz game inspired by Kahoot: a host builds a quiz and runs it live, players join from their devices, answer questions and see the winners table at the end.
 
-**[Live demo](https://dimetriyo.github.io/clone-kahoot/)** · **[Backend repository](https://github.com/m5production/clone-kahoot-backend)**
+**[Live demo](https://m5production.github.io/clone-kahoot/)** · **[Backend repository](https://github.com/m5production/clone-kahoot-backend)**
 
 ![Clone-Kahoot screenshot](https://github.com/user-attachments/assets/779f7d60-530c-487a-9875-cbadeec15e46)
 
@@ -17,9 +17,11 @@ A real-time quiz game inspired by Kahoot: a host builds a quiz and runs it live,
 
 ## Tech stack
 
-**Frontend (this repo):** React, TypeScript, Vite, React Router, TanStack Query, React Hook Form, Axios, Tailwind CSS, shadcn/ui, React Toastify
+**Frontend (this repo):** React 19, TypeScript, Vite, React Router, TanStack Query, React Hook Form, Axios, Tailwind CSS, shadcn/ui, React Toastify — Feature-Sliced Design, Biome
 
-**Backend ([clone-kahoot-backend](https://github.com/m5production/clone-kahoot-backend)):** Node.js, Express, TypeScript, WebSocket (`ws`), Prisma ORM, SQLite, Docker, deployed on Amvera
+**Backend ([clone-kahoot-backend](https://github.com/m5production/clone-kahoot-backend)):** Node.js, NestJS (Express adapter), TypeScript, WebSocket (`ws`), Prisma ORM, PostgreSQL, Docker, deployed on Amvera
+
+**Tests:** Vitest (unit + browser mode) and Playwright e2e against the real backend
 
 ## Architecture
 
@@ -28,15 +30,19 @@ React SPA (GitHub Pages)
    │  REST (Axios + TanStack Query)   ─┐
    │  WebSocket (live game events)    ─┤
    ▼                                    ▼
-Node.js + Express API + ws server (Docker, Amvera)
+NestJS API + ws server (Docker, Amvera)
    │
    ▼
-Prisma ORM → SQLite
+Prisma ORM → PostgreSQL
 ```
 
-- `src/pages/*` — feature pages; each keeps its API hooks in an `api/` subfolder (`useGetGames`, `usePostNewQuestion`, ...)
-- `src/components/ui/` — UI primitives and `ActiveGameProvider`, which holds the WebSocket connection and live game state
-- `src/types/` — shared domain types (`Game`, `Question`, `Player`, ...)
+`src/` follows Feature-Sliced Design:
+
+- `src/app/` — application setup: router, styles
+- `src/pages/` — feature pages (home, host-game, player-game, quiz-editor, winners, login)
+- `src/features/` — user actions (control-game, submit-answer, session, game and question management)
+- `src/entities/` — domain models (`Game`, `Question`, `Player`, ...) and `ActiveGameProvider`, which holds the WebSocket connection and live game state
+- `src/shared/` — HTTP/WS clients, env config, UI primitives, test helpers
 
 ## Running locally
 
@@ -48,12 +54,14 @@ bun install
 bun run dev
 ```
 
-In development the app talks to `http://localhost:3000`; production builds use the deployed backend (see `src/constants.ts`).
+API/WS hosts come from `.env.development` / `.env.production` (`VITE_API_URL`, `VITE_WS_URL`, read in `src/shared/config/env.ts`); in development the app talks to `http://localhost:3000`.
 
 | Script | Description |
 |---|---|
 | `bun run dev` | Start the Vite dev server |
 | `bun run build` | Type-check and build for production |
 | `bun run lint` | Run Biome (lint + format check) |
+| `bun run test` | Run unit + component tests (Vitest) |
+| `bun run test:e2e` | Run Playwright e2e tests against the real backend |
 | `bun run preview` | Preview the production build |
 | `bun run deploy` | Publish `dist` to GitHub Pages |
