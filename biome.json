@@ -308,7 +308,7 @@
       }
     },
     {
-      "includes": ["src/shared/test/**/*.tsx"],
+      "includes": ["src/shared/test/**/*.tsx", "src/**/*.spec.tsx"],
       "linter": {
         "rules": {
           "style": {
