@@ -18,7 +18,7 @@ test.describe('quiz editor', () => {
     api,
   }) => {
     const { page, user } = await signIn('editor')
-    const game = await api.createGame(user.id)
+    const game = await api.createGame(user)
     await page.goto(`/${game.id}/admin`)
 
     await page.getByTestId('add-question-button').click()
@@ -54,8 +54,8 @@ test.describe('quiz editor', () => {
 
   test('the host edits a question', async ({ signIn, api }) => {
     const { page, user } = await signIn('editor')
-    const game = await api.createGame(user.id)
-    const question = await api.createQuestion(game.id, '2+2?', ['4'])
+    const game = await api.createGame(user)
+    const question = await api.createQuestion(user, game.id, '2+2?', ['4'])
     await page.goto(`/${game.id}/admin`)
 
     await page.getByTestId(`question-item-${question.id}`).click()
@@ -86,11 +86,14 @@ test.describe('quiz editor', () => {
     api,
   }) => {
     const { page, user } = await signIn('editor')
-    const game = await api.createGame(user.id)
-    const question = await api.createQuestion(game.id, '', [])
+    const game = await api.createGame(user)
+    const question = await api.createQuestion(user, game.id, '2+2?', ['4'])
     await page.goto(`/${game.id}/admin`)
     await page.getByTestId(`question-item-${question.id}`).click()
     await expect(questionForm(page)).toHaveAttribute('aria-busy', 'false')
+
+    await questionForm(page).getByTestId('question-text-input').clear()
+    await answerInput(page, 0).clear()
 
     await questionForm(page).getByTestId('save-question-button').click()
     await expect(questionForm(page).getByText('Question text must present')).toBeVisible()
@@ -110,9 +113,9 @@ test.describe('quiz editor', () => {
 
   test('the host deletes a question', async ({ signIn, api }) => {
     const { page, user } = await signIn('editor')
-    const game = await api.createGame(user.id)
-    const kept = await api.createQuestion(game.id, 'Kept', ['a'])
-    const deleted = await api.createQuestion(game.id, 'Deleted', ['b'])
+    const game = await api.createGame(user)
+    const kept = await api.createQuestion(user, game.id, 'Kept', ['a'])
+    const deleted = await api.createQuestion(user, game.id, 'Deleted', ['b'])
     await page.goto(`/${game.id}/admin`)
 
     await page.getByTestId(`question-item-${deleted.id}`).click()

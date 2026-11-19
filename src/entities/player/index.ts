@@ -1,8 +1,4 @@
-export {
-  findPlayerAnswer,
-  hasAnsweredQuestion,
-  rankPlayersByScore,
-} from './player.lib'
+export { findPlayerAnswer, hasAnsweredQuestion } from './player.lib'
 export type {
   Player,
   PlayerAnswer,

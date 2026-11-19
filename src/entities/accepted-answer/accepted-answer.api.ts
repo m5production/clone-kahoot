@@ -15,7 +15,7 @@ export const replaceAcceptedAnswers = async (
 ) => {
   const { data } = await httpClient.put<AcceptedAnswer[]>(
     '/accepted-answers/',
-    answers,
+    answers.map(({ text }) => ({ text })),
     { params: { questionId } }
   )
 
@@ -23,7 +23,7 @@ export const replaceAcceptedAnswers = async (
 }
 
 export const deleteAcceptedAnswers = async (questionId: string) => {
-  const { data } = await httpClient.delete<AcceptedAnswer[]>(
+  const { data } = await httpClient.delete<{ count: number }>(
     '/accepted-answers',
     { params: { questionId } }
   )

@@ -4,7 +4,7 @@ import { createAnswer, createPlayer } from './player.fixtures'
 import { Players } from './player.ui.list'
 
 const players = [
-  createPlayer({ id: 'a', name: 'Ann', answers: [createAnswer('q1', true, '4')] }),
+  createPlayer({ id: 'a', name: 'Ann', answers: [createAnswer('q1')] }),
   createPlayer({ id: 'b', name: 'Bob' }),
 ]
 

@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { Button, Input } from '@/shared/ui'
 import { useActiveGame } from '@/entities/active-game'
@@ -14,11 +14,13 @@ const defaultValues: AnswerValues = { answer: '' }
 export function SubmitAnswerForm() {
   const { activeQuestion, players, sendMessage } = useActiveGame()
   const [isQuestionAnswered, setIsQuestionAnswered] = useState(false)
+  // The server never returns the answer text, so the player's own answers are kept locally
+  const myAnswers = useRef(new Map<string, string>())
 
   const {
     register,
     handleSubmit,
-    formState: { isSubmitSuccessful, errors },
+    formState: { errors },
     reset,
   } = useForm({ defaultValues })
 
@@ -33,23 +35,19 @@ export function SubmitAnswerForm() {
     const currentAnswer = activeQuestion
       ? findPlayerAnswer(currentPlayer, activeQuestion.id)
       : undefined
+    const remembered = activeQuestion ? (myAnswers.current.get(activeQuestion.id) ?? '') : ''
 
-    reset({ answer: currentAnswer?.text || '' })
-    setIsQuestionAnswered(Boolean(currentAnswer))
+    reset({ answer: remembered })
+    setIsQuestionAnswered(Boolean(currentAnswer ?? remembered))
   }, [activeQuestion])
 
-  useEffect(() => {
-    reset()
-  }, [isSubmitSuccessful])
-
   const handleSend = ({ answer }: AnswerValues) => {
+    if (!activeQuestion) return
+
+    myAnswers.current.set(activeQuestion.id, answer)
     sendMessage?.({
       type: 'ANSWER_QUESTION',
-      payload: {
-        questionId: activeQuestion?.id,
-        answer,
-        playerId: getSessionUserId(),
-      },
+      payload: { questionId: activeQuestion.id, answer },
     })
   }
 

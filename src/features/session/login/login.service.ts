@@ -1,9 +1,9 @@
-import { toast } from 'react-toastify'
-import { isNotFoundError, notifyApiError } from '@/shared/api'
+import { isUnauthorizedError, notifyApiError } from '@/shared/api'
 import {
   authenticateUser,
   createUser,
-  fetchUserById,
+  fetchCurrentUser,
+  type User,
   type UserCredentials,
 } from '@/entities/user'
 
@@ -11,24 +11,21 @@ const authenticateOrNull = async (credentials: UserCredentials) => {
   try {
     return await authenticateUser(credentials)
   } catch (error) {
-    if (!isNotFoundError(error)) notifyApiError(error)
+    if (!isUnauthorizedError(error)) notifyApiError(error)
 
     return null
   }
 }
 
-/** Logs in with the credentials or registers a new user when no such user exists */
+/** Logs in with the credentials or registers a new user when the login is rejected */
 export const loginOrRegister = async (credentials: UserCredentials) =>
   (await authenticateOrNull(credentials)) ?? createUser(credentials)
 
-export const isExistingUser = async (userId: string) => {
+/** Restores the session: resolves with the current user when the stored token is valid */
+export const fetchSessionUser = async (): Promise<User | null> => {
   try {
-    await fetchUserById(userId)
-
-    return true
-  } catch (error) {
-    if (error instanceof Error) toast(error.message)
-
-    return false
+    return await fetchCurrentUser()
+  } catch {
+    return null
   }
 }

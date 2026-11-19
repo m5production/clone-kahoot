@@ -1,13 +1,10 @@
-import { rankPlayersByScore } from './player.lib'
-import type { Player } from './player.types'
+import type { PlayerScore } from './player.types'
 
 type Props = React.ComponentProps<'ul'> & {
-  players: Player[]
+  winners: PlayerScore[]
 }
 
-export function WinnersTable({ players, ...props }: Props) {
-  const winners = rankPlayersByScore(players)
-
+export function WinnersTable({ winners, ...props }: Props) {
   return (
     <ul data-testid="winners-table" {...props}>
       {winners.map(({ name, score, id }, index) => (

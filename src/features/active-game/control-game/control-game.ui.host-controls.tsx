@@ -23,9 +23,11 @@ export function HostControls({ gameId, isWinnersShown, onWinnersShown }: Props) 
   }
 
   const handleShowAnswersClick = () => {
+    if (!activeQuestion) return
+
     sendMessage?.({
       type: 'SHOW_ANSWERS',
-      payload: { questionId: activeQuestion?.id },
+      payload: { questionId: activeQuestion.id },
     })
   }
 

@@ -18,13 +18,11 @@ import {
 } from './edit-question.mutation'
 
 type Props = Omit<React.ComponentProps<'form'>, 'onSubmit'> & {
-  gameId: string
   questionId: string
   questionNumber: number
 }
 
 export function EditQuestionForm({
-  gameId,
   questionId,
   questionNumber,
   ...props
@@ -71,7 +69,7 @@ export function EditQuestionForm({
       return
     }
 
-    updateQuestion(toQuestionPayload(values, { id: questionId, gameId }), {
+    updateQuestion(toQuestionPayload(values, { id: questionId }), {
       onSuccess: () => {
         toast.success('Question updated successfully')
       },

@@ -1,6 +1,7 @@
 import { PropsWithChildren, useEffect, useRef, useState } from 'react'
-import { createSocket } from '@/shared/api'
-import type { Player, PlayerAnswer } from '@/entities/player' // FSD: cross import
+import { toast } from 'react-toastify'
+import { createSocket, getApiErrorMessage } from '@/shared/api'
+import type { Player, PlayerAnswer, PlayerScore } from '@/entities/player' // FSD: cross import
 import type { ActiveGameQuestion } from '@/entities/question' // FSD: cross import
 import { ActiveGameContext } from './active-game.context'
 import {
@@ -13,14 +14,12 @@ import type { ActiveGameRole, SendMessage } from './active-game.types'
 type Props = PropsWithChildren<{
   role: ActiveGameRole
   gameId: string
-  userId: string | null
   onWinnersShown?: () => void
 }>
 
 export function ActiveGameProvider({
   role,
   gameId,
-  userId,
   onWinnersShown,
   children,
 }: Props) {
@@ -32,6 +31,7 @@ export function ActiveGameProvider({
   const [playerAnswers, setPlayerAnswers] = useState<PlayerAnswer[] | null>(
     null
   )
+  const [standings, setStandings] = useState<PlayerScore[] | null>(null)
 
   const onWinnersShownRef = useRef(onWinnersShown)
   onWinnersShownRef.current = onWinnersShown
@@ -39,46 +39,71 @@ export function ActiveGameProvider({
   // One connection per mounted game screen: a new mount joins the game again, and leaving the
   // screen disconnects (the backend ends the game when the host disconnects)
   useEffect(() => {
-    const socket = createSocket()
-    const send: SendMessage = (message) => socket.send(JSON.stringify(message))
+    let socket: WebSocket | null = null
+    let cancelled = false
 
-    socket.onopen = () => {
-      setSendMessage(() => send)
-      send(buildJoinMessage(role, { gameId, userId }))
-    }
+    const connect = async () => {
+      try {
+        socket = await createSocket()
+      } catch (error) {
+        toast(`Could not connect to the game: ${getApiErrorMessage(error)}`)
+        return
+      }
+      if (cancelled) {
+        socket.close()
+        return
+      }
 
-    socket.onmessage = (event: MessageEvent<string>) => {
-      const message = parseServerMessage(event.data)
+      const send: SendMessage = (message) =>
+        socket?.send(JSON.stringify(message))
 
-      if (!message) return
+      socket.onopen = () => {
+        setSendMessage(() => send)
+        send(buildJoinMessage(role, gameId))
+      }
 
-      switch (message.type) {
-        case 'SHOW_WINNERS':
-          if (role === 'player') onWinnersShownRef.current?.()
-          return
-        case 'SHOW_ANSWERS':
-          setPlayerAnswers(message.payload)
-          return
-        case 'GAME_DATA':
-          setPlayers(message.payload.players)
-          setAllQuestions(message.payload.allQuestions)
-          setActiveQuestion(getActiveQuestion(message.payload))
-          return
+      socket.onmessage = (event: MessageEvent<string>) => {
+        const message = parseServerMessage(event.data)
+
+        if (!message) return
+
+        switch (message.type) {
+          case 'FAULT':
+            toast(message.payload.message)
+            return
+          case 'SHOW_WINNERS':
+            setStandings(message.payload.standings)
+            if (role === 'player') onWinnersShownRef.current?.()
+            return
+          case 'SHOW_ANSWERS':
+            setPlayerAnswers(message.payload.answers)
+            return
+          case 'GAME_DATA':
+            setPlayers(message.payload.players)
+            setAllQuestions(message.payload.allQuestions)
+            setActiveQuestion(getActiveQuestion(message.payload))
+            return
+        }
+      }
+
+      socket.onclose = () => {
+        console.log('WebSocket closed')
       }
     }
 
-    socket.onclose = () => {
-      console.log('WebSocket closed')
-    }
+    connect()
 
     return () => {
-      socket.onopen = null
-      socket.onmessage = null
-      socket.onclose = null
-      socket.close()
+      cancelled = true
+      if (socket) {
+        socket.onopen = null
+        socket.onmessage = null
+        socket.onclose = null
+        socket.close()
+      }
       setSendMessage(null)
     }
-  }, [role, gameId, userId])
+  }, [role, gameId])
 
   useEffect(() => {
     setPlayerAnswers(null)
@@ -92,6 +117,7 @@ export function ActiveGameProvider({
         playerAnswers,
         players,
         sendMessage,
+        standings,
       }}
     >
       {children}

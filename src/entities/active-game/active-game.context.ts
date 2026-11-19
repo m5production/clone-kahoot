@@ -6,6 +6,7 @@ export const ActiveGameContext = createContext<ActiveGameState>({
   allQuestions: [],
   playerAnswers: null,
   players: [],
+  standings: null,
   sendMessage: null,
 })
 

@@ -31,22 +31,24 @@ test.describe('live game', () => {
   // First: a game left running by an earlier test would answer 403 instead of 404
   test('a player cannot join a quiz that is not running', async ({ signIn, api }) => {
     const host = await signIn('host')
-    const game = await api.createGame(host.user.id)
+    const game = await api.createGame(host.user)
     const player = await signIn('player')
 
     await player.page.goto('/home')
     await player.page.getByTestId('join-game-input').fill(game.id)
     await player.page.getByTestId('join-game-submit-button').click()
 
-    await expect(player.page.getByText('There is no active game at the moment')).toBeVisible()
+    await expect(
+      player.page.getByText(`No game with id ${game.id} is currently running`)
+    ).toBeVisible()
     await expect(player.page).toHaveURL('/home')
   })
 
   test('host and two players play a quiz to the winners', async ({ signIn, api }) => {
     const host = await signIn('host')
-    const game = await api.createGame(host.user.id)
-    const q1 = await api.createQuestion(game.id, '2+2?', ['4'])
-    const q2 = await api.createQuestion(game.id, 'Capital of France?', ['Paris'])
+    const game = await api.createGame(host.user)
+    const q1 = await api.createQuestion(host.user, game.id, '2+2?', ['4'])
+    const q2 = await api.createQuestion(host.user, game.id, 'Capital of France?', ['Paris'])
     const alice = await signIn('alice')
     const bob = await signIn('bob')
 
@@ -124,10 +126,10 @@ test.describe('live game', () => {
     api,
   }) => {
     const host = await signIn('host')
-    const first = await api.createGame(host.user.id)
-    await api.createQuestion(first.id, 'First quiz?', ['1'])
-    const second = await api.createGame(host.user.id)
-    await api.createQuestion(second.id, 'Second quiz?', ['2'])
+    const first = await api.createGame(host.user)
+    await api.createQuestion(host.user, first.id, 'First quiz?', ['1'])
+    const second = await api.createGame(host.user)
+    await api.createQuestion(host.user, second.id, 'Second quiz?', ['2'])
     const player = await signIn('player')
 
     await startGame(host, first.id)
@@ -153,8 +155,8 @@ test.describe('live game', () => {
 
   test('a host leaving the game page ends the game', async ({ signIn, api }) => {
     const host = await signIn('host')
-    const game = await api.createGame(host.user.id)
-    await api.createQuestion(game.id, '2+2?', ['4'])
+    const game = await api.createGame(host.user)
+    await api.createQuestion(host.user, game.id, '2+2?', ['4'])
     await startGame(host, game.id)
     await expect(host.page.getByTestId('question-view')).toHaveText('2+2?')
 
@@ -165,14 +167,16 @@ test.describe('live game', () => {
     await player.page.goto('/home')
     await player.page.getByTestId('join-game-input').fill(game.id)
     await player.page.getByTestId('join-game-submit-button').click()
-    await expect(player.page.getByText('There is no active game at the moment')).toBeVisible()
+    await expect(
+      player.page.getByText(`No game with id ${game.id} is currently running`)
+    ).toBeVisible()
   })
 
   test('a player cannot join another quiz while one is running', async ({ signIn, api }) => {
     const host = await signIn('host')
-    const running = await api.createGame(host.user.id)
-    await api.createQuestion(running.id, '2+2?', ['4'])
-    const other = await api.createGame(host.user.id)
+    const running = await api.createGame(host.user)
+    await api.createQuestion(host.user, running.id, '2+2?', ['4'])
+    const other = await api.createGame(host.user)
     await startGame(host, running.id)
     await expect(host.page.getByTestId('question-view')).toHaveText('2+2?')
 

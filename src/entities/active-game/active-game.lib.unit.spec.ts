@@ -10,8 +10,8 @@ const game: ActiveGame = {
   id: 'game-1',
   players: [],
   allQuestions: [
-    { id: 'q1', gameId: 'game-1', text: 'First', img: null },
-    { id: 'q2', gameId: 'game-1', text: 'Second', img: 'https://img' },
+    { id: 'q1', text: 'First', img: null },
+    { id: 'q2', text: 'Second', img: 'https://img' },
   ],
   activeQuestionId: 'q2',
 }
@@ -22,13 +22,14 @@ describe('parseServerMessage', () => {
       type: 'GAME_DATA',
       payload: game,
     })
-    expect(parseServerMessage('{"type":"SHOW_WINNERS","payload":null}')).toEqual({
-      type: 'SHOW_WINNERS',
-      payload: null,
-    })
-    expect(parseServerMessage('{"type":"FAULT","payload":"No game"}')).toEqual({
+    expect(
+      parseServerMessage('{"type":"SHOW_WINNERS","payload":{"standings":[]}}')
+    ).toEqual({ type: 'SHOW_WINNERS', payload: { standings: [] } })
+    expect(
+      parseServerMessage('{"type":"FAULT","payload":{"code":"X","message":"No game"}}')
+    ).toEqual({
       type: 'FAULT',
-      payload: 'No game',
+      payload: { code: 'X', message: 'No game' },
     })
   })
 
@@ -57,16 +58,16 @@ describe('getActiveQuestion', () => {
 
 describe('buildJoinMessage', () => {
   it('starts the game for the host', () => {
-    expect(buildJoinMessage('host', { gameId: 'game-1', userId: 'u1' })).toEqual({
+    expect(buildJoinMessage('host', 'game-1')).toEqual({
       type: 'START_GAME',
       payload: { gameId: 'game-1' },
     })
   })
 
-  it('connects a player by user id', () => {
-    expect(buildJoinMessage('player', { gameId: 'game-1', userId: 'u1' })).toEqual({
+  it('connects a player to the game room', () => {
+    expect(buildJoinMessage('player', 'game-1')).toEqual({
       type: 'PLAYER_CONNECTED',
-      payload: { userId: 'u1' },
+      payload: { gameId: 'game-1' },
     })
   })
 })

@@ -34,9 +34,8 @@ describe('toQuestionFormValues', () => {
 
 describe('toQuestionPayload', () => {
   it('sends a missing image as null', () => {
-    expect(toQuestionPayload(values, { id: 'q1', gameId: 'g1' })).toEqual({
+    expect(toQuestionPayload(values, { id: 'q1' })).toEqual({
       id: 'q1',
-      gameId: 'g1',
       text: 'Capital of France?',
       img: null,
     })
@@ -44,7 +43,7 @@ describe('toQuestionPayload', () => {
 
   it('keeps an image url', () => {
     expect(
-      toQuestionPayload({ ...values, img: 'https://img' }, { id: 'q1', gameId: 'g1' }).img
+      toQuestionPayload({ ...values, img: 'https://img' }, { id: 'q1' }).img
     ).toBe('https://img')
   })
 })

@@ -3,7 +3,7 @@
 React 19 SPA (Vite, TypeScript, Tailwind v4, shadcn/Radix, TanStack Query, react-router, axios, native WebSocket).
 Package manager: **bun**. Deployed to GitHub Pages (`bun run deploy`).
 
-Backend lives in the sibling repo `../backend` (Express + WebSocket + Prisma/SQLite), product docs in `../docs`.
+Backend lives in the sibling repo `../backend` (NestJS + WebSocket + Prisma/PostgreSQL), product docs in `../docs`.
 
 ## Commands
 
@@ -16,8 +16,10 @@ Backend lives in the sibling repo `../backend` (Express + WebSocket + Prisma/SQL
 - `bun run check` — lint + lint:circular + build + Vitest; run before committing. Run `test:e2e` too when UI flows change
 
 Local backend for manual/e2e runs: in `../backend` — `npx yarn@1.22.22 install --frozen-lockfile`,
+a running PostgreSQL (`yarn db:up` when Docker is available, or set `DATABASE_URL` in `.env.development`),
 `npx dotenvx run -f .env.development -- npx prisma migrate deploy`, then `npm run dev`
 (yarn is not installed globally; don't use `prisma-migrate-dev`, it creates new migrations).
+E2E runs need `E2E_DATABASE_URL` (or a local `postgresql://postgres:postgres@localhost:5432/clone_kahoot_e2e`).
 
 API/WS hosts can be overridden with `VITE_API_URL` / `VITE_WS_URL` (see `src/shared/config/env.ts`).
 

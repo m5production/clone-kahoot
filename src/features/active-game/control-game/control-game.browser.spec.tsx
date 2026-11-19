@@ -31,7 +31,7 @@ describe('QuestionSwitcher', () => {
 
     expect(sendMessage).toHaveBeenCalledWith({
       type: 'CHANGE_QUESTION',
-      payload: { qusetionId: 'q2' },
+      payload: { questionId: 'q2' },
     })
   })
 })

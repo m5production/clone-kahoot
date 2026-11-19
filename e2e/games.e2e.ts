@@ -22,8 +22,8 @@ test.describe('games', () => {
   test('the home page lists only the own quizzes', async ({ signIn, api }) => {
     const owner = await signIn('owner')
     const other = await signIn('other')
-    const ownGames = [await api.createGame(owner.user.id), await api.createGame(owner.user.id)]
-    const foreignGame = await api.createGame(other.user.id)
+    const ownGames = [await api.createGame(owner.user), await api.createGame(owner.user)]
+    const foreignGame = await api.createGame(other.user)
 
     await owner.page.goto('/home')
 

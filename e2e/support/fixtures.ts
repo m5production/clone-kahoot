@@ -1,6 +1,5 @@
 import { test as base, type BrowserContext, type Page } from '@playwright/test'
 import { createApi, type Api, type TestUser } from './api'
-import { E2E_APP_URL } from './urls'
 
 export interface Actor {
   user: TestUser
@@ -36,14 +35,14 @@ export const test = base.extend<Fixtures>({
       const context = await browser.newContext()
       contexts.push(context)
 
-      // The app's session: the auth cookie and the remembered user id (seeded once per tab,
-      // so a logout inside the test is not undone by the next navigation)
-      await context.addCookies([{ name: 'authorization', value: user.id, url: E2E_APP_URL }])
-      await context.addInitScript((userId) => {
+      // The app's session: the bearer token and the remembered user id (seeded once per
+      // tab, so a logout inside the test is not undone by the next navigation)
+      await context.addInitScript(([userId, token]) => {
         if (sessionStorage.getItem('e2e-session-seeded')) return
         localStorage.setItem('userId', userId)
+        localStorage.setItem('sessionToken', token)
         sessionStorage.setItem('e2e-session-seeded', 'true')
-      }, user.id)
+      }, [user.id, user.token])
 
       return { user, page: await context.newPage() }
     })

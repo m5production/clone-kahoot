@@ -1,34 +1,34 @@
-import type { Player, PlayerAnswer } from '@/entities/player' // FSD: cross import
-import type { ActiveGameQuestion, Question } from '@/entities/question' // FSD: cross import
+import type { Player, PlayerAnswer, PlayerScore } from '@/entities/player' // FSD: cross import
+import type { ActiveGameQuestion } from '@/entities/question' // FSD: cross import
 
 export interface ActiveGame {
   id: string
   players: Player[]
-  allQuestions: Question[]
+  allQuestions: ActiveGameQuestion[]
   activeQuestionId: string | null
+}
+
+export interface GameFault {
+  code: string
+  message: string
 }
 
 export type ServerMessage =
   | { type: 'GAME_DATA'; payload: ActiveGame }
-  | { type: 'FAULT'; payload: string }
-  | { type: 'SHOW_ANSWERS'; payload: PlayerAnswer[] }
-  | { type: 'SHOW_WINNERS'; payload: null }
+  | { type: 'FAULT'; payload: GameFault }
+  | { type: 'SHOW_ANSWERS'; payload: { answers: PlayerAnswer[] } }
+  | { type: 'SHOW_WINNERS'; payload: { standings: PlayerScore[] } }
   | { type: 'END_GAME'; payload: null }
 
 export type ClientMessage =
   | { type: 'START_GAME'; payload: { gameId: string } }
-  | { type: 'PLAYER_CONNECTED'; payload: { userId: string | null } }
-  // `qusetionId` matches the backend protocol
-  | { type: 'CHANGE_QUESTION'; payload: { qusetionId: string } }
+  | { type: 'PLAYER_CONNECTED'; payload: { gameId: string } }
+  | { type: 'CHANGE_QUESTION'; payload: { questionId: string } }
   | {
       type: 'ANSWER_QUESTION'
-      payload: {
-        questionId: string | undefined
-        answer: string
-        playerId: string | null
-      }
+      payload: { questionId: string; answer: string }
     }
-  | { type: 'SHOW_ANSWERS'; payload: { questionId: string | undefined } }
+  | { type: 'SHOW_ANSWERS'; payload: { questionId: string } }
   | { type: 'SHOW_WINNERS'; payload: null }
   | { type: 'END_GAME'; payload: null }
 
@@ -41,5 +41,6 @@ export interface ActiveGameState {
   allQuestions: ActiveGameQuestion[]
   activeQuestion: ActiveGameQuestion | null
   playerAnswers: PlayerAnswer[] | null
+  standings: PlayerScore[] | null
   sendMessage: SendMessage | null
 }

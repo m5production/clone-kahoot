@@ -10,6 +10,7 @@ export const createActiveGameState = (
   ],
   activeQuestion: { id: 'q1', text: '2+2?', img: null },
   playerAnswers: null,
+  standings: null,
   sendMessage: () => {},
   ...overrides,
 })

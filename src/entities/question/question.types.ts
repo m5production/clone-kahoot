@@ -1,6 +1,7 @@
 export interface Question {
   id: string
   gameId: string
+  order: number
   text: string
   img: string | null
 }

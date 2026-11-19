@@ -15,7 +15,7 @@ export function QuestionSwitcher() {
             onClick={() =>
               sendMessage?.({
                 type: 'CHANGE_QUESTION',
-                payload: { qusetionId: id },
+                payload: { questionId: id },
               })
             }
             className={cn(

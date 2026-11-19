@@ -20,14 +20,20 @@ vi.mock('@/entities/accepted-answer', async (importOriginal) => ({
   replaceAcceptedAnswers: vi.fn(),
 }))
 
-const question: Question = { id: 'q1', gameId: 'g1', text: '2+2?', img: null }
+const question: Question = {
+  id: 'q1',
+  gameId: 'g1',
+  order: 1,
+  text: '2+2?',
+  img: null,
+}
 
 const renderForm = async (answers: AcceptedAnswer[]) => {
   queryClient.setQueryData(QUESTION_QUERY.queryKey('q1'), question)
   queryClient.setQueryData(ACCEPTED_ANSWERS_QUERY.queryKey('q1'), answers)
 
   const screen = await renderWithProviders(
-    <EditQuestionForm gameId="g1" questionId="q1" questionNumber={3} />
+    <EditQuestionForm questionId="q1" questionNumber={3} />
   )
   const form = screen.getByTestId('question-form')
 
@@ -60,7 +66,7 @@ describe('EditQuestionForm', () => {
 
     await expect.poll(() => vi.mocked(toast.success).mock.calls.length).toBe(2)
     expect(updateQuestion).toHaveBeenCalledWith(
-      { id: 'q1', gameId: 'g1', text: 'Two plus two?', img: null },
+      { id: 'q1', text: 'Two plus two?', img: null },
       expect.anything()
     )
     expect(replaceAcceptedAnswers).toHaveBeenCalledWith('q1', [

@@ -6,11 +6,10 @@ export const createPlayer = (
   name: `Player ${overrides.id}`,
   bgColor: '#123456',
   answers: [],
+  connected: true,
   ...overrides,
 })
 
-export const createAnswer = (
-  questionId: string,
-  isCorrect: boolean,
-  text = isCorrect ? 'right' : 'wrong'
-): PlayerQuestionAnswer => ({ questionId, isCorrect, text })
+export const createAnswer = (questionId: string): PlayerQuestionAnswer => ({
+  questionId,
+})

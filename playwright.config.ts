@@ -3,9 +3,11 @@ import { defineConfig, devices } from '@playwright/test'
 import { E2E_API_URL, E2E_APP_URL, E2E_BACKEND_PORT, E2E_WS_URL } from './e2e/support/urls'
 
 const BACKEND_DIR = path.resolve(import.meta.dirname, '../backend')
-// The test database lives outside the backend repo, so runs never touch its working tree
 const E2E_TMP_DIR = path.resolve(import.meta.dirname, 'e2e/.tmp')
-const E2E_DATABASE_URL = `file:${E2E_TMP_DIR}/e2e.db`
+// A dedicated PostgreSQL database for e2e runs; it is reset on every run
+const E2E_DATABASE_URL =
+  process.env.E2E_DATABASE_URL ??
+  'postgresql://postgres:postgres@localhost:5432/clone_kahoot_e2e'
 
 export default defineConfig({
   testDir: './e2e',
@@ -26,11 +28,9 @@ export default defineConfig({
       testIgnore: '**/live-game/**',
     },
     {
-      // The backend keeps a single global active game: live-game specs must not overlap
+      // Live-game specs share one backend with in-memory rooms; each uses its own game
       name: 'live-game',
       testMatch: '**/live-game/**/*.e2e.ts',
-      workers: 1,
-      fullyParallel: false,
     },
   ],
   webServer: [
@@ -38,14 +38,15 @@ export default defineConfig({
       name: 'backend',
       cwd: BACKEND_DIR,
       // A fresh database on every run
-      command: `mkdir -p "${E2E_TMP_DIR}" && npx prisma migrate reset --force --skip-seed --skip-generate && npx ts-node src/server.ts`,
-      url: `${E2E_API_URL}/users/auth/healthcheck`,
+      command: `mkdir -p "${E2E_TMP_DIR}" && npx prisma migrate reset --force --skip-seed --skip-generate && npx tsc && node dist/main.js`,
+      url: `${E2E_API_URL}/health/live`,
       env: {
         PORT: String(E2E_BACKEND_PORT),
-        HOST: 'http://localhost',
+        HOST: '127.0.0.1',
         NODE_ENV: 'test',
         DATABASE_URL: E2E_DATABASE_URL,
-        ALLOWED_ORIGIN: E2E_APP_URL,
+        ALLOWED_ORIGINS: E2E_APP_URL,
+        TRUST_PROXY: 'false',
       },
       reuseExistingServer: false,
       timeout: 120_000,

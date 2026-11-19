@@ -27,9 +27,9 @@ describe('SubmitAnswerForm', () => {
     await expect.poll(() => sendMessage.mock.calls.length).toBe(1)
     expect(sendMessage).toHaveBeenCalledWith({
       type: 'ANSWER_QUESTION',
-      payload: { questionId: 'q1', answer: '4', playerId: 'u1' },
+      payload: { questionId: 'q1', answer: '4' },
     })
-    await expect.element(screen.getByTestId('answer-input')).toHaveValue('')
+    await expect.element(screen.getByTestId('answer-input')).toHaveValue('4')
   })
 
   it('does not send an empty answer', async () => {
@@ -54,13 +54,13 @@ describe('SubmitAnswerForm', () => {
             id: 'u1',
             name: 'alice',
             bgColor: '#000',
-            answers: [{ questionId: 'q1', text: '4', isCorrect: true }],
+            answers: [{ questionId: 'q1' }],
+            connected: true,
           },
         ],
       })
     )
 
-    await expect.element(screen.getByTestId('answer-input')).toHaveValue('4')
     await expect.element(screen.getByTestId('answer-input')).toBeDisabled()
     await expect.element(screen.getByTestId('submit-answer-button')).toBeDisabled()
   })

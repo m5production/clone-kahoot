@@ -54,7 +54,6 @@ export function QuizEditorPage() {
         {selectedQuestion && (
           <div>
             <EditQuestionForm
-              gameId={gameId}
               questionId={selectedQuestion.id}
               questionNumber={selectedQuestion.number}
               className="flex flex-col gap-10"

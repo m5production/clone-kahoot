@@ -2,14 +2,15 @@ import { afterEach, describe, expect, it } from 'vitest'
 import {
   clearSession,
   clearSessionUserId,
+  getSessionToken,
   getSessionUserId,
   isAuthenticated,
+  saveSessionToken,
   saveSessionUserId,
 } from './session.model'
 
 afterEach(() => {
   localStorage.clear()
-  document.cookie = 'authorization=; Max-Age=-1; path=/'
 })
 
 describe('session user id', () => {
@@ -26,19 +27,20 @@ describe('session user id', () => {
   })
 })
 
-describe('isAuthenticated', () => {
-  it('follows the auth cookie', () => {
+describe('session token', () => {
+  it('drives isAuthenticated', () => {
     expect(isAuthenticated()).toBe(false)
 
-    document.cookie = 'authorization=user-1; path=/'
+    saveSessionToken('token-1')
+    expect(getSessionToken()).toBe('token-1')
     expect(isAuthenticated()).toBe(true)
   })
 })
 
 describe('clearSession', () => {
-  it('removes the stored user id and the auth cookie', () => {
+  it('removes the stored user id and token', () => {
     saveSessionUserId('user-1')
-    document.cookie = `authorization=user-1; path=/; domain=${window.location.hostname}`
+    saveSessionToken('token-1')
 
     clearSession()
 

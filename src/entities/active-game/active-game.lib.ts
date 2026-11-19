@@ -34,8 +34,8 @@ export const getActiveQuestion = (
 
 export const buildJoinMessage = (
   role: ActiveGameRole,
-  { gameId, userId }: { gameId: string; userId: string | null }
+  gameId: string
 ): ClientMessage =>
   role === 'host'
     ? { type: 'START_GAME', payload: { gameId } }
-    : { type: 'PLAYER_CONNECTED', payload: { userId } }
+    : { type: 'PLAYER_CONNECTED', payload: { gameId } }

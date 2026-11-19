@@ -23,7 +23,19 @@ const createAxiosError = (status?: number, data?: unknown) =>
   )
 
 describe('getApiErrorMessage', () => {
-  it('prefers the server response body', () => {
+  it('prefers the server error message', () => {
+    expect(
+      getApiErrorMessage(
+        createAxiosError(404, {
+          code: 'NOT_FOUND',
+          message: 'User not found',
+          requestId: 'r1',
+        })
+      )
+    ).toBe('User not found')
+  })
+
+  it('handles a plain string body', () => {
     expect(getApiErrorMessage(createAxiosError(404, 'User not found'))).toBe(
       'User not found'
     )

@@ -21,8 +21,15 @@ export const createQuestion = async (rawQuestion: RawQuestion) => {
   return data
 }
 
-export const updateQuestion = async ({ id, ...question }: Question) => {
-  const { data } = await httpClient.put<Question>(`/questions/${id}`, question)
+export const updateQuestion = async ({
+  id,
+  text,
+  img,
+}: Pick<Question, 'id' | 'text' | 'img'>) => {
+  const { data } = await httpClient.put<Question>(`/questions/${id}`, {
+    text,
+    img,
+  })
 
   return data
 }

@@ -1,23 +1,26 @@
 import { useEffect } from 'react'
 import { notifyApiError } from '@/shared/api'
 import {
-  clearSessionUserId,
-  getSessionUserId,
+  clearSession,
+  getSessionToken,
+  saveSessionToken,
   saveSessionUserId,
 } from '@/entities/session'
 import type { UserCredentials } from '@/entities/user'
-import { isExistingUser, loginOrRegister } from './login.service'
+import { fetchSessionUser, loginOrRegister } from './login.service'
 
 export const useLogin = (onLoggedIn: () => void) => {
   useEffect(() => {
     const restoreSession = async () => {
-      const userId = getSessionUserId()
+      if (!getSessionToken()) return
 
-      if (!userId || !(await isExistingUser(userId))) {
-        clearSessionUserId()
+      const user = await fetchSessionUser()
+      if (!user) {
+        clearSession()
         return
       }
 
+      saveSessionUserId(user.id)
       onLoggedIn()
     }
 
@@ -28,6 +31,7 @@ export const useLogin = (onLoggedIn: () => void) => {
     try {
       const user = await loginOrRegister(credentials)
 
+      saveSessionToken(user.token)
       saveSessionUserId(user.id)
       onLoggedIn()
     } catch (error) {

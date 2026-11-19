@@ -30,10 +30,9 @@ export const toQuestionFormValues = (
 
 export const toQuestionPayload = (
   values: QuestionFormValues,
-  { id, gameId }: Pick<Question, 'id' | 'gameId'>
-): Question => ({
+  { id }: Pick<Question, 'id'>
+): Pick<Question, 'id' | 'text' | 'img'> => ({
   id,
-  gameId,
   text: values.text,
   img: values.img || null,
 })

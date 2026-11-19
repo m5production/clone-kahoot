@@ -34,7 +34,7 @@ const sockets: FakeSocket[] = []
 
 const useFakeSockets = () => {
   sockets.length = 0
-  vi.mocked(createSocket).mockImplementation(() => {
+  vi.mocked(createSocket).mockImplementation(async () => {
     const socket = new FakeSocket()
     sockets.push(socket)
     // The provider only uses the members FakeSocket implements
@@ -44,8 +44,8 @@ const useFakeSockets = () => {
 
 const game: ActiveGame = {
   id: 'g1',
-  players: [{ id: 'u1', name: 'alice', bgColor: '#000', answers: [] }],
-  allQuestions: [{ id: 'q1', gameId: 'g1', text: '2+2?', img: null }],
+  players: [{ id: 'u1', name: 'alice', bgColor: '#000', answers: [], connected: true }],
+  allQuestions: [{ id: 'q1', text: '2+2?', img: null }],
   activeQuestionId: 'q1',
 }
 
@@ -61,7 +61,7 @@ function GameProbe() {
 
 const renderProvider = (role: 'host' | 'player', onWinnersShown = vi.fn()) =>
   render(
-    <ActiveGameProvider role={role} gameId="g1" userId="u1" onWinnersShown={onWinnersShown}>
+    <ActiveGameProvider role={role} gameId="g1" onWinnersShown={onWinnersShown}>
       <GameProbe />
     </ActiveGameProvider>
   )
@@ -88,10 +88,10 @@ describe('ActiveGameProvider', () => {
     if (!socket) throw new Error('no socket was created')
 
     socket.open()
-    socket.receive({ type: 'SHOW_WINNERS', payload: null })
+    socket.receive({ type: 'SHOW_WINNERS', payload: { standings: [] } })
 
     expect(socket.sentMessages()).toEqual([
-      { type: 'PLAYER_CONNECTED', payload: { userId: 'u1' } },
+      { type: 'PLAYER_CONNECTED', payload: { gameId: 'g1' } },
     ])
     expect(onWinnersShown).toHaveBeenCalledOnce()
   })

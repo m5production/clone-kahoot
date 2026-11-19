@@ -1,20 +1,15 @@
 import { describe, expect, it } from 'vitest'
 import { render } from 'vitest-browser-react'
-import { createAnswer, createPlayer } from './player.fixtures'
 import { WinnersTable } from './player.ui.winners-table'
 
 describe('WinnersTable', () => {
-  it('lists players by the number of correct answers', async () => {
+  it('lists players in the order given by the server standings', async () => {
     const screen = await render(
       <WinnersTable
-        players={[
-          createPlayer({ id: 'a', name: 'Ann', answers: [createAnswer('q1', false)] }),
-          createPlayer({
-            id: 'b',
-            name: 'Bob',
-            answers: [createAnswer('q1', true), createAnswer('q2', true)],
-          }),
-          createPlayer({ id: 'c', name: 'Cid', answers: [createAnswer('q1', true)] }),
+        winners={[
+          { id: 'b', name: 'Bob', score: 2 },
+          { id: 'c', name: 'Cid', score: 1 },
+          { id: 'a', name: 'Ann', score: 0 },
         ]}
       />
     )
@@ -28,7 +23,7 @@ describe('WinnersTable', () => {
   })
 
   it('renders an empty table without players', async () => {
-    const screen = await render(<WinnersTable players={[]} />)
+    const screen = await render(<WinnersTable winners={[]} />)
 
     expect(screen.getByRole('listitem').elements()).toHaveLength(0)
   })

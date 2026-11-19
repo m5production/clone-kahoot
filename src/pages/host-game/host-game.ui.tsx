@@ -3,14 +3,13 @@ import { useParams } from 'react-router'
 import { ActiveGameProvider, useActiveGame } from '@/entities/active-game'
 import { Players, WinnersTable } from '@/entities/player'
 import { QuestionView } from '@/entities/question'
-import { getSessionUserId } from '@/entities/session'
 import {
   HostControls,
   QuestionSwitcher,
 } from '@/features/active-game/control-game'
 
 function HostGame({ gameId }: { gameId: string }) {
-  const { players, activeQuestion, playerAnswers } = useActiveGame()
+  const { players, activeQuestion, playerAnswers, standings } = useActiveGame()
   const [isWinnersShown, setIsWinnersShown] = useState(false)
 
   return (
@@ -30,7 +29,10 @@ function HostGame({ gameId }: { gameId: string }) {
       </aside>
 
       {isWinnersShown ? (
-        <WinnersTable className="col-start-2 row-span-full" players={players} />
+        <WinnersTable
+          className="col-start-2 row-span-full"
+          winners={standings ?? []}
+        />
       ) : (
         <>
           <div className="p-4">
@@ -62,7 +64,7 @@ export function HostGamePage() {
   }
 
   return (
-    <ActiveGameProvider role="host" gameId={gameId} userId={getSessionUserId()}>
+    <ActiveGameProvider role="host" gameId={gameId}>
       <HostGame gameId={gameId} />
     </ActiveGameProvider>
   )
