@@ -1,7 +1,7 @@
 const DEV_API_URL = 'http://localhost:3000/api'
-const PROD_API_URL = 'https://piggies-quiz-m5production.amvera.io/api'
+const PROD_API_URL = 'https://clone-cahoot-m5production.mia0.amvera.tech/api'
 const DEV_WS_URL = 'http://localhost:3000/'
-const PROD_WS_URL = 'https://piggies-quiz-m5production.amvera.io/'
+const PROD_WS_URL = 'https://clone-cahoot-m5production.mia0.amvera.tech/'
 
 export const API_URL: string =
   import.meta.env.VITE_API_URL ??
