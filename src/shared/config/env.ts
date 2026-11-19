@@ -1,12 +1,9 @@
-const DEV_API_URL = 'http://localhost:3000/api'
-const PROD_API_URL = 'https://clone-cahoot-m5production.mia0.amvera.tech/api'
-const DEV_WS_URL = 'http://localhost:3000/'
-const PROD_WS_URL = 'https://clone-cahoot-m5production.mia0.amvera.tech/'
+const requireEnv = (value: string | undefined, name: string): string => {
+  if (!value) {
+    throw new Error(`Missing required environment variable: ${name}`)
+  }
+  return value
+}
 
-export const API_URL: string =
-  import.meta.env.VITE_API_URL ??
-  (import.meta.env.PROD ? PROD_API_URL : DEV_API_URL)
-
-export const WS_URL: string =
-  import.meta.env.VITE_WS_URL ??
-  (import.meta.env.PROD ? PROD_WS_URL : DEV_WS_URL)
+export const API_URL = requireEnv(import.meta.env.VITE_API_URL, 'VITE_API_URL')
+export const WS_URL = requireEnv(import.meta.env.VITE_WS_URL, 'VITE_WS_URL')

@@ -21,7 +21,7 @@ a running PostgreSQL (`yarn db:up` when Docker is available, or set `DB_*` in `.
 (yarn is not installed globally; don't use `prisma-migrate-dev`, it creates new migrations).
 E2E runs need `E2E_DB_*` vars (or a local `postgres:postgres@localhost:5432/clone_kahoot_e2e`).
 
-API/WS hosts can be overridden with `VITE_API_URL` / `VITE_WS_URL` (see `src/shared/config/env.ts`).
+API/WS hosts come from `.env.development` / `.env.production` / `.env.test` (`VITE_API_URL`, `VITE_WS_URL`, read in `src/shared/config/env.ts`); override locally via `.env.local` or the environment.
 
 ## Architecture
 
