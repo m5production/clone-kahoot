@@ -40,7 +40,9 @@ Keep this list in sync with `src/` — add/rename/remove rows in the same change
 
 | Screen | Ids |
 |---|---|
-| Login (`features/session/login`) | `login-form`, `login-name-input`, `login-password-input`, `login-submit-button` |
+| Welcome (`pages/welcome`) | `welcome-login-link`, `welcome-register-link` |
+| Login (`pages/login`, `features/session/login`) | `login-form`, `login-name-input`, `login-password-input`, `login-submit-button`, `login-register-link`, `login-welcome-link` |
+| Register (`pages/register`, `features/session/register`) | `register-form`, `register-name-input`, `register-password-input`, `register-submit-button`, `register-login-link`, `register-welcome-link` |
 | Home (`pages/home` + features) | `user-avatar`, `logout-button`, `join-game-form`, `join-game-input`, `join-game-submit-button`, `create-game-button`, `games-list` → `game-item-<gameId>` → `game-link`, `games-empty` |
 | Quiz editor (`pages/quiz-editor` + features) | `home-link`, `start-game-link`, `questions-sidebar`, `add-question-button`, `questions-list` → `question-item-<questionId>` (`aria-selected`), `question-form` → `question-image-input`, `question-text-input`, `accepted-answers-list` → `accepted-answer-item-<index>` → `accepted-answer-input`, `remove-answer-button`; `add-answer-button`, `save-question-button`; `delete-question-button` |
 | Host game (`pages/host-game`, `features/active-game/control-game`) | `host-questions-list` → `host-question-item-<questionId>` → `switch-question-button` (`aria-current`); `host-controls` → `copy-game-link-button`, `show-answers-button`, `show-winners-button`, `stop-game-button`, `home-link` |

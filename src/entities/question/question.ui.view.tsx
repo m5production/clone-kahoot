@@ -11,7 +11,7 @@ export function QuestionView({ text, img }: Pick<Question, 'img' | 'text'>) {
           alt={`Image illustrating the question: ${text}`}
         />
       )}
-      <p className="font-bold text-4xl">{text}</p>
+      <p className="font-extrabold text-4xl text-center text-balance">{text}</p>
     </div>
   )
 }

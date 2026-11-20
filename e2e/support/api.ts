@@ -18,7 +18,10 @@ const authHeaders = (token: string) => ({ Authorization: `Bearer ${token}` })
 
 /** Test data set up through the backend API, bypassing the UI */
 export const createApi = (request: APIRequestContext) => ({
-  createUser: async (name: string, password = 'pass'): Promise<TestUser> => {
+  createUser: async (
+    name: string,
+    password = 'password1',
+  ): Promise<TestUser> => {
     const response = await request.post(`${E2E_API_URL}/users`, {
       data: { name, password },
     })

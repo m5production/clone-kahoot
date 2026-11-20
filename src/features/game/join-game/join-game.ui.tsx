@@ -35,15 +35,24 @@ export function JoinGameForm() {
       >
         <Input
           data-testid="join-game-input"
+          className="h-11"
+          placeholder="Game link or PIN"
           {...register('gameId', { required: 'Enter valid game link' })}
           aria-invalid={Boolean(errors.gameId)}
         />
-        <Button data-testid="join-game-submit-button" type="submit">
+        <Button
+          data-testid="join-game-submit-button"
+          type="submit"
+          size="lg"
+          className="font-bold"
+        >
           Join game
         </Button>
       </form>
 
-      {errors.gameId && <p className="text-red-300">{errors.gameId.message}</p>}
+      {errors.gameId && (
+        <p className="text-destructive">{errors.gameId.message}</p>
+      )}
     </>
   )
 }

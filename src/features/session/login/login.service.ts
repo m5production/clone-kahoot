@@ -1,31 +1,19 @@
+import { saveSessionToken, saveSessionUserId } from '@/entities/session'
 import {
+  type AuthResponse,
   authenticateUser,
-  createUser,
-  fetchCurrentUser,
-  type User,
   type UserCredentials,
 } from '@/entities/user'
-import { isUnauthorizedError, notifyApiError } from '@/shared/api'
 
-const authenticateOrNull = async (credentials: UserCredentials) => {
-  try {
-    return await authenticateUser(credentials)
-  } catch (error) {
-    if (!isUnauthorizedError(error)) notifyApiError(error)
-
-    return null
-  }
-}
-
-/** Logs in with the credentials or registers a new user when the login is rejected */
-export const loginOrRegister = async (credentials: UserCredentials) =>
-  (await authenticateOrNull(credentials)) ?? createUser(credentials)
-
-/** Restores the session: resolves with the current user when the stored token is valid */
-export const fetchSessionUser = async (): Promise<User | null> => {
-  try {
-    return await fetchCurrentUser()
-  } catch {
-    return null
-  }
+/**
+ * Logs in an existing user (FR-85): unknown names and wrong passwords are
+ * rejected, no account is created. Stores the returned session.
+ */
+export const loginUser = async (
+  credentials: UserCredentials,
+): Promise<AuthResponse> => {
+  const auth = await authenticateUser(credentials)
+  saveSessionToken(auth.token)
+  saveSessionUserId(auth.id)
+  return auth
 }

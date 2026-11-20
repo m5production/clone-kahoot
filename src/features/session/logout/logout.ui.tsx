@@ -18,7 +18,12 @@ export function LogoutButton() {
   }
 
   return (
-    <Button data-testid="logout-button" onClick={handleLogoutClick}>
+    <Button
+      data-testid="logout-button"
+      variant="ghost"
+      className="text-primary-foreground hover:bg-primary-foreground/15 hover:text-primary-foreground"
+      onClick={handleLogoutClick}
+    >
       Logout
     </Button>
   )

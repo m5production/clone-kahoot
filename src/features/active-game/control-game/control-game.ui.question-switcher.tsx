@@ -1,6 +1,5 @@
 import { useActiveGame } from '@/entities/active-game'
-import { cn } from '@/shared/lib'
-import { Button, buttonVariants } from '@/shared/ui'
+import { Button } from '@/shared/ui'
 
 export function QuestionSwitcher() {
   const { allQuestions, activeQuestion, sendMessage } = useActiveGame()
@@ -18,6 +17,7 @@ export function QuestionSwitcher() {
         >
           <Button
             data-testid="switch-question-button"
+            variant={activeQuestion?.id === id ? 'default' : 'ghost'}
             aria-current={activeQuestion?.id === id}
             onClick={() =>
               sendMessage?.({
@@ -25,11 +25,7 @@ export function QuestionSwitcher() {
                 payload: { questionId: id },
               })
             }
-            className={cn(
-              'w-full truncate',
-              activeQuestion?.id === id &&
-                buttonVariants({ variant: 'secondary' }),
-            )}
+            className="w-full truncate justify-start"
           >
             Question {index + 1}
           </Button>

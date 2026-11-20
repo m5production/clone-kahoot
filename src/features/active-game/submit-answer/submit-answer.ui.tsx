@@ -54,9 +54,10 @@ export function SubmitAnswerForm() {
   }
 
   return (
-    <>
+    <div className="flex flex-col gap-3">
       <Input
         data-testid="answer-input"
+        className="h-12 text-lg"
         aria-invalid={Boolean(errors.answer)}
         placeholder="Type your answer here!"
         disabled={isQuestionAnswered}
@@ -64,19 +65,23 @@ export function SubmitAnswerForm() {
         type="text"
       />
       {errors.answer && (
-        <p className="text-red-300">
+        <p className="text-destructive">
           "Please enter your answer. It is not allowed to submit empty answer"
         </p>
       )}
-      <p>After submitting the answer you will not be able to change it.</p>
+      <p className="text-sm text-muted-foreground">
+        After submitting the answer you will not be able to change it.
+      </p>
       <Button
         data-testid="submit-answer-button"
         disabled={isQuestionAnswered}
         type="button"
+        size="lg"
+        className="w-full font-bold"
         onClick={handleSubmit(handleSend)}
       >
         Send
       </Button>
-    </>
+    </div>
   )
 }

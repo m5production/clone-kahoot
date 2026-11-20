@@ -8,3 +8,4 @@ export {
   saveSessionToken,
   saveSessionUserId,
 } from './session.model'
+export { restoreSession } from './session.service'

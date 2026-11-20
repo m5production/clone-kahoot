@@ -13,8 +13,9 @@ export function AddQuestionButton({ gameId, onCreated }: Props) {
   return (
     <Button
       data-testid="add-question-button"
+      variant="outline"
       onClick={() => createQuestion({ gameId, text: '' })}
-      className="w-full cursor-pointer"
+      className="w-full cursor-pointer border-dashed"
     >
       + Add new question
     </Button>

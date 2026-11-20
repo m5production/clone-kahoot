@@ -13,14 +13,14 @@ function HostGame({ gameId }: { gameId: string }) {
   const [isWinnersShown, setIsWinnersShown] = useState(false)
 
   return (
-    <section className="grid grid-cols-[200px_1fr_200px] h-full grid-rows-[1fr_200px]">
-      <aside className="bg-orange-300 text-blue-600 p-4 h-full row-span-full flex flex-col gap-4">
-        <h3 className="font-bold text-xl">Questions</h3>
+    <section className="grid grid-cols-[240px_1fr_240px] min-h-full grid-rows-[1fr_auto]">
+      <aside className="bg-card border-r p-4 h-full row-span-full flex flex-col gap-4">
+        <h3 className="font-bold text-lg">Questions</h3>
         <QuestionSwitcher />
       </aside>
 
-      <aside className="col-start-3 row-span-full bg-pink-400 p-4">
-        <h3 className="font-bold text-xl mb-6">Controls</h3>
+      <aside className="col-start-3 row-span-full bg-card border-l p-4 flex flex-col gap-4">
+        <h3 className="font-bold text-lg mb-2">Controls</h3>
         <HostControls
           gameId={gameId}
           isWinnersShown={isWinnersShown}
@@ -30,12 +30,12 @@ function HostGame({ gameId }: { gameId: string }) {
 
       {isWinnersShown ? (
         <WinnersTable
-          className="col-start-2 row-span-full"
+          className="col-start-2 row-span-full w-full max-w-xl mx-auto self-center"
           winners={standings ?? []}
         />
       ) : (
         <>
-          <div className="p-4">
+          <div className="flex items-center justify-center p-8">
             {activeQuestion && (
               <QuestionView
                 text={activeQuestion.text}
@@ -47,7 +47,7 @@ function HostGame({ gameId }: { gameId: string }) {
           <Players
             activeQuestionId={activeQuestion?.id}
             players={players}
-            className="col-start-2 col-span-1 bg-purple-400 p-4"
+            className="col-start-2 col-span-1 bg-primary text-primary-foreground p-4"
             playerAnswers={playerAnswers}
           />
         </>

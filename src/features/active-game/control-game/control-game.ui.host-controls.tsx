@@ -50,16 +50,21 @@ export function HostControls({
     <div data-testid="host-controls" className="flex flex-col gap-4">
       <Button
         data-testid="copy-game-link-button"
-        className="whitespace-normal h-auto"
+        className="whitespace-normal h-auto w-full"
         onClick={handleCopyLinkClick}
       >
         Copy link for the players
       </Button>
-      {isCopyConfirmationShown &&
-        'Link for the players has been copied to your clipboard'}
+      {isCopyConfirmationShown && (
+        <p className="text-sm text-muted-foreground">
+          Link for the players has been copied to your clipboard
+        </p>
+      )}
 
       <Button
         data-testid="show-answers-button"
+        variant="secondary"
+        className="w-full"
         type="button"
         onClick={handleShowAnswersClick}
       >
@@ -68,7 +73,8 @@ export function HostControls({
 
       <Button
         data-testid="show-winners-button"
-        className="whitespace-normal h-auto"
+        variant="secondary"
+        className="whitespace-normal h-auto w-full"
         type="button"
         onClick={handleShowWinnersClick}
         disabled={isWinnersShown}
@@ -78,6 +84,8 @@ export function HostControls({
 
       <Button
         data-testid="stop-game-button"
+        variant="outline"
+        className="w-full text-destructive hover:bg-destructive/10 hover:text-destructive"
         disabled={!isWinnersShown}
         onClick={handleStopQuizClick}
       >
@@ -87,7 +95,7 @@ export function HostControls({
       {isWinnersShown && (
         <Link
           data-testid="home-link"
-          className={cn(buttonVariants())}
+          className={cn(buttonVariants({ variant: 'ghost' }), 'w-full')}
           to="/home"
         >
           Home

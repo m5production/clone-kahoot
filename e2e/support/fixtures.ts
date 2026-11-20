@@ -24,9 +24,12 @@ export const test = base.extend<Fixtures>({
   uniqueName: async ({}, use, testInfo) => {
     const runId = Date.now().toString(36)
 
-    await use(
-      (prefix) => `${prefix}-${runId}-${testInfo.workerIndex}-${++nameCounter}`,
-    )
+    await use((prefix) => {
+      // Backend names are capped at 20 characters (BR-40): the unique suffix
+      // always survives, the prefix is shortened when needed
+      const suffix = `-${runId.slice(-4)}${testInfo.workerIndex}${++nameCounter}`
+      return `${prefix.slice(0, 20 - suffix.length)}${suffix}`
+    })
   },
 
   signIn: async ({ browser, api, uniqueName }, use) => {

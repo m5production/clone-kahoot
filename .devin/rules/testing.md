@@ -53,7 +53,7 @@ Commands: `bun run test` (unit + component), `test:unit`, `test:browser`, `test:
 - Fixtures (`e2e/support/fixtures.ts`, import `test`/`expect` from there):
   - `api` — create users, games, questions with accepted answers via the backend API;
   - `uniqueName(prefix)` — user names are unique in the backend;
-  - `signIn(prefix)` — a new user in its **own browser context** (auth cookie + remembered user id),
+  - `signIn(prefix)` — a new user in its **own browser context** (session token + remembered user id),
     returns `{ user, page }`; use one per actor (host, each player).
 - Set test data up through `api`, not the UI; the UI flow itself is tested once in its own spec.
 - The backend keeps **one global active game** → live-game specs live in `e2e/live-game/` and run in
@@ -67,8 +67,9 @@ Commands: `bun run test` (unit + component), `test:unit`, `test:browser`, `test:
 
 ## Covered scenarios
 
-1. Auth (`e2e/auth.e2e.ts`): register, log in, taken name + wrong password, required fields,
-   remembered user, guard redirects, logout.
+1. Auth (`e2e/auth.e2e.ts`): welcome page, register via `/register`, log in via `/login`,
+   wrong credentials (no account created), taken nickname (incl. different case),
+   required fields, remembered user → `/home`, guest → welcome, logout.
 2. Games (`e2e/games.e2e.ts`): create → editor → listed on home; only own games listed.
 3. Questions (`e2e/questions.e2e.ts`): create with image and answers, edit, validation, delete;
    persisted after reload.

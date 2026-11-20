@@ -1,14 +1,10 @@
 #root {
   width: 100%;
-  max-width: 1280px;
-  margin: 0 auto;
-  text-align: center;
   flex-grow: 1;
 }
 
 body {
   height: 100vh;
-  background-color: ivory;
   display: flex;
   flex-direction: column;
 }

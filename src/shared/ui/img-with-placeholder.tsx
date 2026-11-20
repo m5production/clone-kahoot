@@ -15,7 +15,7 @@ function ImgWithPlaceholder(
   return (
     <>
       {!isShowImg && (
-        <div className="bg-orange-500 w-[400px] text-4xl rounded-4xl h-[400px] mx-auto flex justify-center items-center">
+        <div className="bg-muted text-muted-foreground w-[400px] text-4xl rounded-4xl h-[400px] mx-auto flex justify-center items-center">
           Image is loading...
         </div>
       )}

@@ -20,8 +20,9 @@ export function DeleteQuestionButton({ questionId, onDelete }: Props) {
   return (
     <Button
       data-testid="delete-question-button"
+      variant="outline"
       onClick={handleDeleteClick}
-      className="mt-4"
+      className="w-fit text-destructive hover:bg-destructive/10 hover:text-destructive"
     >
       Delete question
     </Button>

@@ -23,8 +23,8 @@ export function Players({
               key={playerId}
               data-testid={`player-answer-item-${playerId}`}
               className={cn(
-                'rounded-full px-2 border-2 border-current bg-red-300',
-                playerAnswer?.isCorrect && 'bg-green-400',
+                'rounded-full px-2 border-2 border-current bg-destructive/15 text-destructive',
+                playerAnswer?.isCorrect && 'bg-success/15 text-success',
               )}
             >
               <span className="font-semibold">{playerName}:</span>{' '}
@@ -44,7 +44,7 @@ export function Players({
                   'rounded-xl p-2 text-white',
                   activeQuestionId &&
                     hasAnsweredQuestion(player, activeQuestionId) &&
-                    'ring-amber-400 ring-8',
+                    'ring-primary ring-4',
                 )}
                 style={{ backgroundColor: player.bgColor }}
               >
