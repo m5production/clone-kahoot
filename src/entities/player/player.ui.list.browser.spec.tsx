@@ -1,17 +1,17 @@
 import { describe, expect, it } from 'vitest'
 import { render } from 'vitest-browser-react'
-import { createAnswer, createPlayer } from './player.fixtures'
+import { createPlayer } from './player.fixtures'
 import { Players } from './player.ui.list'
 
 const players = [
-  createPlayer({ id: 'a', name: 'Ann', answers: [createAnswer('q1')] }),
+  createPlayer({ id: 'a', name: 'Ann', answered: true }),
   createPlayer({ id: 'b', name: 'Bob' }),
 ]
 
 describe('Players', () => {
-  it('lists the connected players with their count', async () => {
+  it('lists the players with their count', async () => {
     const screen = await render(
-      <Players players={players} activeQuestionId="q1" playerAnswers={null} />,
+      <Players players={players} showAnswered playerAnswers={null} />,
     )
 
     await expect
@@ -29,18 +29,9 @@ describe('Players', () => {
     const screen = await render(
       <Players
         players={players}
-        activeQuestionId="q1"
         playerAnswers={[
-          {
-            playerId: 'a',
-            playerName: 'Ann',
-            playerAnswer: { questionId: 'q1', text: '4', isCorrect: true },
-          },
-          {
-            playerId: 'b',
-            playerName: 'Bob',
-            playerAnswer: { questionId: 'q1', text: null, isCorrect: false },
-          },
+          { playerId: 'a', playerName: 'Ann', text: '4', isCorrect: true },
+          { playerId: 'b', playerName: 'Bob', text: null, isCorrect: false },
         ]}
       />,
     )
@@ -56,9 +47,9 @@ describe('Players', () => {
       .not.toBeInTheDocument()
   })
 
-  it('keeps the players list while no question is active', async () => {
+  it('keeps the players list while answers are not revealed', async () => {
     const screen = await render(
-      <Players players={players} playerAnswers={[]} />,
+      <Players players={players} playerAnswers={null} />,
     )
 
     await expect.element(screen.getByTestId('players-list')).toBeVisible()

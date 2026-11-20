@@ -1,79 +1,62 @@
 import { describe, expect, it } from 'vitest'
+import { createSessionState } from './active-game.fixtures'
 import {
-  buildJoinMessage,
-  getActiveQuestion,
+  buildJoinPath,
+  extractSessionId,
   parseServerMessage,
 } from './active-game.lib'
-import type { ActiveGame } from './active-game.types'
-
-const game: ActiveGame = {
-  id: 'game-1',
-  players: [],
-  allQuestions: [
-    { id: 'q1', text: 'First', img: null },
-    { id: 'q2', text: 'Second', img: 'https://img' },
-  ],
-  activeQuestionId: 'q2',
-}
 
 describe('parseServerMessage', () => {
   it('parses every known message type', () => {
-    expect(
-      parseServerMessage(JSON.stringify({ type: 'GAME_DATA', payload: game })),
-    ).toEqual({
-      type: 'GAME_DATA',
-      payload: game,
-    })
-    expect(
-      parseServerMessage('{"type":"SHOW_WINNERS","payload":{"standings":[]}}'),
-    ).toEqual({ type: 'SHOW_WINNERS', payload: { standings: [] } })
+    const session = createSessionState()
     expect(
       parseServerMessage(
-        '{"type":"FAULT","payload":{"code":"X","message":"No game"}}',
+        JSON.stringify({ type: 'SESSION_STATE', payload: session }),
+      ),
+    ).toEqual({ type: 'SESSION_STATE', payload: session })
+    expect(
+      parseServerMessage('{"type":"WINNERS","payload":{"standings":[]}}'),
+    ).toEqual({ type: 'WINNERS', payload: { standings: [] } })
+    expect(
+      parseServerMessage(
+        '{"type":"SESSION_ENDED","payload":{"reason":"host_timeout"}}',
+      ),
+    ).toEqual({ type: 'SESSION_ENDED', payload: { reason: 'host_timeout' } })
+    expect(
+      parseServerMessage(
+        '{"type":"FAULT","payload":{"code":"X","message":"No session"}}',
       ),
     ).toEqual({
       type: 'FAULT',
-      payload: { code: 'X', message: 'No game' },
+      payload: { code: 'X', message: 'No session' },
     })
   })
 
   it.each([
-    ['invalid JSON', 'not json'],
-    ['unknown type', '{"type":"HELLO","payload":null}'],
-    ['no type', '{"payload":null}'],
-    ['non-string type', '{"type":1}'],
-    ['not an object', '"GAME_DATA"'],
-    ['null', 'null'],
-  ])('returns null for %s', (_, raw) => {
+    'not json',
+    '{"type":"GAME_DATA"}',
+    '{"type":"PLAYER_CONNECTED"}',
+    '{"type":42}',
+    'null',
+  ])('ignores the malformed message %s', (raw) => {
     expect(parseServerMessage(raw)).toBeNull()
   })
 })
 
-describe('getActiveQuestion', () => {
-  it('returns the question with the active id', () => {
-    expect(getActiveQuestion(game)).toEqual(game.allQuestions[1])
-  })
-
-  it('returns null when nothing is active or the id is unknown', () => {
-    expect(getActiveQuestion({ ...game, activeQuestionId: null })).toBeNull()
-    expect(
-      getActiveQuestion({ ...game, activeQuestionId: 'missing' }),
-    ).toBeNull()
+describe('extractSessionId', () => {
+  it.each([
+    ['abc-123', 'abc-123'],
+    ['  abc-123  ', 'abc-123'],
+    ['https://app.example/join/abc-123', 'abc-123'],
+    ['http://localhost:5173/join/abc-123', 'abc-123'],
+    ['/join/abc-123', 'abc-123'],
+  ])('extracts the id from %s', (input, expected) => {
+    expect(extractSessionId(input)).toBe(expected)
   })
 })
 
-describe('buildJoinMessage', () => {
-  it('starts the game for the host', () => {
-    expect(buildJoinMessage('host', 'game-1')).toEqual({
-      type: 'START_GAME',
-      payload: { gameId: 'game-1' },
-    })
-  })
-
-  it('connects a player to the game room', () => {
-    expect(buildJoinMessage('player', 'game-1')).toEqual({
-      type: 'PLAYER_CONNECTED',
-      payload: { gameId: 'game-1' },
-    })
+describe('buildJoinPath', () => {
+  it('builds the join path', () => {
+    expect(buildJoinPath('s1')).toBe('/join/s1')
   })
 })

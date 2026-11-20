@@ -1,7 +1,12 @@
-import { Link } from 'react-router'
+import { Link, useSearchParams } from 'react-router'
+import { getSafeReturnUrl } from '@/entities/session'
 import { Button } from '@/shared/ui'
 
 export function WelcomePage() {
+  const [searchParams] = useSearchParams()
+  const next = getSafeReturnUrl(searchParams.get('next'))
+  const suffix = next ? `?next=${encodeURIComponent(next)}` : ''
+
   return (
     <div className="min-h-full flex items-center justify-center bg-gradient-to-b from-primary to-primary-deep p-4">
       <div className="w-full max-w-md flex flex-col items-center gap-8 text-center">
@@ -21,7 +26,7 @@ export function WelcomePage() {
             size="lg"
             className="w-full text-base font-bold bg-card text-card-foreground hover:bg-card/90"
           >
-            <Link data-testid="welcome-login-link" to="/login">
+            <Link data-testid="welcome-login-link" to={`/login${suffix}`}>
               Sign in
             </Link>
           </Button>
@@ -31,7 +36,7 @@ export function WelcomePage() {
             variant="outline"
             className="w-full text-base font-bold"
           >
-            <Link data-testid="welcome-register-link" to="/register">
+            <Link data-testid="welcome-register-link" to={`/register${suffix}`}>
               Create account
             </Link>
           </Button>

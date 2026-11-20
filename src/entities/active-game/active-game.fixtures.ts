@@ -1,16 +1,41 @@
-import type { ActiveGameState } from './active-game.types'
+import type {
+  ActiveGameState,
+  SessionPlayer,
+  SessionStateMessage,
+} from './active-game.types'
+
+export const createSessionPlayer = (
+  overrides: Partial<SessionPlayer> & Pick<SessionPlayer, 'id'>,
+): SessionPlayer => ({
+  name: `Player ${overrides.id}`,
+  bgColor: '#123456',
+  connected: true,
+  answered: false,
+  ...overrides,
+})
+
+export const createSessionState = (
+  overrides: Partial<SessionStateMessage> = {},
+): SessionStateMessage => ({
+  sessionId: 's1',
+  gameId: 'g1',
+  quizTitle: 'Test quiz',
+  state: 'question_open',
+  hostConnected: true,
+  players: [],
+  question: { id: 'q1', text: '2+2?', img: null, number: 1, total: 2 },
+  ...overrides,
+})
 
 export const createActiveGameState = (
   overrides: Partial<ActiveGameState> = {},
 ): ActiveGameState => ({
-  players: [],
-  allQuestions: [
-    { id: 'q1', text: '2+2?', img: null },
-    { id: 'q2', text: 'Capital of France?', img: null },
-  ],
-  activeQuestion: { id: 'q1', text: '2+2?', img: null },
-  playerAnswers: null,
+  role: 'host',
+  session: createSessionState(),
+  revealed: null,
+  myAnswer: null,
   standings: null,
+  endReason: null,
   sendMessage: () => {},
   ...overrides,
 })

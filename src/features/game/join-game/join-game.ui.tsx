@@ -1,11 +1,10 @@
 import { useForm } from 'react-hook-form'
 import { useNavigate } from 'react-router'
-import { checkActiveGame } from '@/entities/game'
-import { notifyApiError } from '@/shared/api'
+import { buildJoinPath, extractSessionId } from '@/entities/active-game'
 import { Button, Input } from '@/shared/ui'
 
 interface JoinGameValues {
-  gameId: string
+  link: string
 }
 
 export function JoinGameForm() {
@@ -14,16 +13,10 @@ export function JoinGameForm() {
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm<JoinGameValues>({ defaultValues: { gameId: '' } })
+  } = useForm<JoinGameValues>({ defaultValues: { link: '' } })
 
-  const handleJoinGameSubmit = async ({ gameId }: JoinGameValues) => {
-    try {
-      await checkActiveGame(gameId)
-
-      navigate(`/${gameId}/player`)
-    } catch (error) {
-      notifyApiError(error)
-    }
+  const handleJoinGameSubmit = ({ link }: JoinGameValues) => {
+    navigate(buildJoinPath(extractSessionId(link)))
   }
 
   return (
@@ -36,9 +29,9 @@ export function JoinGameForm() {
         <Input
           data-testid="join-game-input"
           className="h-11"
-          placeholder="Game link or PIN"
-          {...register('gameId', { required: 'Enter valid game link' })}
-          aria-invalid={Boolean(errors.gameId)}
+          placeholder="Invitation link"
+          {...register('link', { required: 'Enter a valid invitation link' })}
+          aria-invalid={Boolean(errors.link)}
         />
         <Button
           data-testid="join-game-submit-button"
@@ -50,9 +43,7 @@ export function JoinGameForm() {
         </Button>
       </form>
 
-      {errors.gameId && (
-        <p className="text-destructive">{errors.gameId.message}</p>
-      )}
+      {errors.link && <p className="text-destructive">{errors.link.message}</p>}
     </>
   )
 }

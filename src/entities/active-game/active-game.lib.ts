@@ -1,14 +1,17 @@
-import type { ActiveGameQuestion } from '@/entities/question' // FSD: cross import
-import type {
-  ActiveGame,
-  ActiveGameRole,
-  ClientMessage,
-  ServerMessage,
-} from './active-game.types'
+import type { ServerMessage } from './active-game.types'
 
 const SERVER_MESSAGE_TYPES: ReadonlySet<string> = new Set<
   ServerMessage['type']
->(['GAME_DATA', 'FAULT', 'SHOW_ANSWERS', 'SHOW_WINNERS', 'END_GAME'])
+>([
+  'JOINED_SESSION',
+  'SESSION_STATE',
+  'ANSWER_ACCEPTED',
+  'QUESTION_CLOSED',
+  'ANSWERS_REVEALED',
+  'WINNERS',
+  'SESSION_ENDED',
+  'FAULT',
+])
 
 const isServerMessage = (value: unknown): value is ServerMessage =>
   typeof value === 'object' &&
@@ -27,15 +30,15 @@ export const parseServerMessage = (raw: string): ServerMessage | null => {
   }
 }
 
-export const getActiveQuestion = (
-  game: Pick<ActiveGame, 'allQuestions' | 'activeQuestionId'>,
-): ActiveGameQuestion | null =>
-  game.allQuestions.find(({ id }) => id === game.activeQuestionId) ?? null
+/** Join links are `/join/<sessionId>`; the form also accepts a bare id */
+export const extractSessionId = (input: string): string => {
+  const trimmed = input.trim()
+  const match = trimmed.match(/\/join\/([A-Za-z0-9_-]+)/)
 
-export const buildJoinMessage = (
-  role: ActiveGameRole,
-  gameId: string,
-): ClientMessage =>
-  role === 'host'
-    ? { type: 'START_GAME', payload: { gameId } }
-    : { type: 'PLAYER_CONNECTED', payload: { gameId } }
+  return match ? match[1] : trimmed
+}
+
+export const buildJoinPath = (sessionId: string) => `/join/${sessionId}`
+
+export const buildJoinUrl = (sessionId: string) =>
+  `${window.location.origin}${buildJoinPath(sessionId)}`

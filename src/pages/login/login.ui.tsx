@@ -1,4 +1,5 @@
-import { Link, useNavigate } from 'react-router'
+import { Link, useNavigate, useSearchParams } from 'react-router'
+import { getSafeReturnUrl } from '@/entities/session'
 import { LoginForm } from '@/features/session/login'
 import {
   Card,
@@ -10,6 +11,9 @@ import {
 
 export function LoginPage() {
   const navigate = useNavigate()
+  const [searchParams] = useSearchParams()
+  const next = getSafeReturnUrl(searchParams.get('next'))
+  const suffix = next ? `?next=${encodeURIComponent(next)}` : ''
 
   return (
     <div className="min-h-full flex items-center justify-center bg-gradient-to-b from-primary to-primary-deep p-4">
@@ -24,12 +28,12 @@ export function LoginPage() {
         </CardHeader>
 
         <CardContent className="flex flex-col gap-4">
-          <LoginForm onLoggedIn={() => navigate('/home')} />
+          <LoginForm onLoggedIn={() => navigate(next ?? '/home')} />
           <p className="text-center text-sm text-muted-foreground">
             No account yet?{' '}
             <Link
               data-testid="login-register-link"
-              to="/register"
+              to={`/register${suffix}`}
               className="font-medium text-primary hover:underline"
             >
               Create one

@@ -2,8 +2,9 @@ import { describe, expect, it, vi } from 'vitest'
 import { render } from 'vitest-browser-react'
 import { createSocket } from '@/shared/api'
 import { useActiveGame } from './active-game.context'
+import { createSessionState } from './active-game.fixtures'
 import { ActiveGameProvider } from './active-game.provider'
-import type { ActiveGame, ServerMessage } from './active-game.types'
+import type { ServerMessage } from './active-game.types'
 
 vi.mock('@/shared/api', async (importOriginal) => ({
   ...(await importOriginal<typeof import('@/shared/api')>()),
@@ -44,84 +45,125 @@ const useFakeSockets = () => {
   })
 }
 
-const game: ActiveGame = {
-  id: 'g1',
-  players: [
-    { id: 'u1', name: 'alice', bgColor: '#000', answers: [], connected: true },
-  ],
-  allQuestions: [{ id: 'q1', text: '2+2?', img: null }],
-  activeQuestionId: 'q1',
+const lastSocket = () => {
+  const socket = sockets.at(-1)
+  if (!socket) throw new Error('no socket was created')
+  return socket
 }
 
-function GameProbe() {
-  const { activeQuestion, players } = useActiveGame()
+function SessionProbe() {
+  const { role, session, standings, endReason } = useActiveGame()
 
-  return (
-    <p data-testid="probe">
-      {activeQuestion?.text ?? 'no question'} / {players.length} players
-    </p>
-  )
+  const probe = [
+    role ?? 'no role',
+    session?.question?.text ?? 'no question',
+    `${session?.players.length ?? 0} players`,
+    `${standings?.length ?? 'no'} winners`,
+    endReason ?? 'running',
+  ].join('|')
+
+  return <p data-testid="probe">{probe}</p>
 }
 
-const renderProvider = (role: 'host' | 'player', onWinnersShown = vi.fn()) =>
+const renderProvider = () =>
   render(
-    <ActiveGameProvider role={role} gameId="g1" onWinnersShown={onWinnersShown}>
-      <GameProbe />
+    <ActiveGameProvider sessionId="s1">
+      <SessionProbe />
     </ActiveGameProvider>,
   )
 
+const join = (socket: FakeSocket) => {
+  socket.open()
+  socket.receive({
+    type: 'JOINED_SESSION',
+    payload: { role: 'player', sessionId: 's1' },
+  })
+}
+
 describe('ActiveGameProvider', () => {
-  it('starts the game as the host once connected and shows the game data', async () => {
+  it('joins the session once connected and shows the session state', async () => {
     useFakeSockets()
-    const screen = await renderProvider('host')
-    const socket = sockets.at(-1)
-    if (!socket) throw new Error('no socket was created')
+    const screen = await renderProvider()
+    const socket = lastSocket()
 
     socket.open()
     expect(socket.sentMessages()).toEqual([
-      { type: 'START_GAME', payload: { gameId: 'g1' } },
+      { type: 'JOIN_SESSION', payload: { sessionId: 's1' } },
     ])
 
-    socket.receive({ type: 'GAME_DATA', payload: game })
+    join(socket)
+    socket.receive({
+      type: 'SESSION_STATE',
+      payload: createSessionState({
+        players: [
+          {
+            id: 'u1',
+            name: 'alice',
+            bgColor: '#000',
+            connected: true,
+            answered: false,
+          },
+        ],
+      }),
+    })
+
     await expect
       .element(screen.getByTestId('probe'))
-      .toHaveTextContent('2+2? / 1 players')
+      .toHaveTextContent('player|2+2?|1 players|no winners|running')
   })
 
-  it('connects a player and reports the winners', async () => {
+  it('keeps the winners and the end reason', async () => {
     useFakeSockets()
-    const onWinnersShown = vi.fn()
-    await renderProvider('player', onWinnersShown)
-    const socket = sockets.at(-1)
-    if (!socket) throw new Error('no socket was created')
+    const screen = await renderProvider()
+    const socket = lastSocket()
+    join(socket)
 
-    socket.open()
-    socket.receive({ type: 'SHOW_WINNERS', payload: { standings: [] } })
+    socket.receive({
+      type: 'WINNERS',
+      payload: { standings: [{ id: 'u1', name: 'alice', score: 2 }] },
+    })
+    socket.receive({
+      type: 'SESSION_ENDED',
+      payload: { reason: 'finished' },
+    })
 
-    expect(socket.sentMessages()).toEqual([
-      { type: 'PLAYER_CONNECTED', payload: { gameId: 'g1' } },
-    ])
-    expect(onWinnersShown).toHaveBeenCalledOnce()
+    await expect
+      .element(screen.getByTestId('probe'))
+      .toHaveTextContent('player|no question|0 players|1 winners|finished')
   })
 
-  it('closes its connection on unmount and joins again with a new one on the next mount', async () => {
+  it('closes its connection on unmount and joins again on the next mount', async () => {
     useFakeSockets()
-    const first = await renderProvider('host')
-    const firstSocket = sockets.at(-1)
-    if (!firstSocket) throw new Error('no socket was created')
+    const first = await renderProvider()
+    const firstSocket = lastSocket()
     firstSocket.open()
 
     await first.unmount()
     expect(firstSocket.close).toHaveBeenCalled()
 
-    await renderProvider('host')
-    const secondSocket = sockets.at(-1)
-    if (!secondSocket || secondSocket === firstSocket)
-      throw new Error('no new socket was created')
+    await renderProvider()
+    const secondSocket = lastSocket()
+    if (secondSocket === firstSocket) throw new Error('no new socket was made')
 
     secondSocket.open()
     expect(secondSocket.sentMessages()).toEqual([
-      { type: 'START_GAME', payload: { gameId: 'g1' } },
+      { type: 'JOIN_SESSION', payload: { sessionId: 's1' } },
+    ])
+  })
+
+  it('reconnects after a drop and rejoins the session', async () => {
+    useFakeSockets()
+    await renderProvider()
+    const firstSocket = lastSocket()
+    join(firstSocket)
+
+    firstSocket.onclose?.()
+
+    await expect.poll(() => sockets.length, { timeout: 4000 }).toBe(2)
+    const secondSocket = lastSocket()
+    secondSocket.open()
+    expect(secondSocket.sentMessages()).toEqual([
+      { type: 'JOIN_SESSION', payload: { sessionId: 's1' } },
     ])
   })
 })

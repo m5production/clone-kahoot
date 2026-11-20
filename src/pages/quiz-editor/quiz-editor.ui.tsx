@@ -2,6 +2,7 @@ import { useQuery } from '@tanstack/react-query'
 import { useState } from 'react'
 import { Link, useParams } from 'react-router'
 import { GAME_QUESTIONS_QUERY, isQuizReady } from '@/entities/question'
+import { StartSessionButton } from '@/features/active-game/start-session'
 import { RenameGameTitle } from '@/features/game/rename-game'
 import { DeleteQuestionButton } from '@/features/question/delete-question'
 import { EditQuestionForm } from '@/features/question/edit-question'
@@ -48,13 +49,7 @@ export function QuizEditorPage() {
         <header className="flex items-center justify-between gap-4">
           <RenameGameTitle gameId={gameId} />
           {isReadyToStartGame ? (
-            <Link
-              data-testid="start-game-link"
-              to={`/${gameId}/admin/activeGame`}
-              className={cn(buttonVariants({ size: 'lg' }), 'font-bold')}
-            >
-              Start this quiz
-            </Link>
+            <StartSessionButton gameId={gameId} />
           ) : (
             <Button
               data-testid="start-game-button"

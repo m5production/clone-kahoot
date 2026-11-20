@@ -1,6 +1,6 @@
 import { type JSX, useEffect, useState } from 'react'
-import { Navigate } from 'react-router'
-import { restoreSession } from '@/entities/session'
+import { Navigate, useSearchParams } from 'react-router'
+import { getSafeReturnUrl, restoreSession } from '@/entities/session'
 
 /**
  * Wraps guest pages (welcome, login, register): restores the stored session
@@ -21,8 +21,12 @@ export function GuestOnly({ children }: { children: JSX.Element }) {
     }
   }, [])
 
+  const [searchParams] = useSearchParams()
+  const next = getSafeReturnUrl(searchParams.get('next'))
+
   if (state === 'checking') return null
-  if (state === 'signed-in') return <Navigate to="/home" replace />
+  // FR-72: a signed-in user continues to the page they came for
+  if (state === 'signed-in') return <Navigate to={next ?? '/home'} replace />
 
   return children
 }

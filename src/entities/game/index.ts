@@ -1,5 +1,4 @@
 export {
-  checkActiveGame,
   createGame,
   deleteGame,
   fetchGameById,

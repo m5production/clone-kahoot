@@ -4,95 +4,112 @@ import { useActiveGame } from '@/entities/active-game'
 import { cn } from '@/shared/lib'
 import { Button, buttonVariants } from '@/shared/ui'
 
-const COPY_CONFIRMATION_MS = 3000
+const CONFIRM_END_MS = 3000
 
-type Props = {
-  gameId: string
-  isWinnersShown: boolean
-  onWinnersShown: () => void
-}
+type ControlMessage =
+  | 'START_GAME'
+  | 'NEXT_QUESTION'
+  | 'CLOSE_QUESTION'
+  | 'SHOW_ANSWERS'
+  | 'SHOW_WINNERS'
+  | 'END_SESSION'
 
-export function HostControls({
-  gameId,
-  isWinnersShown,
-  onWinnersShown,
-}: Props) {
-  const { sendMessage, activeQuestion } = useActiveGame()
-  const [isCopyConfirmationShown, setIsCopyConfirmationShown] = useState(false)
+export function HostControls() {
+  const { session, endReason, sendMessage } = useActiveGame()
+  const [isEndConfirming, setIsEndConfirming] = useState(false)
 
-  const handleCopyLinkClick = () => {
-    navigator.clipboard.writeText(gameId)
-    setIsCopyConfirmationShown(true)
-    setTimeout(() => setIsCopyConfirmationShown(false), COPY_CONFIRMATION_MS)
-  }
+  const state = session?.state
+  const question = session?.question
+  const isLastQuestion =
+    question !== null &&
+    question !== undefined &&
+    question.number === question.total
 
-  const handleShowAnswersClick = () => {
-    if (!activeQuestion) return
+  const send = (type: ControlMessage) => sendMessage?.({ type, payload: null })
 
-    sendMessage?.({
-      type: 'SHOW_ANSWERS',
-      payload: { questionId: activeQuestion.id },
-    })
-  }
-
-  const handleShowWinnersClick = () => {
-    if (!sendMessage) return
-
-    sendMessage({ type: 'SHOW_WINNERS', payload: null })
-    onWinnersShown()
-  }
-
-  const handleStopQuizClick = () => {
-    sendMessage?.({ type: 'END_GAME', payload: null })
+  const handleEndSessionClick = () => {
+    // FR-70: ending the session needs a confirmation click
+    if (!isEndConfirming) {
+      setIsEndConfirming(true)
+      setTimeout(() => setIsEndConfirming(false), CONFIRM_END_MS)
+      return
+    }
+    setIsEndConfirming(false)
+    send('END_SESSION')
   }
 
   return (
     <div data-testid="host-controls" className="flex flex-col gap-4">
-      <Button
-        data-testid="copy-game-link-button"
-        className="whitespace-normal h-auto w-full"
-        onClick={handleCopyLinkClick}
-      >
-        Copy link for the players
-      </Button>
-      {isCopyConfirmationShown && (
-        <p className="text-sm text-muted-foreground">
-          Link for the players has been copied to your clipboard
-        </p>
+      {state === 'lobby' && (
+        <Button
+          data-testid="start-game-button"
+          className="w-full font-bold"
+          type="button"
+          onClick={() => send('START_GAME')}
+        >
+          Start the game
+        </Button>
       )}
 
-      <Button
-        data-testid="show-answers-button"
-        variant="secondary"
-        className="w-full"
-        type="button"
-        onClick={handleShowAnswersClick}
-      >
-        Show answers
-      </Button>
+      {state === 'question_open' && (
+        <Button
+          data-testid="close-question-button"
+          variant="secondary"
+          className="w-full"
+          type="button"
+          onClick={() => send('CLOSE_QUESTION')}
+        >
+          Close the question
+        </Button>
+      )}
 
-      <Button
-        data-testid="show-winners-button"
-        variant="secondary"
-        className="whitespace-normal h-auto w-full"
-        type="button"
-        onClick={handleShowWinnersClick}
-        disabled={isWinnersShown}
-      >
-        End Quiz and show winners
-      </Button>
+      {state === 'question_closed' && (
+        <Button
+          data-testid="show-answers-button"
+          variant="secondary"
+          className="w-full"
+          type="button"
+          onClick={() => send('SHOW_ANSWERS')}
+        >
+          Show answers
+        </Button>
+      )}
 
-      <Button
-        data-testid="stop-game-button"
-        variant="outline"
-        className="w-full text-destructive hover:bg-destructive/10 hover:text-destructive"
-        disabled={!isWinnersShown}
-        onClick={handleStopQuizClick}
-      >
-        Stop Quiz
-      </Button>
+      {state === 'answers_shown' &&
+        (isLastQuestion ? (
+          <Button
+            data-testid="show-winners-button"
+            variant="secondary"
+            className="w-full"
+            type="button"
+            onClick={() => send('SHOW_WINNERS')}
+          >
+            Show winners
+          </Button>
+        ) : (
+          <Button
+            data-testid="next-question-button"
+            variant="secondary"
+            className="w-full"
+            type="button"
+            onClick={() => send('NEXT_QUESTION')}
+          >
+            Next question
+          </Button>
+        ))}
 
-      {isWinnersShown && (
+      {!endReason && (
+        <Button
+          data-testid="end-session-button"
+          variant="outline"
+          className="w-full text-destructive hover:bg-destructive/10 hover:text-destructive"
+          onClick={handleEndSessionClick}
+        >
+          {isEndConfirming ? 'Confirm: end the session?' : 'End the session'}
+        </Button>
+      )}
+
+      {endReason && (
         <Link
           data-testid="home-link"
           className={cn(buttonVariants({ variant: 'ghost' }), 'w-full')}

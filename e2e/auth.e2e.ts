@@ -135,10 +135,13 @@ test.describe('authorisation', () => {
   test('pages behind the login redirect a guest to the welcome page', async ({
     page,
   }) => {
-    for (const path of ['/home', '/some-game/admin', '/some-game/player']) {
+    for (const path of ['/home', '/some-game/admin', '/join/some-session']) {
       await page.goto(path)
       await expect(page.getByTestId('welcome-login-link')).toBeVisible()
-      await expect(page).toHaveURL('/')
+      // FR-72: the page they asked for is kept in ?next= for after the sign-in
+      const url = new URL(page.url())
+      expect(url.pathname).toBe('/')
+      expect(url.searchParams.get('next')).toBe(path)
     }
   })
 
@@ -150,6 +153,7 @@ test.describe('authorisation', () => {
 
     await expect(page.getByTestId('welcome-login-link')).toBeVisible()
     await page.goto('/home')
-    await expect(page).toHaveURL('/')
+    await expect(page.getByTestId('welcome-login-link')).toBeVisible()
+    expect(new URL(page.url()).pathname).toBe('/')
   })
 })

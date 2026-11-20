@@ -2,6 +2,7 @@ export {
   clearSession,
   clearSessionToken,
   clearSessionUserId,
+  getSafeReturnUrl,
   getSessionToken,
   getSessionUserId,
   isAuthenticated,

@@ -1,11 +1,61 @@
-import type { Player, PlayerAnswer, PlayerScore } from '@/entities/player' // FSD: cross import
-import type { ActiveGameQuestion } from '@/entities/question' // FSD: cross import
+export type SessionState =
+  | 'lobby'
+  | 'question_open'
+  | 'question_closed'
+  | 'answers_shown'
 
-export interface ActiveGame {
+export type SessionEndReason = 'finished' | 'host_ended' | 'host_timeout'
+
+export interface SessionPlayer {
   id: string
-  players: Player[]
-  allQuestions: ActiveGameQuestion[]
-  activeQuestionId: string | null
+  name: string
+  bgColor: string
+  connected: boolean
+  answered: boolean
+}
+
+export interface SessionQuestion {
+  id: string
+  text: string
+  img: string | null
+  number: number
+  total: number
+}
+
+/** GET /api/sessions/:id — public data shown on the join page */
+export interface SessionSummary {
+  state: SessionState
+  quizTitle: string
+  hostName: string
+}
+
+export interface SessionStateMessage {
+  sessionId: string
+  gameId: string
+  quizTitle: string
+  state: SessionState
+  hostConnected: boolean
+  players: SessionPlayer[]
+  question: SessionQuestion | null
+}
+
+export interface RevealedAnswer {
+  playerId: string
+  playerName: string
+  text: string | null
+  isCorrect: boolean
+}
+
+export interface AnswersRevealed {
+  questionId: string
+  acceptedAnswers: string[]
+  answers: RevealedAnswer[]
+}
+
+export interface Winner {
+  id: string
+  name: string
+  score: number
 }
 
 export interface GameFault {
@@ -13,34 +63,49 @@ export interface GameFault {
   message: string
 }
 
+export type ActiveGameRole = 'host' | 'player'
+
 export type ServerMessage =
-  | { type: 'GAME_DATA'; payload: ActiveGame }
+  | {
+      type: 'JOINED_SESSION'
+      payload: { role: ActiveGameRole; sessionId: string }
+    }
+  | { type: 'SESSION_STATE'; payload: SessionStateMessage }
+  | {
+      type: 'ANSWER_ACCEPTED'
+      payload: { questionId: string; text: string }
+    }
+  | { type: 'QUESTION_CLOSED'; payload: { questionId: string } }
+  | { type: 'ANSWERS_REVEALED'; payload: AnswersRevealed }
+  | { type: 'WINNERS'; payload: { standings: Winner[] } }
+  | { type: 'SESSION_ENDED'; payload: { reason: SessionEndReason } }
   | { type: 'FAULT'; payload: GameFault }
-  | { type: 'SHOW_ANSWERS'; payload: { answers: PlayerAnswer[] } }
-  | { type: 'SHOW_WINNERS'; payload: { standings: PlayerScore[] } }
-  | { type: 'END_GAME'; payload: null }
 
 export type ClientMessage =
-  | { type: 'START_GAME'; payload: { gameId: string } }
-  | { type: 'PLAYER_CONNECTED'; payload: { gameId: string } }
-  | { type: 'CHANGE_QUESTION'; payload: { questionId: string } }
+  | { type: 'JOIN_SESSION'; payload: { sessionId: string } }
+  | { type: 'START_GAME'; payload: null }
+  | { type: 'NEXT_QUESTION'; payload: null }
+  | { type: 'CLOSE_QUESTION'; payload: null }
+  | { type: 'SHOW_ANSWERS'; payload: null }
+  | { type: 'SHOW_WINNERS'; payload: null }
+  | { type: 'END_SESSION'; payload: null }
   | {
       type: 'ANSWER_QUESTION'
       payload: { questionId: string; answer: string }
     }
-  | { type: 'SHOW_ANSWERS'; payload: { questionId: string } }
-  | { type: 'SHOW_WINNERS'; payload: null }
-  | { type: 'END_GAME'; payload: null }
 
 export type SendMessage = (message: ClientMessage) => void
 
-export type ActiveGameRole = 'host' | 'player'
-
 export interface ActiveGameState {
-  players: Player[]
-  allQuestions: ActiveGameQuestion[]
-  activeQuestion: ActiveGameQuestion | null
-  playerAnswers: PlayerAnswer[] | null
-  standings: PlayerScore[] | null
+  /** null until the server assigns a role on JOIN_SESSION */
+  role: ActiveGameRole | null
+  /** null until the first SESSION_STATE */
+  session: SessionStateMessage | null
+  /** answers of the current question, set on ANSWERS_REVEALED */
+  revealed: AnswersRevealed | null
+  /** the player's own answer to the open question, kept locally (echoed by ANSWER_ACCEPTED) */
+  myAnswer: { questionId: string; text: string } | null
+  standings: Winner[] | null
+  endReason: SessionEndReason | null
   sendMessage: SendMessage | null
 }

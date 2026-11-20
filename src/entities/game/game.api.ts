@@ -37,7 +37,3 @@ export const reorderQuestions = async (
 ) => {
   await httpClient.patch(`/games/${gameId}/questions/reorder`, { questionIds })
 }
-
-export const checkActiveGame = async (gameId: string) => {
-  await httpClient.get(`/active-game/${gameId}`)
-}

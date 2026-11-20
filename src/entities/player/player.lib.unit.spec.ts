@@ -1,17 +1,16 @@
 import { describe, expect, it } from 'vitest'
-import { createAnswer, createPlayer } from './player.fixtures'
-import { findPlayerAnswer, hasAnsweredQuestion } from './player.lib'
+import { createPlayer } from './player.fixtures'
+import { findPlayer } from './player.lib'
 
-describe('findPlayerAnswer / hasAnsweredQuestion', () => {
-  const player = createPlayer({ id: 'a', answers: [createAnswer('q1')] })
+describe('findPlayer', () => {
+  const players = [createPlayer({ id: 'a' }), createPlayer({ id: 'b' })]
 
-  it('finds the answer to the question', () => {
-    expect(findPlayerAnswer(player, 'q1')).toEqual(createAnswer('q1'))
-    expect(hasAnsweredQuestion(player, 'q1')).toBe(true)
+  it('finds the player by id', () => {
+    expect(findPlayer(players, 'b')).toEqual(players[1])
   })
 
-  it('reports a question without an answer', () => {
-    expect(findPlayerAnswer(player, 'q2')).toBeUndefined()
-    expect(hasAnsweredQuestion(player, 'q2')).toBe(false)
+  it('reports an unknown or missing id', () => {
+    expect(findPlayer(players, 'x')).toBeUndefined()
+    expect(findPlayer(players, null)).toBeUndefined()
   })
 })

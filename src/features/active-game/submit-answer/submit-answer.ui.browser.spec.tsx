@@ -4,6 +4,8 @@ import {
   ActiveGameContext,
   type ActiveGameState,
   createActiveGameState,
+  createSessionPlayer,
+  createSessionState,
 } from '@/entities/active-game'
 import { saveSessionUserId } from '@/entities/session'
 import { SubmitAnswerForm } from './submit-answer.ui'
@@ -16,7 +18,7 @@ const renderForm = (state: ActiveGameState) =>
   )
 
 describe('SubmitAnswerForm', () => {
-  it('sends the answer to the active question for the current player', async () => {
+  it('sends the answer to the open question for the current player', async () => {
     saveSessionUserId('u1')
     const sendMessage = vi.fn()
     const screen = await renderForm(createActiveGameState({ sendMessage }))
@@ -51,15 +53,22 @@ describe('SubmitAnswerForm', () => {
     saveSessionUserId('u1')
     const screen = await renderForm(
       createActiveGameState({
-        players: [
-          {
-            id: 'u1',
-            name: 'alice',
-            bgColor: '#000',
-            answers: [{ questionId: 'q1' }],
-            connected: true,
-          },
-        ],
+        session: createSessionState({
+          players: [createSessionPlayer({ id: 'u1', answered: true })],
+        }),
+      }),
+    )
+
+    await expect.element(screen.getByTestId('answer-input')).toBeDisabled()
+    await expect
+      .element(screen.getByTestId('submit-answer-button'))
+      .toBeDisabled()
+  })
+
+  it('locks the form while no question is open', async () => {
+    const screen = await renderForm(
+      createActiveGameState({
+        session: createSessionState({ state: 'question_closed' }),
       }),
     )
 

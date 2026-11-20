@@ -1,52 +1,50 @@
 import { type PropsWithChildren, useEffect, useRef, useState } from 'react'
 import { toast } from 'react-toastify'
-import type { Player, PlayerAnswer, PlayerScore } from '@/entities/player' // FSD: cross import
-import type { ActiveGameQuestion } from '@/entities/question' // FSD: cross import
 import { createSocket, getApiErrorMessage } from '@/shared/api'
 import { ActiveGameContext } from './active-game.context'
-import {
-  buildJoinMessage,
-  getActiveQuestion,
-  parseServerMessage,
-} from './active-game.lib'
-import type { ActiveGameRole, SendMessage } from './active-game.types'
+import { parseServerMessage } from './active-game.lib'
+import type {
+  ActiveGameRole,
+  AnswersRevealed,
+  SendMessage,
+  SessionEndReason,
+  SessionStateMessage,
+  Winner,
+} from './active-game.types'
+
+const RECONNECT_DELAY_MS = 2000
 
 type Props = PropsWithChildren<{
-  role: ActiveGameRole
-  gameId: string
-  onWinnersShown?: () => void
+  sessionId: string
 }>
 
-export function ActiveGameProvider({
-  role,
-  gameId,
-  onWinnersShown,
-  children,
-}: Props) {
-  const [players, setPlayers] = useState<Player[]>([])
-  const [allQuestions, setAllQuestions] = useState<ActiveGameQuestion[]>([])
-  const [activeQuestion, setActiveQuestion] =
-    useState<ActiveGameQuestion | null>(null)
+export function ActiveGameProvider({ sessionId, children }: Props) {
+  const [role, setRole] = useState<ActiveGameRole | null>(null)
+  const [session, setSession] = useState<SessionStateMessage | null>(null)
+  const [revealed, setRevealed] = useState<AnswersRevealed | null>(null)
+  const [myAnswer, setMyAnswer] = useState<{
+    questionId: string
+    text: string
+  } | null>(null)
+  const [standings, setStandings] = useState<Winner[] | null>(null)
+  const [endReason, setEndReason] = useState<SessionEndReason | null>(null)
   const [sendMessage, setSendMessage] = useState<SendMessage | null>(null)
-  const [playerAnswers, setPlayerAnswers] = useState<PlayerAnswer[] | null>(
-    null,
-  )
-  const [standings, setStandings] = useState<PlayerScore[] | null>(null)
 
-  const onWinnersShownRef = useRef(onWinnersShown)
-  onWinnersShownRef.current = onWinnersShown
+  // A mounted session screen keeps reconnecting while it lives: a drop means the
+  // socket reconnects and JOIN_SESSION restores the seat (BR-58, BR-59)
+  const endedRef = useRef(false)
 
-  // One connection per mounted game screen: a new mount joins the game again, and leaving the
-  // screen disconnects (the backend ends the game when the host disconnects)
   useEffect(() => {
     let socket: WebSocket | null = null
     let cancelled = false
+    let retryTimer: ReturnType<typeof setTimeout> | null = null
 
     const connect = async () => {
       try {
         socket = await createSocket()
       } catch (error) {
         toast(`Could not connect to the game: ${getApiErrorMessage(error)}`)
+        if (!cancelled) retryTimer = setTimeout(connect, RECONNECT_DELAY_MS)
         return
       }
       if (cancelled) {
@@ -59,7 +57,7 @@ export function ActiveGameProvider({
 
       socket.onopen = () => {
         setSendMessage(() => send)
-        send(buildJoinMessage(role, gameId))
+        send({ type: 'JOIN_SESSION', payload: { sessionId } })
       }
 
       socket.onmessage = (event: MessageEvent<string>) => {
@@ -71,23 +69,50 @@ export function ActiveGameProvider({
           case 'FAULT':
             toast(message.payload.message)
             return
-          case 'SHOW_WINNERS':
+          case 'JOINED_SESSION':
+            setRole(message.payload.role)
+            return
+          case 'SESSION_STATE':
+            setSession(message.payload)
+            // a new question clears the revealed answers and the stored own
+            // answer of the previous one
+            setRevealed((current) =>
+              current && current.questionId !== message.payload.question?.id
+                ? null
+                : current,
+            )
+            setMyAnswer((current) =>
+              current && current.questionId !== message.payload.question?.id
+                ? null
+                : current,
+            )
+            return
+          case 'ANSWER_ACCEPTED':
+            setMyAnswer({
+              questionId: message.payload.questionId,
+              text: message.payload.text,
+            })
+            return
+          case 'QUESTION_CLOSED':
+            return
+          case 'ANSWERS_REVEALED':
+            setRevealed(message.payload)
+            return
+          case 'WINNERS':
             setStandings(message.payload.standings)
-            if (role === 'player') onWinnersShownRef.current?.()
             return
-          case 'SHOW_ANSWERS':
-            setPlayerAnswers(message.payload.answers)
-            return
-          case 'GAME_DATA':
-            setPlayers(message.payload.players)
-            setAllQuestions(message.payload.allQuestions)
-            setActiveQuestion(getActiveQuestion(message.payload))
+          case 'SESSION_ENDED':
+            endedRef.current = true
+            setEndReason(message.payload.reason)
             return
         }
       }
 
       socket.onclose = () => {
-        console.log('WebSocket closed')
+        setSendMessage(null)
+        if (!cancelled && !endedRef.current) {
+          retryTimer = setTimeout(connect, RECONNECT_DELAY_MS)
+        }
       }
     }
 
@@ -95,6 +120,7 @@ export function ActiveGameProvider({
 
     return () => {
       cancelled = true
+      if (retryTimer) clearTimeout(retryTimer)
       if (socket) {
         socket.onopen = null
         socket.onmessage = null
@@ -103,20 +129,17 @@ export function ActiveGameProvider({
       }
       setSendMessage(null)
     }
-  }, [role, gameId])
-
-  useEffect(() => {
-    setPlayerAnswers(null)
-  }, [activeQuestion])
+  }, [sessionId])
 
   return (
     <ActiveGameContext.Provider
       value={{
-        activeQuestion,
-        allQuestions,
-        playerAnswers,
-        players,
+        endReason,
+        myAnswer,
+        revealed,
+        role,
         sendMessage,
+        session,
         standings,
       }}
     >

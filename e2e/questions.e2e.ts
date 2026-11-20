@@ -220,7 +220,7 @@ test.describe('quiz editor', () => {
     await page.goto(`/${game.id}/admin`)
 
     const startButton = page.getByTestId('start-game-button')
-    const startLink = page.getByTestId('start-game-link')
+    const startLink = page.getByTestId('start-session-button')
 
     // A question with neither text nor answers, and one with text but no
     // accepted answers — both are incomplete, so the quiz cannot start

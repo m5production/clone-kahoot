@@ -1,25 +1,18 @@
-// GAME_DATA intentionally carries only which questions were answered:
-// answer texts and correctness are revealed separately via SHOW_ANSWERS
-export interface PlayerQuestionAnswer {
-  questionId: string
-}
-
 export interface Player {
   id: string
   name: string
   bgColor: string
-  answers: PlayerQuestionAnswer[]
   connected: boolean
+  /** answered the currently open question (from SESSION_STATE) */
+  answered: boolean
 }
 
+/** a row of ANSWERS_REVEALED — shown only after the question is closed */
 export interface PlayerAnswer {
   playerId: string
   playerName: string
-  playerAnswer: {
-    questionId: string
-    text: string | null
-    isCorrect: boolean
-  }
+  text: string | null
+  isCorrect: boolean
 }
 
 export interface PlayerScore {

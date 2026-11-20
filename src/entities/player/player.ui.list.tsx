@@ -1,34 +1,33 @@
 import { cn } from '@/shared/lib'
-import { hasAnsweredQuestion } from './player.lib'
 import type { Player, PlayerAnswer } from './player.types'
 
 type Props = React.ComponentProps<'section'> & {
   players: Player[]
-  activeQuestionId?: string
+  showAnswered?: boolean
   playerAnswers: PlayerAnswer[] | null
 }
 
 export function Players({
   players,
-  activeQuestionId,
+  showAnswered,
   playerAnswers,
   ...props
 }: Props) {
   return (
     <section data-testid="players-panel" {...props}>
-      {playerAnswers && activeQuestionId ? (
-        <ul data-testid="player-answers-list" className="flex flex-wrap">
-          {playerAnswers.map(({ playerAnswer, playerId, playerName }) => (
+      {playerAnswers ? (
+        <ul data-testid="player-answers-list" className="flex flex-wrap gap-2">
+          {playerAnswers.map(({ playerId, playerName, text, isCorrect }) => (
             <li
               key={playerId}
               data-testid={`player-answer-item-${playerId}`}
               className={cn(
                 'rounded-full px-2 border-2 border-current bg-destructive/15 text-destructive',
-                playerAnswer?.isCorrect && 'bg-success/15 text-success',
+                isCorrect && 'bg-success/15 text-success',
               )}
             >
               <span className="font-semibold">{playerName}:</span>{' '}
-              {playerAnswer?.text || 'No answer'}
+              {text || 'No answer'}
             </li>
           ))}
         </ul>
@@ -42,9 +41,8 @@ export function Players({
                 data-testid={`player-item-${player.id}`}
                 className={cn(
                   'rounded-xl p-2 text-white',
-                  activeQuestionId &&
-                    hasAnsweredQuestion(player, activeQuestionId) &&
-                    'ring-primary ring-4',
+                  !player.connected && 'opacity-50',
+                  showAnswered && player.answered && 'ring-primary ring-4',
                 )}
                 style={{ backgroundColor: player.bgColor }}
               >
