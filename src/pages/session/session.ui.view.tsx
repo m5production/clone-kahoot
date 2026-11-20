@@ -1,5 +1,5 @@
 import { Link } from 'react-router'
-import { useActiveGame } from '@/entities/active-game'
+import { useActiveGame, useQuestionCountdown } from '@/entities/active-game'
 import { Players, WinnersTable } from '@/entities/player'
 import { QuestionView } from '@/entities/question'
 import {
@@ -77,7 +77,8 @@ function HostScreen() {
         <HostControls />
       </aside>
 
-      <div className="flex items-center justify-center p-8">
+      <div className="flex flex-col items-center justify-center gap-4 p-8">
+        <QuestionTimer />
         {question && <QuestionView text={question.text} img={question.img} />}
       </div>
 
@@ -105,6 +106,7 @@ function PlayerScreen() {
           </p>
         )}
         {question && <QuestionView text={question.text} img={question.img} />}
+        <QuestionTimer />
 
         {state === 'question_open' && (
           <Card className="w-full max-w-md rounded-3xl border-0 shadow-xl">
@@ -140,6 +142,27 @@ function PlayerScreen() {
         }
       />
     </div>
+  )
+}
+
+/** Remaining seconds of the open question in server time; hidden outside question_open (BR-61, NFR-P6) */
+function QuestionTimer() {
+  const remaining = useQuestionCountdown()
+
+  if (remaining === null) return null
+
+  const seconds = Math.ceil(remaining / 1000)
+
+  return (
+    <p
+      data-testid="question-timer"
+      className={cn(
+        'rounded-full px-4 py-1 text-2xl font-extrabold tabular-nums',
+        seconds <= 5 ? 'bg-destructive/15 text-destructive' : 'bg-muted',
+      )}
+    >
+      {seconds}
+    </p>
   )
 }
 

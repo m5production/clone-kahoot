@@ -13,10 +13,14 @@ export interface PlayerAnswer {
   playerName: string
   text: string | null
   isCorrect: boolean
+  /** speed-based points earned on the question (BR-70) */
+  points: number
 }
 
 export interface PlayerScore {
+  place: number
   id: string
   name: string
   score: number
+  correctCount: number
 }

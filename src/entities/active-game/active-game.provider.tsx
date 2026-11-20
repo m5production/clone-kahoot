@@ -29,6 +29,8 @@ export function ActiveGameProvider({ sessionId, children }: Props) {
   const [standings, setStandings] = useState<Winner[] | null>(null)
   const [endReason, setEndReason] = useState<SessionEndReason | null>(null)
   const [sendMessage, setSendMessage] = useState<SendMessage | null>(null)
+  // NFR-P6: clients count down to question.endsAt in server time, not local time
+  const [clockOffset, setClockOffset] = useState(0)
 
   // A mounted session screen keeps reconnecting while it lives: a drop means the
   // socket reconnects and JOIN_SESSION restores the seat (BR-58, BR-59)
@@ -74,6 +76,7 @@ export function ActiveGameProvider({ sessionId, children }: Props) {
             return
           case 'SESSION_STATE':
             setSession(message.payload)
+            setClockOffset(message.payload.serverNow - Date.now())
             // a new question clears the revealed answers and the stored own
             // answer of the previous one
             setRevealed((current) =>
@@ -134,6 +137,7 @@ export function ActiveGameProvider({ sessionId, children }: Props) {
   return (
     <ActiveGameContext.Provider
       value={{
+        clockOffset,
         endReason,
         myAnswer,
         revealed,

@@ -1,6 +1,6 @@
 import { useEffect, useRef } from 'react'
 import { useForm } from 'react-hook-form'
-import { useActiveGame } from '@/entities/active-game'
+import { useActiveGame, useQuestionCountdown } from '@/entities/active-game'
 import { findPlayer } from '@/entities/player'
 import { getSessionUserId } from '@/entities/session'
 import { Button, Input } from '@/shared/ui'
@@ -13,6 +13,8 @@ const defaultValues: AnswerValues = { answer: '' }
 
 export function SubmitAnswerForm() {
   const { session, myAnswer, sendMessage } = useActiveGame()
+  const remaining = useQuestionCountdown()
+  const timeUp = remaining === 0
   // The server never broadcasts answer texts before the reveal, so the player's
   // own answers are kept locally to survive a reconnect
   const myAnswers = useRef(new Map<string, string>())
@@ -44,7 +46,7 @@ export function SubmitAnswerForm() {
   }, [question?.id, myAnswer?.text])
 
   const handleSend = ({ answer }: AnswerValues) => {
-    if (!question || !isOpen) return
+    if (!question || !isOpen || timeUp) return
 
     myAnswers.current.set(question.id, answer)
     sendMessage?.({
@@ -60,7 +62,7 @@ export function SubmitAnswerForm() {
         className="h-12 text-lg"
         aria-invalid={Boolean(errors.answer)}
         placeholder="Type your answer here!"
-        disabled={!isOpen || answered}
+        disabled={!isOpen || answered || timeUp}
         {...register('answer', { required: "You can't submit empty answer" })}
         type="text"
       />
@@ -70,13 +72,15 @@ export function SubmitAnswerForm() {
         </p>
       )}
       <p className="text-sm text-muted-foreground">
-        {answered
-          ? 'Your answer has been accepted.'
-          : 'After submitting the answer you will not be able to change it.'}
+        {timeUp && !answered
+          ? 'Time is up — the question is closed.'
+          : answered
+            ? 'Your answer has been accepted.'
+            : 'After submitting the answer you will not be able to change it.'}
       </p>
       <Button
         data-testid="submit-answer-button"
-        disabled={!isOpen || answered}
+        disabled={!isOpen || answered || timeUp}
         type="button"
         size="lg"
         className="w-full font-bold"

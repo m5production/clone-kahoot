@@ -20,6 +20,8 @@ export interface SessionQuestion {
   img: string | null
   number: number
   total: number
+  /** server timestamp (ms) when the question closes (BR-61) */
+  endsAt: number
 }
 
 /** GET /api/sessions/:id — public data shown on the join page */
@@ -37,6 +39,8 @@ export interface SessionStateMessage {
   hostConnected: boolean
   players: SessionPlayer[]
   question: SessionQuestion | null
+  /** server clock at broadcast time (ms); used to sync the countdown (NFR-P6) */
+  serverNow: number
 }
 
 export interface RevealedAnswer {
@@ -44,6 +48,8 @@ export interface RevealedAnswer {
   playerName: string
   text: string | null
   isCorrect: boolean
+  /** speed-based points earned on this question (BR-70) */
+  points: number
 }
 
 export interface AnswersRevealed {
@@ -53,9 +59,11 @@ export interface AnswersRevealed {
 }
 
 export interface Winner {
+  place: number
   id: string
   name: string
   score: number
+  correctCount: number
 }
 
 export interface GameFault {
@@ -108,4 +116,6 @@ export interface ActiveGameState {
   standings: Winner[] | null
   endReason: SessionEndReason | null
   sendMessage: SendMessage | null
+  /** serverNow − local Date.now() at the last SESSION_STATE; adds to local time to get server time */
+  clockOffset: number
 }

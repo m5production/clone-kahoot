@@ -120,7 +120,11 @@ describe('ActiveGameProvider', () => {
 
     socket.receive({
       type: 'WINNERS',
-      payload: { standings: [{ id: 'u1', name: 'alice', score: 2 }] },
+      payload: {
+        standings: [
+          { place: 1, id: 'u1', name: 'alice', score: 2, correctCount: 2 },
+        ],
+      },
     })
     socket.receive({
       type: 'SESSION_ENDED',

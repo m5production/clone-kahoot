@@ -3,6 +3,7 @@ import {
   ActiveGameContext,
   type ActiveGameState,
   createActiveGameState,
+  createSessionQuestion,
   createSessionState,
 } from '@/entities/active-game'
 import { renderWithProviders } from '@/shared/test'
@@ -19,7 +20,12 @@ describe('QuestionProgress', () => {
     const screen = await renderInGame(
       createActiveGameState({
         session: createSessionState({
-          question: { id: 'q2', text: 'x', img: null, number: 2, total: 3 },
+          question: createSessionQuestion({
+            id: 'q2',
+            text: 'x',
+            number: 2,
+            total: 3,
+          }),
         }),
       }),
       <QuestionProgress />,
@@ -98,7 +104,12 @@ describe('HostControls', () => {
     const { screen, sendMessage } = await renderControls({
       session: createSessionState({
         state: 'answers_shown',
-        question: { id: 'q1', text: 'x', img: null, number: 1, total: 2 },
+        question: createSessionQuestion({
+          id: 'q1',
+          text: 'x',
+          number: 1,
+          total: 2,
+        }),
       }),
     })
 
@@ -114,7 +125,12 @@ describe('HostControls', () => {
     const { screen, sendMessage } = await renderControls({
       session: createSessionState({
         state: 'answers_shown',
-        question: { id: 'q2', text: 'x', img: null, number: 2, total: 2 },
+        question: createSessionQuestion({
+          id: 'q2',
+          text: 'x',
+          number: 2,
+          total: 2,
+        }),
       }),
     })
 

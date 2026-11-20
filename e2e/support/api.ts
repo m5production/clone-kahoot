@@ -54,10 +54,11 @@ export const createApi = (request: APIRequestContext) => ({
     gameId: string,
     text: string,
     acceptedAnswers: string[],
+    timeLimitSec?: number,
   ): Promise<TestQuestion> => {
     const response = await request.post(`${E2E_API_URL}/questions`, {
       headers: authHeaders(user.token),
-      data: { gameId, text },
+      data: { gameId, text, timeLimitSec },
     })
     await expect(response, await response.text()).toBeOK()
     const question: TestQuestion = await response.json()

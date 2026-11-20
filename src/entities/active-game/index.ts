@@ -3,6 +3,7 @@ export { ActiveGameContext, useActiveGame } from './active-game.context'
 export {
   createActiveGameState,
   createSessionPlayer,
+  createSessionQuestion,
   createSessionState,
 } from './active-game.fixtures'
 export {
@@ -29,3 +30,4 @@ export type {
   SessionSummary,
   Winner,
 } from './active-game.types'
+export { useQuestionCountdown } from './use-question-countdown'

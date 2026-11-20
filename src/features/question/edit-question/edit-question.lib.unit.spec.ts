@@ -10,27 +10,32 @@ import {
 const values: QuestionFormValues = {
   text: 'Capital of France?',
   img: '',
+  timeLimitSec: '30',
   answers: [{ answerText: 'Paris' }, { answerText: 'paris' }],
 }
 
 describe('toQuestionFormValues', () => {
   it('maps a question and its accepted answers to form values', () => {
     expect(
-      toQuestionFormValues({ text: 'Q', img: 'https://img' }, [
-        { text: 'A' },
-        { text: 'B' },
-      ]),
+      toQuestionFormValues(
+        { text: 'Q', img: 'https://img', timeLimitSec: 60 },
+        [{ text: 'A' }, { text: 'B' }],
+      ),
     ).toEqual({
       text: 'Q',
       img: 'https://img',
+      timeLimitSec: '60',
       answers: [{ answerText: 'A' }, { answerText: 'B' }],
     })
   })
 
   it('gives a fresh question an empty image field and one empty answer field', () => {
-    expect(toQuestionFormValues({ text: '', img: null }, [])).toEqual({
+    expect(
+      toQuestionFormValues({ text: '', img: null, timeLimitSec: 20 }, []),
+    ).toEqual({
       text: '',
       img: '',
+      timeLimitSec: '20',
       answers: [{ answerText: '' }],
     })
   })
@@ -42,6 +47,7 @@ describe('toQuestionPayload', () => {
       id: 'q1',
       text: 'Capital of France?',
       img: null,
+      timeLimitSec: 30,
     })
   })
 

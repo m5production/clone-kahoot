@@ -82,10 +82,10 @@ test.describe('live session', () => {
     for (const page of [host.page, alice.page]) {
       await expect(
         page.getByTestId(`player-answer-item-${alice.user.id}`),
-      ).toHaveText(`${alice.user.name}: 4`)
+      ).toHaveText(new RegExp(`${alice.user.name}: 4 \\+\\d+`))
       await expect(
         page.getByTestId(`player-answer-item-${bob.user.id}`),
-      ).toHaveText(`${bob.user.name}: 5`)
+      ).toHaveText(`${bob.user.name}: 5 +0`)
     }
 
     // Question 2 (the last one): both are right
@@ -102,16 +102,45 @@ test.describe('live session', () => {
     await host.page.getByTestId('show-answers-button').click()
     await host.page.getByTestId('show-winners-button').click()
 
-    const expectedWinners = [
-      `1. ${alice.user.name}: 2`,
-      `2. ${bob.user.name}: 1`,
-    ]
+    // scores are speed-based, so rows are checked by place, name and the
+    // correct count rather than an exact score
     for (const page of [host.page, alice.page, bob.page]) {
-      await expect(
-        page.getByTestId('winners-table').getByRole('listitem'),
-      ).toHaveText(expectedWinners)
+      const rows = page.getByTestId('winners-table').getByRole('listitem')
+      await expect(rows).toHaveCount(2)
+      await expect(rows.nth(0)).toContainText(`1. ${alice.user.name}`)
+      await expect(rows.nth(0)).toContainText('2 correct')
+      await expect(rows.nth(1)).toContainText(`2. ${bob.user.name}`)
+      await expect(rows.nth(1)).toContainText('1 correct')
       await expect(page.getByTestId('home-link')).toBeVisible()
     }
+  })
+
+  test('the question closes when its timer runs out (BR-61)', async ({
+    signIn,
+    api,
+  }) => {
+    const host = await signIn('host')
+    const game = await api.createGame(host.user)
+    await api.createQuestion(host.user, game.id, '2+2?', ['4'], 10)
+    const player = await signIn('player')
+
+    const sessionId = await startSession(host, game.id)
+    await joinSession(player, sessionId)
+    await host.page.getByTestId('start-game-button').click()
+
+    // both sides count down from the same server deadline
+    const hostTimer = host.page.getByTestId('question-timer')
+    const playerTimer = player.page.getByTestId('question-timer')
+    await expect(hostTimer).toBeVisible()
+    await expect(hostTimer).toHaveText(/^(10|[1-9])$/, { timeout: 15_000 })
+    await expect(playerTimer).toHaveText(/^(10|[1-9])$/)
+
+    // nobody answers: after 10 s the server closes the question by itself
+    await expect(
+      player.page.getByText('The question is closed'),
+    ).toBeVisible({ timeout: 15_000 })
+    await expect(host.page.getByTestId('show-answers-button')).toBeVisible()
+    await expect(playerTimer).not.toBeVisible()
   })
 
   test('a reconnecting player keeps their seat and answers', async ({

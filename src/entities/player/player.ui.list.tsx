@@ -17,19 +17,22 @@ export function Players({
     <section data-testid="players-panel" {...props}>
       {playerAnswers ? (
         <ul data-testid="player-answers-list" className="flex flex-wrap gap-2">
-          {playerAnswers.map(({ playerId, playerName, text, isCorrect }) => (
-            <li
-              key={playerId}
-              data-testid={`player-answer-item-${playerId}`}
-              className={cn(
-                'rounded-full px-2 border-2 border-current bg-destructive/15 text-destructive',
-                isCorrect && 'bg-success/15 text-success',
-              )}
-            >
-              <span className="font-semibold">{playerName}:</span>{' '}
-              {text || 'No answer'}
-            </li>
-          ))}
+          {playerAnswers.map(
+            ({ playerId, playerName, text, isCorrect, points }) => (
+              <li
+                key={playerId}
+                data-testid={`player-answer-item-${playerId}`}
+                className={cn(
+                  'rounded-full px-2 border-2 border-current bg-destructive/15 text-destructive',
+                  isCorrect && 'bg-success/15 text-success',
+                )}
+              >
+                <span className="font-semibold">{playerName}:</span>{' '}
+                {text || 'No answer'}{' '}
+                <span className="text-xs font-semibold">+{points}</span>
+              </li>
+            ),
+          )}
         </ul>
       ) : (
         <>

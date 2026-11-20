@@ -30,18 +30,30 @@ describe('Players', () => {
       <Players
         players={players}
         playerAnswers={[
-          { playerId: 'a', playerName: 'Ann', text: '4', isCorrect: true },
-          { playerId: 'b', playerName: 'Bob', text: null, isCorrect: false },
+          {
+            playerId: 'a',
+            playerName: 'Ann',
+            text: '4',
+            isCorrect: true,
+            points: 950,
+          },
+          {
+            playerId: 'b',
+            playerName: 'Bob',
+            text: null,
+            isCorrect: false,
+            points: 0,
+          },
         ]}
       />,
     )
 
     await expect
       .element(screen.getByTestId('player-answer-item-a'))
-      .toHaveTextContent('Ann: 4')
+      .toHaveTextContent('Ann: 4 +950')
     await expect
       .element(screen.getByTestId('player-answer-item-b'))
-      .toHaveTextContent('Bob: No answer')
+      .toHaveTextContent('Bob: No answer +0')
     await expect
       .element(screen.getByTestId('players-list'))
       .not.toBeInTheDocument()

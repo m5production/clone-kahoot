@@ -30,6 +30,7 @@ const question: Question = {
   order: 1,
   text: '2+2?',
   img: null,
+  timeLimitSec: 30,
   answersCount: 1,
 }
 
@@ -77,13 +78,18 @@ describe('EditQuestionForm', () => {
     const form = await renderForm([{ id: 'a1', questionId: 'q1', text: '4' }])
 
     await form.getByTestId('question-text-input').fill('Two plus two?')
+    // FR-53: the editor stores the chosen time limit
+    await expect
+      .element(form.getByTestId('question-time-limit-select'))
+      .toHaveValue('30')
+    await form.getByTestId('question-time-limit-select').selectOptions('60')
     await form.getByTestId('add-answer-button').click()
     await answerInput(form, 1).fill('four')
     await form.getByTestId('save-question-button').click()
 
     await expect.poll(() => vi.mocked(toast.success).mock.calls.length).toBe(2)
     expect(updateQuestion).toHaveBeenCalledWith(
-      { id: 'q1', text: 'Two plus two?', img: null },
+      { id: 'q1', text: 'Two plus two?', img: null, timeLimitSec: 60 },
       expect.anything(),
     )
     expect(replaceAcceptedAnswers).toHaveBeenCalledWith('q1', [

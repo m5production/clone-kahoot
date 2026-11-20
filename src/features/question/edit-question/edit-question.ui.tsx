@@ -150,12 +150,10 @@ export function EditQuestionForm({
 
       <Label className="flex w-fit flex-col gap-1 text-sm font-medium">
         Time to answer
-        {/* FR-53 (stage 4b): the per-question time limit; a fixed default is shown for now */}
         <select
           data-testid="question-time-limit-select"
-          disabled
-          defaultValue="20"
-          className="h-9 rounded-md border px-3 opacity-60"
+          className="h-9 rounded-md border bg-background px-3"
+          {...register('timeLimitSec')}
         >
           {[10, 20, 30, 60, 90, 120].map((seconds) => (
             <option key={seconds} value={seconds}>

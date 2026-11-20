@@ -1,6 +1,7 @@
 import type {
   ActiveGameState,
   SessionPlayer,
+  SessionQuestion,
   SessionStateMessage,
 } from './active-game.types'
 
@@ -14,6 +15,18 @@ export const createSessionPlayer = (
   ...overrides,
 })
 
+export const createSessionQuestion = (
+  overrides: Partial<SessionQuestion> = {},
+): SessionQuestion => ({
+  id: 'q1',
+  text: '2+2?',
+  img: null,
+  number: 1,
+  total: 2,
+  endsAt: Date.now() + 20_000,
+  ...overrides,
+})
+
 export const createSessionState = (
   overrides: Partial<SessionStateMessage> = {},
 ): SessionStateMessage => ({
@@ -23,7 +36,8 @@ export const createSessionState = (
   state: 'question_open',
   hostConnected: true,
   players: [],
-  question: { id: 'q1', text: '2+2?', img: null, number: 1, total: 2 },
+  question: createSessionQuestion(),
+  serverNow: Date.now(),
   ...overrides,
 })
 
@@ -37,5 +51,6 @@ export const createActiveGameState = (
   standings: null,
   endReason: null,
   sendMessage: () => {},
+  clockOffset: 0,
   ...overrides,
 })

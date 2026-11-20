@@ -5,6 +5,7 @@ import {
   type ActiveGameState,
   createActiveGameState,
   createSessionPlayer,
+  createSessionQuestion,
   createSessionState,
 } from '@/entities/active-game'
 import { saveSessionUserId } from '@/entities/session'
@@ -76,5 +77,21 @@ describe('SubmitAnswerForm', () => {
     await expect
       .element(screen.getByTestId('submit-answer-button'))
       .toBeDisabled()
+  })
+
+  it('locks the form when the question time is up', async () => {
+    const screen = await renderForm(
+      createActiveGameState({
+        session: createSessionState({
+          question: createSessionQuestion({ endsAt: Date.now() - 1000 }),
+        }),
+      }),
+    )
+
+    await expect.element(screen.getByTestId('answer-input')).toBeDisabled()
+    await expect
+      .element(screen.getByTestId('submit-answer-button'))
+      .toBeDisabled()
+    await expect.element(screen.getByText(/Time is up/)).toBeVisible()
   })
 })
