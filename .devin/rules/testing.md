@@ -70,9 +70,11 @@ Commands: `bun run test` (unit + component), `test:unit`, `test:browser`, `test:
 1. Auth (`e2e/auth.e2e.ts`): welcome page, register via `/register`, log in via `/login`,
    wrong credentials (no account created), taken nickname (incl. different case),
    required fields, remembered user → `/home`, guest → welcome, logout.
-2. Games (`e2e/games.e2e.ts`): create → editor → listed on home; only own games listed.
-3. Questions (`e2e/questions.e2e.ts`): create with image and answers, edit, validation, delete;
-   persisted after reload.
+2. Games (`e2e/games.e2e.ts`): create with title → editor → listed on home; only own games
+   listed, newest first; rename in editor; delete with confirmation (cascade).
+3. Questions (`e2e/questions.e2e.ts`): create with image and answers, edit, validation
+   (incl. duplicate answers), delete; persisted after reload; reorder via up/down buttons;
+   start blocked until every question is ready (FR-55).
 4. Live game (`e2e/live-game/live-game.e2e.ts`): host + two players, answers shown, question switch,
    answers kept when going back, winners order on all screens, stop game; join errors (not running,
    another game running, empty link).

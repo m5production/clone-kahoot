@@ -6,6 +6,7 @@ import { ACCEPTED_ANSWERS_QUERY } from '@/entities/accepted-answer'
 import { QUESTION_QUERY } from '@/entities/question'
 import { Button, ImgWithPlaceholder, Input, Label } from '@/shared/ui'
 import {
+  duplicateAnswerIndexes,
   EMPTY_QUESTION_FORM,
   type QuestionFormValues,
   toAcceptedAnswersPayload,
@@ -69,6 +70,15 @@ export function EditQuestionForm({
       return
     }
 
+    const duplicates = duplicateAnswerIndexes(values)
+    for (const index of duplicates) {
+      setError(`answers.${index}.answerText`, {
+        type: 'validate',
+        message: 'This answer duplicates another one',
+      })
+    }
+    if (duplicates.length) return
+
     updateQuestion(toQuestionPayload(values, { id: questionId }), {
       onSuccess: () => {
         toast.success('Question updated successfully')
@@ -76,7 +86,11 @@ export function EditQuestionForm({
     })
 
     replaceAcceptedAnswers(
-      { questionId, answers: toAcceptedAnswersPayload(values, questionId) },
+      {
+        questionId,
+        gameId: question?.gameId,
+        answers: toAcceptedAnswersPayload(values, questionId),
+      },
       {
         onSuccess: () => {
           toast.success('Accepted answers updated successfully')
@@ -97,16 +111,17 @@ export function EditQuestionForm({
       {...props}
       onSubmit={handleSubmit(handleSave)}
     >
-      <h3 className="text-4xl mt-4">Question #{questionNumber}</h3>
+      <h3 className="text-2xl font-bold">Question #{questionNumber}</h3>
       <Input
         data-testid="question-image-input"
+        className="h-11"
         placeholder="Insert image url"
         {...register('img')}
       />
 
       {imageUrl && (
         <ImgWithPlaceholder
-          className="mx-auto"
+          className="mx-auto rounded-xl"
           alt="Question illustration"
           width={400}
           height={400}
@@ -114,41 +129,74 @@ export function EditQuestionForm({
         />
       )}
 
-      <Label className="flex flex-col">
+      <Label className="flex flex-col gap-1">
         <Input
           data-testid="question-text-input"
+          className="h-12 text-lg font-medium"
           placeholder="Type in question text"
-          {...register('text', { required: 'Question text must present' })}
+          {...register('text', {
+            required: 'Question text must present',
+            maxLength: {
+              value: 300,
+              message: 'Question text must be at most 300 characters',
+            },
+          })}
+          aria-invalid={Boolean(errors.text)}
         />
         {errors.text && (
-          <p className="self-start text-red-400">{errors.text.message}</p>
+          <p className="self-start text-destructive">{errors.text.message}</p>
         )}
       </Label>
 
+      <Label className="flex w-fit flex-col gap-1 text-sm font-medium">
+        Time to answer
+        {/* FR-53 (stage 4b): the per-question time limit; a fixed default is shown for now */}
+        <select
+          data-testid="question-time-limit-select"
+          disabled
+          defaultValue="20"
+          className="h-9 rounded-md border px-3 opacity-60"
+        >
+          {[10, 20, 30, 60, 90, 120].map((seconds) => (
+            <option key={seconds} value={seconds}>
+              {seconds} seconds
+            </option>
+          ))}
+        </select>
+      </Label>
+
       <section className="flex flex-col gap-4">
-        <h4 className="text-2xl">Type accepted answers</h4>
+        <h4 className="text-lg font-semibold">Accepted answers</h4>
 
         {errors.answers?.message && (
-          <p className="text-red-400">{errors.answers.message}</p>
+          <p className="text-destructive">{errors.answers.message}</p>
         )}
 
-        <ul data-testid="accepted-answers-list" className="flex flex-col gap-4">
+        <ul data-testid="accepted-answers-list" className="flex flex-col gap-3">
           {fields.map((field, index) => (
             <li
               key={field.id}
               data-testid={`accepted-answer-item-${index}`}
-              className="flex gap-4"
+              className="flex items-start gap-2"
             >
-              <Label className="flex flex-col">
+              <Label className="flex flex-1 flex-col gap-1">
                 <Input
                   data-testid="accepted-answer-input"
+                  className="h-11"
                   placeholder="Accepted answer"
                   {...register(`answers.${index}.answerText`, {
                     required: 'Empty answer is not accepted',
+                    maxLength: {
+                      value: 100,
+                      message: 'Answer must be at most 100 characters',
+                    },
+                    validate: (value) =>
+                      value.trim().length > 0 || 'Empty answer is not accepted',
                   })}
+                  aria-invalid={Boolean(errors.answers?.[index]?.answerText)}
                 />
                 {errors.answers?.[index]?.answerText && (
-                  <p className="self-start text-red-400">
+                  <p className="self-start text-destructive">
                     {errors.answers[index].answerText.message}
                   </p>
                 )}
@@ -157,6 +205,8 @@ export function EditQuestionForm({
               <Button
                 data-testid="remove-answer-button"
                 type="button"
+                variant="ghost"
+                className="text-destructive hover:bg-destructive/10 hover:text-destructive"
                 onClick={() => remove(index)}
               >
                 Remove
@@ -167,15 +217,27 @@ export function EditQuestionForm({
         <Button
           data-testid="add-answer-button"
           type="button"
-          className="w-50"
+          variant="outline"
+          className="w-fit border-dashed"
+          disabled={fields.length >= 10}
+          title={
+            fields.length >= 10
+              ? 'A question can have at most 10 accepted answers'
+              : undefined
+          }
           onClick={handleAddAnswerClick}
         >
           Add one more answer
         </Button>
       </section>
 
-      <Button data-testid="save-question-button" type="submit">
-        Add (update) question to the Quiz
+      <Button
+        data-testid="save-question-button"
+        type="submit"
+        size="lg"
+        className="w-fit font-bold"
+      >
+        Save question
       </Button>
     </form>
   )

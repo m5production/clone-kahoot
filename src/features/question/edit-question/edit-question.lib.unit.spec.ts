@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import {
+  duplicateAnswerIndexes,
   type QuestionFormValues,
   toAcceptedAnswersPayload,
   toQuestionFormValues,
@@ -57,5 +58,28 @@ describe('toAcceptedAnswersPayload', () => {
       { text: 'Paris', questionId: 'q1' },
       { text: 'paris', questionId: 'q1' },
     ])
+  })
+})
+
+describe('duplicateAnswerIndexes', () => {
+  it('flags fields that repeat an earlier answer after normalization', () => {
+    expect(duplicateAnswerIndexes(values)).toEqual([1])
+    expect(
+      duplicateAnswerIndexes({
+        ...values,
+        answers: [
+          { answerText: 'Paris' },
+          { answerText: 'Lutetia' },
+          { answerText: ' PARIS ' },
+        ],
+      }),
+    ).toEqual([2])
+    expect(duplicateAnswerIndexes({ ...values, answers: [] })).toEqual([])
+    expect(
+      duplicateAnswerIndexes({
+        ...values,
+        answers: [{ answerText: 'Paris' }, { answerText: ' ' }],
+      }),
+    ).toEqual([])
   })
 })

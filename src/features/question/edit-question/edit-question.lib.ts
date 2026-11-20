@@ -42,3 +42,23 @@ export const toAcceptedAnswersPayload = (
   questionId: string,
 ): RawAcceptedAnswer[] =>
   values.answers.map(({ answerText }) => ({ text: answerText, questionId }))
+
+const normalizeAnswer = (text: string) => text.trim().toLowerCase()
+
+/** FR-56/BR-47: indexes of answer fields duplicating an earlier field after normalization */
+export const duplicateAnswerIndexes = (
+  values: QuestionFormValues,
+): number[] => {
+  const seen = new Set<string>()
+  const duplicates: number[] = []
+  values.answers.forEach(({ answerText }, index) => {
+    const normalized = normalizeAnswer(answerText)
+    if (!normalized) return
+    if (seen.has(normalized)) {
+      duplicates.push(index)
+    } else {
+      seen.add(normalized)
+    }
+  })
+  return duplicates
+}

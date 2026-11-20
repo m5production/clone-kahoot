@@ -4,6 +4,7 @@ export interface Question {
   order: number
   text: string
   img: string | null
+  answersCount: number
 }
 
 export interface RawQuestion {

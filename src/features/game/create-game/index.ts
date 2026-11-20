@@ -1,1 +1,1 @@
-export { CreateGameButton } from './create-game.ui'
+export { CreateGameForm } from './create-game.ui'

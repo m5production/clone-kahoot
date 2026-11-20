@@ -6,7 +6,10 @@ import { fetchGames } from './game.api'
 import { GAMES_QUERY } from './game.queries'
 
 vi.mock('react-toastify', () => ({ toast: vi.fn() }))
-vi.mock('./game.api', () => ({ fetchGames: vi.fn() }))
+vi.mock('./game.api', () => ({
+  fetchGames: vi.fn(),
+  fetchGameById: vi.fn(),
+}))
 
 afterEach(() => {
   queryClient.clear()
@@ -14,7 +17,14 @@ afterEach(() => {
 
 describe('GAMES_QUERY', () => {
   it('loads the games', async () => {
-    const games = [{ id: 'g1', adminId: 'u1' }]
+    const games = [
+      {
+        id: 'g1',
+        title: 'Geography',
+        questionCount: 2,
+        updatedAt: '2026-11-20T00:00:00.000Z',
+      },
+    ]
     vi.mocked(fetchGames).mockResolvedValue(games)
 
     await expect(

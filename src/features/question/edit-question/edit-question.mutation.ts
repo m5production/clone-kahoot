@@ -4,7 +4,11 @@ import {
   type RawAcceptedAnswer,
   replaceAcceptedAnswers,
 } from '@/entities/accepted-answer'
-import { QUESTION_QUERY, updateQuestion } from '@/entities/question'
+import {
+  GAME_QUESTIONS_QUERY,
+  QUESTION_QUERY,
+  updateQuestion,
+} from '@/entities/question'
 import { notifyApiError } from '@/shared/api'
 
 export const useUpdateQuestionMutation = () =>
@@ -12,6 +16,8 @@ export const useUpdateQuestionMutation = () =>
     mutationFn: updateQuestion,
     onSuccess: (question) => {
       QUESTION_QUERY.invalidate(question.id)
+      // the question text affects the readiness marker in the questions list
+      GAME_QUESTIONS_QUERY.invalidate(question.gameId)
     },
     onError: notifyApiError,
   })
@@ -23,10 +29,13 @@ export const useReplaceAcceptedAnswersMutation = () =>
       answers,
     }: {
       questionId: string
+      gameId?: string
       answers: RawAcceptedAnswer[]
     }) => replaceAcceptedAnswers(questionId, answers),
-    onSuccess: (_, { questionId }) => {
+    onSuccess: (_, { questionId, gameId }) => {
       ACCEPTED_ANSWERS_QUERY.invalidate(questionId)
+      // answersCount lives on the questions list (BR-49 readiness)
+      if (gameId) GAME_QUESTIONS_QUERY.invalidate(gameId)
     },
     onError: notifyApiError,
   })

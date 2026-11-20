@@ -1,69 +1,93 @@
+import { useQuery } from '@tanstack/react-query'
 import { useState } from 'react'
 import { Link, useParams } from 'react-router'
+import { GAME_QUESTIONS_QUERY, isQuizReady } from '@/entities/question'
+import { RenameGameTitle } from '@/features/game/rename-game'
 import { DeleteQuestionButton } from '@/features/question/delete-question'
 import { EditQuestionForm } from '@/features/question/edit-question'
 import { cn } from '@/shared/lib'
-import { Button, buttonVariants } from '@/shared/ui'
+import { Button, buttonVariants, Card, CardContent } from '@/shared/ui'
 import type { SelectedQuestion } from './quiz-editor.types'
 import { QuestionsSidebar } from './quiz-editor.ui.questions-sidebar'
 
 export function QuizEditorPage() {
   const { gameId } = useParams()
   const [selectedQuestion, setSelectedQuestion] = useState<SelectedQuestion>()
+  const { data: questions } = useQuery(
+    GAME_QUESTIONS_QUERY.queryOptions(gameId),
+  )
 
   if (!gameId) {
     return null
   }
 
-  const isReadyToStartGame = true // TODO: disable start game btn when not all questions ready
+  // FR-55, BR-49: the quiz launches only when every question is game-ready
+  const isReadyToStartGame = questions ? isQuizReady(questions) : false
 
   return (
-    <section className="grid grid-cols-[200px_1fr] h-full">
+    <section className="grid grid-cols-[280px_1fr] min-h-full">
       <QuestionsSidebar
         gameId={gameId}
         selectedQuestion={selectedQuestion}
         onSelectQuestion={setSelectedQuestion}
-        className="bg-blue-500 text-white p-4 h-full"
+        className="bg-card border-r p-4 flex flex-col gap-3 h-screen sticky top-0"
       >
         <Link
           data-testid="home-link"
           to="/home"
-          className={cn(buttonVariants(), 'mb-4')}
+          className={cn(
+            buttonVariants({ variant: 'ghost', size: 'sm' }),
+            'self-start -ml-2 text-muted-foreground',
+          )}
         >
-          Go to main page
+          ← Back to quizzes
         </Link>
       </QuestionsSidebar>
-      <div className="p-4 flex flex-col">
-        {isReadyToStartGame ? (
-          <Link
-            data-testid="start-game-link"
-            to={`/${gameId}/admin/activeGame`}
-            className={cn(buttonVariants(), 'self-end')}
-          >
-            Start this quiz
-          </Link>
-        ) : (
-          <Button
-            title="You need to fill question text and provide accepted answers to all the questions"
-            disabled
-            className="self-end"
-          >
-            Start this quiz
-          </Button>
-        )}
-        {selectedQuestion && (
-          <div>
-            <EditQuestionForm
-              questionId={selectedQuestion.id}
-              questionNumber={selectedQuestion.number}
-              className="flex flex-col gap-10"
-            />
-            <DeleteQuestionButton
-              questionId={selectedQuestion.id}
-              onDelete={() => setSelectedQuestion(undefined)}
-            />
-          </div>
-        )}
+
+      <div className="flex flex-col gap-6 p-6 min-w-0">
+        <header className="flex items-center justify-between gap-4">
+          <RenameGameTitle gameId={gameId} />
+          {isReadyToStartGame ? (
+            <Link
+              data-testid="start-game-link"
+              to={`/${gameId}/admin/activeGame`}
+              className={cn(buttonVariants({ size: 'lg' }), 'font-bold')}
+            >
+              Start this quiz
+            </Link>
+          ) : (
+            <Button
+              data-testid="start-game-button"
+              title="You need to fill question text and provide accepted answers to all the questions"
+              disabled
+              size="lg"
+            >
+              Start this quiz
+            </Button>
+          )}
+        </header>
+
+        <Card className="rounded-3xl max-w-2xl">
+          <CardContent className="flex flex-col gap-6">
+            {selectedQuestion ? (
+              <>
+                <EditQuestionForm
+                  questionId={selectedQuestion.id}
+                  questionNumber={selectedQuestion.number}
+                  className="flex flex-col gap-6"
+                />
+                <DeleteQuestionButton
+                  questionId={selectedQuestion.id}
+                  onDelete={() => setSelectedQuestion(undefined)}
+                />
+              </>
+            ) : (
+              <p className="py-12 text-center text-muted-foreground">
+                Select a question on the left or add a new one
+              </p>
+            )}
+          </CardContent>
+        </Card>
       </div>
     </section>
   )

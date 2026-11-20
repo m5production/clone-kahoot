@@ -24,6 +24,7 @@ export default mergeConfig(
         'clsx',
         'tailwind-merge',
         'class-variance-authority',
+        'lucide-react',
         '@radix-ui/react-label',
         '@radix-ui/react-slot',
         'vitest-browser-react',

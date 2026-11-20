@@ -1,7 +1,9 @@
 import { useQuery } from '@tanstack/react-query'
+import { TriangleAlert } from 'lucide-react'
 import type { PropsWithChildren } from 'react'
-import { GAME_QUESTIONS_QUERY } from '@/entities/question'
+import { GAME_QUESTIONS_QUERY, isQuestionReady } from '@/entities/question'
 import { AddQuestionButton } from '@/features/question/create-question'
+import { MoveQuestionButtons } from '@/features/question/reorder-questions'
 import { cn } from '@/shared/lib'
 import type { SelectedQuestion } from './quiz-editor.types'
 
@@ -26,32 +28,50 @@ export function QuestionsSidebar({
   return (
     <aside data-testid="questions-sidebar" {...props}>
       {children}
+      <h3 className="font-bold text-lg">Questions</h3>
+
+      <ul
+        data-testid="questions-list"
+        className="w-full flex flex-col gap-1 flex-1 min-h-0 overflow-y-auto"
+      >
+        {questions?.map((question, index) => (
+          // biome-ignore lint/a11y/useKeyWithClickEvents lint/a11y/useAriaPropsSupportedByRole: a plain list item, selection is visual-only
+          <li
+            key={question.id}
+            data-testid={`question-item-${question.id}`}
+            aria-selected={selectedQuestion?.id === question.id}
+            onClick={() =>
+              onSelectQuestion({ id: question.id, number: index + 1 })
+            }
+            className={cn(
+              'w-full rounded-lg px-3 py-2 text-sm font-medium cursor-pointer transition hover:bg-accent hover:text-accent-foreground flex items-center gap-1',
+              selectedQuestion?.id === question.id &&
+                'bg-primary text-primary-foreground hover:bg-primary hover:text-primary-foreground',
+            )}
+          >
+            <span className="flex-1 truncate">Question {index + 1}</span>
+            {!isQuestionReady(question) && (
+              <TriangleAlert
+                aria-label="incomplete"
+                role="img"
+                className="size-4 shrink-0 text-amber-500"
+              />
+            )}
+            <MoveQuestionButtons
+              gameId={gameId}
+              questions={questions}
+              index={index}
+            />
+          </li>
+        ))}
+      </ul>
+
       <AddQuestionButton
         gameId={gameId}
         onCreated={({ id }) =>
           onSelectQuestion({ id, number: (questions?.length || 0) + 1 })
         }
       />
-
-      <h3 className="font-bold text-xl mt-4">Questions</h3>
-
-      <ul data-testid="questions-list" className="w-full">
-        {questions?.map(({ id }, index) => (
-          // biome-ignore lint/a11y/useKeyWithClickEvents lint/a11y/useAriaPropsSupportedByRole: a plain list item, selection is visual-only
-          <li
-            key={id}
-            data-testid={`question-item-${id}`}
-            aria-selected={selectedQuestion?.id === id}
-            onClick={() => onSelectQuestion({ id, number: index + 1 })}
-            className={cn(
-              'w-full truncate hover:cursor-pointer p-1 hover:ring-1 ring-amber-300 rounded-md transition',
-              selectedQuestion?.id === id && 'bg-amber-200',
-            )}
-          >
-            Question {index + 1}
-          </li>
-        ))}
-      </ul>
     </aside>
   )
 }

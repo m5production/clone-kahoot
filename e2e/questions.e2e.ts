@@ -39,7 +39,7 @@ test.describe('quiz editor', () => {
     await form.getByTestId('question-text-input').fill('Capital of France?')
     await answerInput(page, 0).fill('Paris')
     await form.getByTestId('add-answer-button').click()
-    await answerInput(page, 1).fill('paris')
+    await answerInput(page, 1).fill('Lutetia')
     await form.getByTestId('save-question-button').click()
 
     await expect(page.getByText('Question updated successfully')).toBeVisible()
@@ -59,7 +59,28 @@ test.describe('quiz editor', () => {
       form.getByRole('img', { name: 'Question illustration' }),
     ).toBeVisible()
     await expect(answerInput(page, 0)).toHaveValue('Paris')
-    await expect(answerInput(page, 1)).toHaveValue('paris')
+    await expect(answerInput(page, 1)).toHaveValue('Lutetia')
+  })
+
+  test('a question cannot be saved with duplicate accepted answers', async ({
+    signIn,
+    api,
+  }) => {
+    const { page, user } = await signIn('editor')
+    const game = await api.createGame(user)
+    const question = await api.createQuestion(user, game.id, '2+2?', ['4'])
+    await page.goto(`/${game.id}/admin`)
+    await page.getByTestId(`question-item-${question.id}`).click()
+    await expect(questionForm(page)).toHaveAttribute('aria-busy', 'false')
+
+    await questionForm(page).getByTestId('add-answer-button').click()
+    await answerInput(page, 1).fill(' 4 ')
+    await questionForm(page).getByTestId('save-question-button').click()
+
+    await expect(
+      questionForm(page).getByText('This answer duplicates another one'),
+    ).toBeVisible()
+    await expect(page.getByText('Question updated successfully')).toHaveCount(0)
   })
 
   test('the host edits a question', async ({ signIn, api }) => {
@@ -131,6 +152,110 @@ test.describe('quiz editor', () => {
       ),
     ).toBeVisible()
     await expect(page.getByText('Question updated successfully')).toHaveCount(0)
+  })
+
+  test('the host reorders questions with up/down buttons', async ({
+    signIn,
+    api,
+  }) => {
+    const { page, user } = await signIn('editor')
+    const game = await api.createGame(user)
+    const first = await api.createQuestion(user, game.id, 'First?', ['1'])
+    const second = await api.createQuestion(user, game.id, 'Second?', ['2'])
+    const third = await api.createQuestion(user, game.id, 'Third?', ['3'])
+    await page.goto(`/${game.id}/admin`)
+
+    const itemAt = (index: number) => questionItems(page).nth(index)
+    const testIdOf = (id: string) => `question-item-${id}`
+    await expect(itemAt(0)).toHaveAttribute('data-testid', testIdOf(first.id))
+    await expect(itemAt(2)).toHaveAttribute('data-testid', testIdOf(third.id))
+
+    // Buttons at the list bounds are disabled
+    await expect(
+      page
+        .getByTestId(`question-item-${first.id}`)
+        .getByTestId('move-up-button'),
+    ).toBeDisabled()
+    await expect(
+      page
+        .getByTestId(`question-item-${third.id}`)
+        .getByTestId('move-down-button'),
+    ).toBeDisabled()
+
+    await page
+      .getByTestId(`question-item-${first.id}`)
+      .getByTestId('move-down-button')
+      .click()
+
+    await expect(itemAt(0)).toHaveAttribute('data-testid', testIdOf(second.id))
+    await expect(itemAt(1)).toHaveAttribute('data-testid', testIdOf(first.id))
+
+    await page
+      .getByTestId(`question-item-${first.id}`)
+      .getByTestId('move-down-button')
+      .click()
+    await expect(itemAt(2)).toHaveAttribute('data-testid', testIdOf(first.id))
+
+    await page
+      .getByTestId(`question-item-${first.id}`)
+      .getByTestId('move-up-button')
+      .click()
+    await expect(itemAt(1)).toHaveAttribute('data-testid', testIdOf(first.id))
+
+    // The new order persists after a reload
+    await page.reload()
+    await expect(itemAt(0)).toHaveAttribute('data-testid', testIdOf(second.id))
+    await expect(itemAt(1)).toHaveAttribute('data-testid', testIdOf(first.id))
+    await expect(itemAt(2)).toHaveAttribute('data-testid', testIdOf(third.id))
+  })
+
+  test('the quiz cannot be started until every question is ready', async ({
+    signIn,
+    api,
+  }) => {
+    const { page, user } = await signIn('editor')
+    const game = await api.createGame(user)
+    const empty = await api.createQuestion(user, game.id, '', [])
+    const textOnly = await api.createQuestion(user, game.id, '2+2?', [])
+    await page.goto(`/${game.id}/admin`)
+
+    const startButton = page.getByTestId('start-game-button')
+    const startLink = page.getByTestId('start-game-link')
+
+    // A question with neither text nor answers, and one with text but no
+    // accepted answers — both are incomplete, so the quiz cannot start
+    await expect(startButton).toBeDisabled()
+    await expect(startLink).toHaveCount(0)
+    const emptyItem = page.getByTestId(`question-item-${empty.id}`)
+    const textOnlyItem = page.getByTestId(`question-item-${textOnly.id}`)
+    await expect(emptyItem.getByLabel('incomplete')).toBeVisible()
+    await expect(textOnlyItem.getByLabel('incomplete')).toBeVisible()
+
+    // Completing only one question is not enough (FR-55)
+    const form = questionForm(page)
+    await emptyItem.click()
+    await expect(form).toHaveAttribute('aria-busy', 'false')
+    await form.getByTestId('question-text-input').fill('1+1?')
+    await answerInput(page, 0).fill('2')
+    await form.getByTestId('save-question-button').click()
+    await expect(page.getByText('Question updated successfully')).toBeVisible()
+    await expect(
+      page.getByText('Accepted answers updated successfully'),
+    ).toBeVisible()
+    await expect(emptyItem.getByLabel('incomplete')).toHaveCount(0)
+    await expect(textOnlyItem.getByLabel('incomplete')).toBeVisible()
+    await expect(startButton).toBeDisabled()
+
+    // When every question has text and an accepted answer the quiz is launchable
+    await textOnlyItem.click()
+    await expect(form).toHaveAttribute('aria-busy', 'false')
+    await answerInput(page, 0).fill('4')
+    await form.getByTestId('save-question-button').click()
+    await expect(
+      page.getByText('Accepted answers updated successfully').first(),
+    ).toBeVisible()
+    await expect(textOnlyItem.getByLabel('incomplete')).toHaveCount(0)
+    await expect(startLink).toBeVisible()
   })
 
   test('the host deletes a question', async ({ signIn, api }) => {

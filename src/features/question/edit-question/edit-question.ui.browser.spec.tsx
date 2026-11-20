@@ -30,6 +30,7 @@ const question: Question = {
   order: 1,
   text: '2+2?',
   img: null,
+  answersCount: 1,
 }
 
 const renderForm = async (answers: AcceptedAnswer[]) => {
