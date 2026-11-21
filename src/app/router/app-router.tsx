@@ -1,9 +1,11 @@
 import { Route, Routes } from 'react-router'
+import { HistoryPage } from '@/pages/history'
 import { HomePage } from '@/pages/home'
 import { LoginPage } from '@/pages/login'
 import { QuizEditorPage } from '@/pages/quiz-editor'
 import { RegisterPage } from '@/pages/register'
 import { SessionPage } from '@/pages/session'
+import { SessionReportPage } from '@/pages/session-report'
 import { WelcomePage } from '@/pages/welcome'
 import { GuestOnly } from './guest-only'
 import { RequireAuth } from './require-auth'
@@ -48,6 +50,22 @@ export function AppRouter() {
         element={
           <RequireAuth>
             <SessionPage />
+          </RequireAuth>
+        }
+      />
+      <Route
+        path="history"
+        element={
+          <RequireAuth>
+            <HistoryPage />
+          </RequireAuth>
+        }
+      />
+      <Route
+        path="history/:sessionId"
+        element={
+          <RequireAuth>
+            <SessionReportPage />
           </RequireAuth>
         }
       />

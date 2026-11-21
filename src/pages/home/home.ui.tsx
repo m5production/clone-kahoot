@@ -7,7 +7,14 @@ import { CreateGameForm } from '@/features/game/create-game'
 import { DeleteGameButton } from '@/features/game/delete-game'
 import { JoinGameForm } from '@/features/game/join-game'
 import { LogoutButton } from '@/features/session/logout'
-import { Card, CardContent, CardHeader, CardTitle } from '@/shared/ui'
+import { cn } from '@/shared/lib'
+import {
+  buttonVariants,
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from '@/shared/ui'
 
 export function HomePage() {
   const { data: games } = useQuery(GAMES_QUERY.queryOptions())
@@ -15,6 +22,13 @@ export function HomePage() {
   return (
     <div className="relative min-h-full w-full bg-gradient-to-b from-primary to-primary-deep p-6 flex flex-col items-center justify-center gap-8 text-center">
       <div className="absolute top-4 right-4 flex items-center gap-3">
+        <Link
+          data-testid="history-link"
+          className={cn(buttonVariants({ variant: 'secondary', size: 'sm' }))}
+          to="/history"
+        >
+          History
+        </Link>
         <UserAvatar userId={getSessionUserId()} />
         <LogoutButton />
       </div>
@@ -64,6 +78,13 @@ export function HomePage() {
                         {' · edited '}
                         {formatGameUpdatedAt(updatedAt)}
                       </span>
+                    </Link>
+                    <Link
+                      data-testid={`game-history-link-${id}`}
+                      className="shrink-0 text-sm text-muted-foreground underline underline-offset-4 hover:text-foreground"
+                      to={`/history?gameId=${id}`}
+                    >
+                      History
                     </Link>
                     <DeleteGameButton gameId={id} title={title} />
                   </li>

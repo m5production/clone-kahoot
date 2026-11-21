@@ -136,9 +136,9 @@ test.describe('live session', () => {
     await expect(playerTimer).toHaveText(/^(10|[1-9])$/)
 
     // nobody answers: after 10 s the server closes the question by itself
-    await expect(
-      player.page.getByText('The question is closed'),
-    ).toBeVisible({ timeout: 15_000 })
+    await expect(player.page.getByText('The question is closed')).toBeVisible({
+      timeout: 15_000,
+    })
     await expect(host.page.getByTestId('show-answers-button')).toBeVisible()
     await expect(playerTimer).not.toBeVisible()
   })
