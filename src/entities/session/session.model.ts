@@ -2,11 +2,10 @@ import {
   clearSessionToken,
   getSessionToken,
   saveSessionToken,
-} from '@/shared/api' // FSD: cross import
+} from '@/shared/api'
+import { USER_ID_STORAGE_KEY } from '@/shared/config'
 
 export { clearSessionToken, getSessionToken, saveSessionToken }
-
-const USER_ID_STORAGE_KEY = 'userId'
 
 export const getSessionUserId = () => localStorage.getItem(USER_ID_STORAGE_KEY)
 

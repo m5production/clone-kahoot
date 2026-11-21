@@ -18,7 +18,10 @@ const isServerMessage = (value: unknown): value is ServerMessage =>
   value !== null &&
   'type' in value &&
   typeof value.type === 'string' &&
-  SERVER_MESSAGE_TYPES.has(value.type)
+  SERVER_MESSAGE_TYPES.has(value.type) &&
+  'payload' in value &&
+  typeof value.payload === 'object' &&
+  value.payload !== null
 
 export const parseServerMessage = (raw: string): ServerMessage | null => {
   try {

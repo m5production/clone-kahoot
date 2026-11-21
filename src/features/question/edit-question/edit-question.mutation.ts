@@ -7,35 +7,31 @@ import {
 import {
   GAME_QUESTIONS_QUERY,
   QUESTION_QUERY,
+  type Question,
   updateQuestion,
 } from '@/entities/question'
 import { notifyApiError } from '@/shared/api'
 
-export const useUpdateQuestionMutation = () =>
+interface SaveQuestionVariables {
+  question: Pick<Question, 'id' | 'text' | 'img' | 'timeLimitSec'>
+  answers: RawAcceptedAnswer[]
+}
+
+/** Saves the question and its accepted answers as one action: a single pending
+    state and one success/error signal instead of two competing mutations */
+export const useSaveQuestionMutation = () =>
   useMutation({
-    mutationFn: updateQuestion,
+    mutationFn: async ({ question, answers }: SaveQuestionVariables) => {
+      const updated = await updateQuestion(question)
+      await replaceAcceptedAnswers(question.id, answers)
+
+      return updated
+    },
     onSuccess: (question) => {
       QUESTION_QUERY.invalidate(question.id)
-      // the question text affects the readiness marker in the questions list
+      ACCEPTED_ANSWERS_QUERY.invalidate(question.id)
+      // the question text and answersCount affect the list readiness marker
       GAME_QUESTIONS_QUERY.invalidate(question.gameId)
-    },
-    onError: notifyApiError,
-  })
-
-export const useReplaceAcceptedAnswersMutation = () =>
-  useMutation({
-    mutationFn: ({
-      questionId,
-      answers,
-    }: {
-      questionId: string
-      gameId?: string
-      answers: RawAcceptedAnswer[]
-    }) => replaceAcceptedAnswers(questionId, answers),
-    onSuccess: (_, { questionId, gameId }) => {
-      ACCEPTED_ANSWERS_QUERY.invalidate(questionId)
-      // answersCount lives on the questions list (BR-49 readiness)
-      if (gameId) GAME_QUESTIONS_QUERY.invalidate(gameId)
     },
     onError: notifyApiError,
   })

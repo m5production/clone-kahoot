@@ -1,6 +1,9 @@
 import { useQuery } from '@tanstack/react-query'
 import { Link, useParams } from 'react-router'
-import { ActiveGameProvider, fetchSessionSummary } from '@/entities/active-game'
+import {
+  ActiveGameProvider,
+  SESSION_SUMMARY_QUERY,
+} from '@/entities/active-game'
 import { getApiErrorMessage } from '@/shared/api'
 import { cn } from '@/shared/lib'
 import { buttonVariants, Card, CardContent } from '@/shared/ui'
@@ -10,12 +13,7 @@ import { SessionView } from './session.ui.view'
 export function SessionPage() {
   const { sessionId } = useParams()
 
-  const summary = useQuery({
-    queryKey: ['session-summary', sessionId],
-    queryFn: () => fetchSessionSummary(sessionId ?? ''),
-    enabled: Boolean(sessionId),
-    retry: false,
-  })
+  const summary = useQuery(SESSION_SUMMARY_QUERY.queryOptions(sessionId))
 
   if (!sessionId) return null
 

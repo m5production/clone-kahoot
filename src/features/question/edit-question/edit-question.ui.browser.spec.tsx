@@ -87,11 +87,13 @@ describe('EditQuestionForm', () => {
     await answerInput(form, 1).fill('four')
     await form.getByTestId('save-question-button').click()
 
-    await expect.poll(() => vi.mocked(toast.success).mock.calls.length).toBe(2)
-    expect(updateQuestion).toHaveBeenCalledWith(
-      { id: 'q1', text: 'Two plus two?', img: null, timeLimitSec: 60 },
-      expect.anything(),
-    )
+    await expect.poll(() => vi.mocked(toast.success).mock.calls.length).toBe(1)
+    expect(updateQuestion).toHaveBeenCalledWith({
+      id: 'q1',
+      text: 'Two plus two?',
+      img: null,
+      timeLimitSec: 60,
+    })
     expect(replaceAcceptedAnswers).toHaveBeenCalledWith('q1', [
       { text: '4', questionId: 'q1' },
       { text: 'four', questionId: 'q1' },
@@ -171,6 +173,6 @@ describe('EditQuestionForm', () => {
       .getByTestId('question-image-input')
       .fill('http://127.0.0.1:9/pic.png')
 
-    await expect.element(form.getByText('Image is loading...')).toBeVisible()
+    await expect.element(form.getByRole('status')).toBeVisible()
   })
 })

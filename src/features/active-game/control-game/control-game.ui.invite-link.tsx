@@ -1,5 +1,6 @@
 import QRCode from 'qrcode'
 import { useEffect, useState } from 'react'
+import { toast } from 'react-toastify'
 import { buildJoinUrl, useActiveGame } from '@/entities/active-game'
 import { Button } from '@/shared/ui'
 
@@ -28,9 +29,17 @@ export function InviteLink() {
   if (!joinUrl) return null
 
   const handleCopyClick = () => {
-    navigator.clipboard.writeText(joinUrl)
-    setIsCopyConfirmationShown(true)
-    setTimeout(() => setIsCopyConfirmationShown(false), COPY_CONFIRMATION_MS)
+    // clipboard requires a secure context — a failure must not fake the confirmation
+    navigator.clipboard
+      .writeText(joinUrl)
+      .then(() => {
+        setIsCopyConfirmationShown(true)
+        setTimeout(
+          () => setIsCopyConfirmationShown(false),
+          COPY_CONFIRMATION_MS,
+        )
+      })
+      .catch(() => toast('Could not copy the invitation link'))
   }
 
   return (

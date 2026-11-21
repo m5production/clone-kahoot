@@ -39,6 +39,8 @@ describe('parseServerMessage', () => {
     '{"type":"PLAYER_CONNECTED"}',
     '{"type":42}',
     'null',
+    '{"type":"SESSION_STATE"}',
+    '{"type":"FAULT","payload":null}',
   ])('ignores the malformed message %s', (raw) => {
     expect(parseServerMessage(raw)).toBeNull()
   })

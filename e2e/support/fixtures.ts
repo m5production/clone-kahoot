@@ -4,6 +4,10 @@ import {
   test as base,
   type Page,
 } from '@playwright/test'
+import {
+  SESSION_TOKEN_STORAGE_KEY,
+  USER_ID_STORAGE_KEY,
+} from '../../src/shared/config/storage-keys'
 import { type Api, createApi, type TestUser } from './api'
 
 export interface Actor {
@@ -52,13 +56,13 @@ export const test = base.extend<Fixtures>({
       // The app's session: the bearer token and the remembered user id (seeded once per
       // tab, so a logout inside the test is not undone by the next navigation)
       await context.addInitScript(
-        ([userId, token]) => {
+        ([userId, token, userIdKey, tokenKey]) => {
           if (sessionStorage.getItem('e2e-session-seeded')) return
-          localStorage.setItem('userId', userId)
-          localStorage.setItem('sessionToken', token)
+          localStorage.setItem(userIdKey, userId)
+          localStorage.setItem(tokenKey, token)
           sessionStorage.setItem('e2e-session-seeded', 'true')
         },
-        [user.id, user.token],
+        [user.id, user.token, USER_ID_STORAGE_KEY, SESSION_TOKEN_STORAGE_KEY],
       )
 
       return { user, page: await context.newPage() }

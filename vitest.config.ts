@@ -25,6 +25,7 @@ export default mergeConfig(
         'tailwind-merge',
         'class-variance-authority',
         'lucide-react',
+        'qrcode',
         '@radix-ui/react-label',
         '@radix-ui/react-slot',
         'vitest-browser-react',

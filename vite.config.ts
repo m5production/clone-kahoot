@@ -10,7 +10,7 @@ export default defineConfig(({ command }) => ({
   base: command === 'build' ? '/clone-kahoot/' : '/',
   resolve: {
     alias: {
-      '@': path.resolve(__dirname, './src'),
+      '@': path.resolve(import.meta.dirname, './src'),
     },
   },
 }))

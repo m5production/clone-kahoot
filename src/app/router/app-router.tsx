@@ -1,4 +1,4 @@
-import { Route, Routes } from 'react-router'
+import { Navigate, Route, Routes } from 'react-router'
 import { HistoryPage } from '@/pages/history'
 import { HomePage } from '@/pages/home'
 import { LoginPage } from '@/pages/login'
@@ -77,6 +77,7 @@ export function AppRouter() {
           </RequireAuth>
         }
       />
+      <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   )
 }

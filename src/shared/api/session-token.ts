@@ -1,4 +1,4 @@
-const SESSION_TOKEN_STORAGE_KEY = 'sessionToken'
+import { SESSION_TOKEN_STORAGE_KEY } from '@/shared/config'
 
 export const getSessionToken = () =>
   localStorage.getItem(SESSION_TOKEN_STORAGE_KEY)

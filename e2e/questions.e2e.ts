@@ -42,10 +42,7 @@ test.describe('quiz editor', () => {
     await answerInput(page, 1).fill('Lutetia')
     await form.getByTestId('save-question-button').click()
 
-    await expect(page.getByText('Question updated successfully')).toBeVisible()
-    await expect(
-      page.getByText('Accepted answers updated successfully'),
-    ).toBeVisible()
+    await expect(page.getByText('Question saved successfully')).toBeVisible()
 
     await page.reload()
     await questionItems(page).first().click()
@@ -80,7 +77,7 @@ test.describe('quiz editor', () => {
     await expect(
       questionForm(page).getByText('This answer duplicates another one'),
     ).toBeVisible()
-    await expect(page.getByText('Question updated successfully')).toHaveCount(0)
+    await expect(page.getByText('Question saved successfully')).toHaveCount(0)
   })
 
   test('the host edits a question', async ({ signIn, api }) => {
@@ -103,9 +100,7 @@ test.describe('quiz editor', () => {
     await questionForm(page).getByTestId('add-answer-button').click()
     await answerInput(page, 0).fill('four')
     await questionForm(page).getByTestId('save-question-button').click()
-    await expect(
-      page.getByText('Accepted answers updated successfully'),
-    ).toBeVisible()
+    await expect(page.getByText('Question saved successfully')).toBeVisible()
 
     await page.reload()
     await page.getByTestId(`question-item-${question.id}`).click()
@@ -151,7 +146,7 @@ test.describe('quiz editor', () => {
         'There should be at least one correct answer',
       ),
     ).toBeVisible()
-    await expect(page.getByText('Question updated successfully')).toHaveCount(0)
+    await expect(page.getByText('Question saved successfully')).toHaveCount(0)
   })
 
   test('the host reorders questions with up/down buttons', async ({
@@ -238,10 +233,7 @@ test.describe('quiz editor', () => {
     await form.getByTestId('question-text-input').fill('1+1?')
     await answerInput(page, 0).fill('2')
     await form.getByTestId('save-question-button').click()
-    await expect(page.getByText('Question updated successfully')).toBeVisible()
-    await expect(
-      page.getByText('Accepted answers updated successfully'),
-    ).toBeVisible()
+    await expect(page.getByText('Question saved successfully')).toBeVisible()
     await expect(emptyItem.getByLabel('incomplete')).toHaveCount(0)
     await expect(textOnlyItem.getByLabel('incomplete')).toBeVisible()
     await expect(startButton).toBeDisabled()
@@ -252,7 +244,7 @@ test.describe('quiz editor', () => {
     await answerInput(page, 0).fill('4')
     await form.getByTestId('save-question-button').click()
     await expect(
-      page.getByText('Accepted answers updated successfully').first(),
+      page.getByText('Question saved successfully').first(),
     ).toBeVisible()
     await expect(textOnlyItem.getByLabel('incomplete')).toHaveCount(0)
     await expect(startLink).toBeVisible()

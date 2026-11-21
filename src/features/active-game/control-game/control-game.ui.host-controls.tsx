@@ -112,6 +112,7 @@ export function HostControls({ horizontal = false }: Props) {
       {!endReason && (
         <Button
           data-testid="end-session-button"
+          type="button"
           variant="outline"
           className={cn(
             'text-destructive hover:bg-destructive/10 hover:text-destructive',

@@ -13,6 +13,7 @@ export {
   parseServerMessage,
 } from './active-game.lib'
 export { ActiveGameProvider } from './active-game.provider'
+export { SESSION_SUMMARY_QUERY } from './active-game.queries'
 export type {
   ActiveGameRole,
   ActiveGameState,

@@ -13,10 +13,7 @@ import {
   toQuestionFormValues,
   toQuestionPayload,
 } from './edit-question.lib'
-import {
-  useReplaceAcceptedAnswersMutation,
-  useUpdateQuestionMutation,
-} from './edit-question.mutation'
+import { useSaveQuestionMutation } from './edit-question.mutation'
 
 type Props = Omit<React.ComponentProps<'form'>, 'onSubmit'> & {
   questionId: string
@@ -28,8 +25,8 @@ export function EditQuestionForm({
   questionNumber,
   ...props
 }: Props) {
-  const { mutate: updateQuestion } = useUpdateQuestionMutation()
-  const { mutate: replaceAcceptedAnswers } = useReplaceAcceptedAnswersMutation()
+  const { mutate: saveQuestion, isPending: isSaving } =
+    useSaveQuestionMutation()
 
   const { data: question } = useQuery(QUESTION_QUERY.queryOptions(questionId))
   const { data: answers } = useQuery(
@@ -79,21 +76,14 @@ export function EditQuestionForm({
     }
     if (duplicates.length) return
 
-    updateQuestion(toQuestionPayload(values, { id: questionId }), {
-      onSuccess: () => {
-        toast.success('Question updated successfully')
-      },
-    })
-
-    replaceAcceptedAnswers(
+    saveQuestion(
       {
-        questionId,
-        gameId: question?.gameId,
+        question: toQuestionPayload(values, { id: questionId }),
         answers: toAcceptedAnswersPayload(values, questionId),
       },
       {
         onSuccess: () => {
-          toast.success('Accepted answers updated successfully')
+          toast.success('Question saved successfully')
         },
       },
     )
@@ -241,6 +231,7 @@ export function EditQuestionForm({
         type="submit"
         size="lg"
         className="w-fit font-bold"
+        disabled={isSaving}
       >
         Save question
       </Button>

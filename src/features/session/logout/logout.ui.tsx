@@ -1,7 +1,7 @@
 import { useNavigate } from 'react-router'
-import { GAMES_QUERY } from '@/entities/game'
 import { clearSession } from '@/entities/session'
 import { logoutUser } from '@/entities/user'
+import { queryClient } from '@/shared/api'
 import { Button } from '@/shared/ui'
 
 export function LogoutButton() {
@@ -12,7 +12,8 @@ export function LogoutButton() {
       await logoutUser()
     } finally {
       clearSession()
-      GAMES_QUERY.invalidate()
+      // another user may sign in next on this machine — drop all cached data
+      queryClient.clear()
       navigate('/')
     }
   }

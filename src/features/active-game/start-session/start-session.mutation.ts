@@ -13,8 +13,9 @@ export const useStartSessionMutation = (
       // BR-51: a session for this host/quiz is already running — the response
       // carries its id so the host can return to it
       const sessionId =
-        isAxiosError(error) && error.response?.status === 409
-          ? (error.response.data as { sessionId?: string }).sessionId
+        isAxiosError<{ sessionId?: string }>(error) &&
+        error.response?.status === 409
+          ? error.response.data.sessionId
           : undefined
 
       if (sessionId) {

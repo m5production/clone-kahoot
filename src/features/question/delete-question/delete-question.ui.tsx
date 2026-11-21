@@ -8,13 +8,13 @@ type Props = {
 }
 
 export function DeleteQuestionButton({ questionId, onDelete }: Props) {
-  const { mutate: deleteQuestion } = useDeleteQuestionMutation(() =>
-    toast.success('Question deleted successfully'),
-  )
+  const { mutate: deleteQuestion } = useDeleteQuestionMutation(() => {
+    toast.success('Question deleted successfully')
+    onDelete?.()
+  })
 
   const handleDeleteClick = () => {
     deleteQuestion(questionId)
-    onDelete?.()
   }
 
   return (

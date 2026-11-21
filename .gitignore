@@ -28,3 +28,6 @@ dist-ssr
 # Tests
 e2e/.tmp
 .vitest
+
+# Tooling
+managed_context
