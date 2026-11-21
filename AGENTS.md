@@ -17,7 +17,7 @@ Backend lives in the sibling repo `../backend` (NestJS + WebSocket + Prisma/Post
 
 Local backend for manual/e2e runs: in `../backend` — `npx yarn@1.22.22 install --frozen-lockfile`,
 a running PostgreSQL (`yarn db:up` when Docker is available, or set `DB_*` in `.env.development`),
-`npx dotenvx run -f .env.development -- npx prisma migrate deploy`, then `npm run dev`
+`npx dotenvx run -f .env.development -- node scripts/prisma-env.mjs migrate deploy`, then `npm run dev`
 (yarn is not installed globally; don't use `prisma-migrate-dev`, it creates new migrations).
 E2E runs need `E2E_DB_*` vars (or a local `postgres:postgres@localhost:5432/clone_kahoot_e2e`).
 

@@ -10,10 +10,12 @@ A real-time quiz game inspired by Kahoot: a host builds a quiz and runs it live,
 
 - Sign-in and protected routes
 - Game list and game creation
-- Quiz builder for the host: create, edit and delete questions and their accepted answers
-- Live game run by the host, with players connected in real time over WebSocket
+- Quiz builder for the host: create, edit, reorder and delete questions — open-ended (with accepted answers) or multiple choice — plus a per-question time limit
+- Live game run by the host, with players connected in real time over WebSocket; players join via a shared link or QR code
 - Player view for answering questions
 - Winners table
+- Game history: past sessions with a full answer report per game
+- Mobile-friendly: the host can run the whole game from a phone, and the quiz editor works on small screens
 
 ## Tech stack
 
@@ -39,8 +41,8 @@ Prisma ORM → PostgreSQL
 `src/` follows Feature-Sliced Design:
 
 - `src/app/` — application setup: router, styles
-- `src/pages/` — feature pages (home, host-game, player-game, quiz-editor, winners, login)
-- `src/features/` — user actions (control-game, submit-answer, session, game and question management)
+- `src/pages/` — route screens (welcome, login, register, home, quiz-editor, session, session-report, history)
+- `src/features/` — user actions (start-session, control-game, submit-answer, session, game/question/history management)
 - `src/entities/` — domain models (`Game`, `Question`, `Player`, ...) and `ActiveGameProvider`, which holds the WebSocket connection and live game state
 - `src/shared/` — HTTP/WS clients, env config, UI primitives, test helpers
 
@@ -60,8 +62,11 @@ API/WS hosts come from `.env.development` / `.env.production` (`VITE_API_URL`, `
 |---|---|
 | `bun run dev` | Start the Vite dev server |
 | `bun run build` | Type-check and build for production |
-| `bun run lint` | Run Biome (lint + format check) |
-| `bun run test` | Run unit + component tests (Vitest) |
-| `bun run test:e2e` | Run Playwright e2e tests against the real backend |
+| `bun run lint` | Run Biome (lint + format check); `bun run lint:fix` applies fixes |
+| `bun run lint:circular` | Fail on circular imports (dpdm) |
+| `bun run test` | Run unit + component tests (Vitest); `test:unit` / `test:browser` run a single tier |
+| `bun run test:e2e` | Run Playwright e2e tests against the real backend (`test:e2e:ui` for UI mode) |
+| `bun run test:all` | Run Vitest and Playwright |
+| `bun run check` | lint + lint:circular + build + tests — run before committing |
 | `bun run preview` | Preview the production build |
 | `bun run deploy` | Publish `dist` to GitHub Pages |

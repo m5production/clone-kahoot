@@ -1,64 +1,50 @@
-# Copilot instructions for clone-kahoot
+# Copilot instructions for clone-kahoot frontend
 
-Purpose
-- Help AI coding agents get productive quickly in this codebase: a Vite + React + TypeScript single-page app for quiz/game functionality.
+React 19 SPA (Vite, TypeScript, Tailwind v4, shadcn/Radix, TanStack Query, react-router, axios, native WebSocket).
+Package manager: **bun** (not npm). Deployed to GitHub Pages via `bun run deploy`.
 
-Quick run (developer machine)
-- Install: `npm install`
-- Dev server: `npm run dev` (uses Vite from `package.json`)
-- Build: `npm run build`
-- Preview build: `npm run preview`
+`AGENTS.md` has the full command list; `.devin/rules/` holds the conventions
+(`fsd-architecture.md`, `code-style.md`, `testing.md`, `test-ids.md`) — they are the source of truth.
 
-Big picture
-- Frontend-only client app built with Vite + React + TypeScript. Key entry: `src/main.tsx`.
-- Routing and feature pages live under `src/pages/` (each feature is a folder, e.g. `MainWindow`, `AdminQuizReview`, `Player`).
-- UI primitives live in `src/components/ui/` (small single-responsibility components such as `button.tsx`, `input.tsx`, `card.tsx`).
-- Data-fetching hooks are colocated inside page folders at `src/pages/*/api/` and follow the `useXxx` naming pattern (examples: `useGetGames.ts`, `usePostAddNewGame.ts`).
-- Shared client hooks and utilities live in `src/lib/` (examples: `useActiveGame.ts`, `useGetAllQuestions.ts`, `utils.ts`).
-- Type models are in `src/types/` (use these types to shape API responses and component props).
-- Small context providers exist (e.g. `src/components/ui/ActiveGameProvider.tsx`) for cross-tree state.
+## Quick run
 
-Project conventions and patterns (explicit)
-- Feature folders: a page folder contains the UI, and an `api/` subfolder for hooks that interact with backend endpoints. When adding new endpoints, add hooks under the corresponding page `api/` folder.
-- Hook naming: asynchronous data hooks are named `useGetXxx`, `usePostXxx`, `usePutXxx`, `usePatchXxx`, `useDeleteXxx` (check `src/pages/*/api/` for examples). Prefer these conventions for discoverability.
-- UI primitives: add small, composable components under `src/components/ui/`. Keep them presentation-only where possible; pass callbacks props for behavior.
-- Types: put new types into `src/types/` and import them across hooks and components. Reuse existing types such as `Question`, `Player`, `ActiveGame`.
-- Styling: global and per-app CSS files exist (`src/index.css`, `src/App.css`). Small components use className strings — keep styles minimal and predictable.
+- Install: `bun install`
+- Dev server: `bun run dev` (Vite on :5173; needs the backend from the sibling repo `../backend` on `http://localhost:3000` — its CORS allows only :5173)
+- Verify changes: `bun run check` (Biome lint + circular-import check + `tsc -b` + Vitest). Run `bun run test:e2e` too when UI flows change.
 
-Data flow and integration points
-- The app relies on data hooks under `pages/*/api` to talk to a backend. Inspect `src/pages/MainWindow/api/useGetGames.ts` and `src/pages/AdminQuizReview/api/useGetSingleQuestion.ts` as canonical examples.
-- Local state vs server: long-lived state shared across many components uses providers (see `ActiveGameProvider.tsx`) or custom hooks in `src/lib/`.
-- When adding a new feature, add API hook(s) in the feature folder, update types in `src/types/`, and wire the UI under `src/pages/<Feature>`.
+## Big picture
 
-Files to open first when modifying behavior
-- `src/main.tsx` — app bootstrap and providers
-- `src/Router.tsx` — route mapping and auth-protected routes
-- `src/pages/*/index.tsx` — feature entry points
-- `src/pages/*/api/*` — data access hooks
-- `src/components/ui/` — shared components and providers
-- `src/lib/` — shared hooks and utilities
+`src/` follows Feature-Sliced Design — imports go **downward only**:
+`app → pages → widgets → features → entities → shared`, enforced by Biome
+`noRestrictedImports` (`bun run lint`) and dpdm (`bun run lint:circular`).
 
-Developer workflow notes (discovered)
-- No test suite was found in the repo root; assume manual verification via `npm run dev` and the browser.
-- Linting / formatting: check `package.json` for scripts; if none, follow typical `npm run` tasks added by Vite templates.
+- `src/app/` — bootstrap, router (`app/router/app-router.tsx`), providers, global styles
+- `src/pages/` — route screens: welcome, login, register, home, quiz-editor, session, session-report, history
+- `src/features/` — user actions as `features/<domain>/<action>` (e.g. `features/question/create-question`, `features/active-game/control-game`)
+- `src/entities/` — domain slices (game, question, answer-option, accepted-answer, player, user, session, active-game, history); `entities/active-game` holds the WebSocket connection and live game state via `ActiveGameProvider`
+- `src/shared/` — HTTP/WS clients, env config (`shared/config/env.ts`), UI primitives, test helpers
 
-Examples (concrete)
-- Adding a GET hook for games: mimic `src/pages/MainWindow/api/useGetGames.ts` — export a `useGetGames` hook that returns fetched data and loading state.
-- New page structure:
-  - `src/pages/NewFeature/index.tsx` — presentational and container components
-  - `src/pages/NewFeature/api/useGetSomething.ts` — data fetching hook
-  - Add routes in `src/Router.tsx`.
+## Conventions
 
-What NOT to change without PR-level discussion
-- App-wide providers and bootstrap in `src/main.tsx` (they influence all pages).
-- Type definitions in `src/types/` that are shared by multiple pages — changing those is breaking.
+- Every slice has an `index.ts` public API — import through it (`@/entities/game`), never internal files. Use `@/` across slices, relative `./` inside a slice (no `../` across slices).
+- File naming: kebab-case + dot suffix — `x.api.ts` (backend calls), `x.queries.ts` (TanStack Query objects), `x.mutation.ts` (`useXMutation` hooks), `x.lib.ts` (pure functions), `x.ui.tsx` (JSX). Keep React thin: logic goes to `*.lib.ts`.
+- Data fetching goes through TanStack Query query objects and mutation hooks, not ad-hoc `useEffect` + axios.
+- Auth: opaque session token + user id in localStorage, sent as `Authorization: Bearer` (no cookies) — `entities/session`, `shared/api`. Read the session via its API, never `localStorage` directly.
+- API/WS hosts come from `.env.development` / `.env.production` / `.env.test` (`VITE_API_URL`, `VITE_WS_URL`).
 
-Where to look for undocumented behavior
-- `managed_context/metadata.json` — contains metadata used by the project; check before changing runtime assumptions.
+## Tests
 
-If you are an AI assistant making changes
-- Follow existing naming conventions (`useXxx`, `pages/*/api`), reuse types from `src/types/`, and run the dev server locally to verify UI behavior.
-- Keep PRs small and focused: change the type, hook, and consumer together in the same PR when feasible.
+Three tiers, all run in CI (`.github/workflows/ci.yml`):
 
-Feedback
-- If anything here is unclear or missing (CI, special environment variables, or backend URL conventions), tell me which area to expand and I'll iterate.
+- unit — `*.unit.spec.ts` next to the code (Vitest + happy-dom)
+- component — `*.browser.spec.tsx` (Vitest browser mode, Playwright provider)
+- e2e — `e2e/**/*.e2e.ts` (`@playwright/test` against the real backend, live-game specs in `e2e/live-game/`)
+
+Commands: `bun run test`, `test:unit`, `test:browser`, `test:e2e`, `test:e2e:ui`, `test:all`.
+Locate elements by `data-testid` per `.devin/rules/test-ids.md`.
+
+## What NOT to change without discussion
+
+- The stack: react-router, Biome, React Context/TanStack Query. No TanStack Router, Jotai, ESLint/Prettier, Storybook, MSW, Sentry or i18n without an explicit decision.
+- Public APIs of shared slices (`shared/api`, `entities/active-game`) — changes ripple across host, player and winners screens.
+- `vitest.browser.setup.ts` must not import modules that specs mock (see `.devin/rules/testing.md`).

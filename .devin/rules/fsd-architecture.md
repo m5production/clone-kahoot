@@ -11,10 +11,10 @@ globs: src/**/*.ts,src/**/*.tsx
 ```
 src/
 ├── app/        # entry, providers (QueryClient, toasts), router + route guards, global styles
-├── pages/      # route screens: login, home, quiz-editor, host-game, player-game, winners
+├── pages/      # route screens: welcome, login, register, home, quiz-editor, session, session-report, history
 ├── widgets/    # only for compositions reused by 2+ pages
 ├── features/   # user actions: features/<domain>/<action>, e.g. features/question/create-question
-├── entities/   # domain: game, question, accepted-answer, player, user, session, active-game
+├── entities/   # domain: game, question, answer-option, accepted-answer, player, user, session, active-game, history
 └── shared/     # api clients (http, ws), config (hosts, storage keys), ui primitives, lib/utils
 ```
 
@@ -69,5 +69,6 @@ kebab-case + dot suffix, flat inside the slice until it gets crowded (then `ui/`
   player answer in `features/active-game/submit-answer`.
 - Host, player and winners screens share one `ActiveGameProvider` mounted by
   `SessionPage` (`/join/:sessionId`), so the winners screen keeps the game state.
-- Session (user id in localStorage, auth cookie) lives in `entities/session`; read it via its API,
+- Session (user id and session token in localStorage, sent as `Authorization: Bearer` — no
+  cookies) lives in `entities/session`; read it via its API,
   never `localStorage` directly. Other entities' UI gets the user id as a prop (`UserAvatar`).

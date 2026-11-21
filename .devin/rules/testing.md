@@ -82,3 +82,15 @@ Commands: `bun run test` (unit + component), `test:unit`, `test:browser`, `test:
 4. Live game (`e2e/live-game/live-game.e2e.ts`): host + two players, answers shown, question switch,
    answers kept when going back, winners order on all screens, stop game; join errors (not running,
    another game running, empty link).
+5. History (`e2e/history.e2e.ts`): a finished game appears in the history and the report shows its
+   answers; an aborted session is recorded as aborted; deleting the quiz keeps its history (BR-81);
+   another host cannot see or delete the record (BR-81); the host deletes a record after
+   confirming (FR-82).
+6. Quiz editor on mobile (`e2e/quiz-editor-mobile.e2e.ts`): bottom nav switches between the
+   question list and the editor; adding a question opens the Question tab, deleting returns to the
+   list; an unready quiz counts incomplete questions and the FAB explains why it cannot start; a
+   ready quiz starts from the FAB and opens the lobby.
+7. Live game extras (`e2e/live-game/`): choice questions — the host builds a choice question, the
+   player answers by button, the report shows the picks (`choice-question.e2e.ts`); the host runs
+   the whole game from a phone and ends the session from the bottom bar with a confirmation
+   (`host-mobile.e2e.ts`).
