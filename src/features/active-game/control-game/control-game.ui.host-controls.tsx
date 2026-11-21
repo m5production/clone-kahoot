@@ -14,7 +14,13 @@ type ControlMessage =
   | 'SHOW_WINNERS'
   | 'END_SESSION'
 
-export function HostControls() {
+type Props = {
+  /** D-12: the mobile bottom bar — the current action grows, "End the session"
+      shrinks next to it; buttons get ≥44px tap zones (NFR-U8) */
+  horizontal?: boolean
+}
+
+export function HostControls({ horizontal = false }: Props) {
   const { session, endReason, sendMessage } = useActiveGame()
   const [isEndConfirming, setIsEndConfirming] = useState(false)
 
@@ -38,12 +44,17 @@ export function HostControls() {
     send('END_SESSION')
   }
 
+  const actionClassName = horizontal ? 'min-h-11 flex-1' : 'w-full'
+
   return (
-    <div data-testid="host-controls" className="flex flex-col gap-4">
+    <div
+      data-testid="host-controls"
+      className={cn('flex', horizontal ? 'flex-row gap-3' : 'flex-col gap-4')}
+    >
       {state === 'lobby' && (
         <Button
           data-testid="start-game-button"
-          className="w-full font-bold"
+          className={cn('font-bold', actionClassName)}
           type="button"
           onClick={() => send('START_GAME')}
         >
@@ -55,7 +66,7 @@ export function HostControls() {
         <Button
           data-testid="close-question-button"
           variant="secondary"
-          className="w-full"
+          className={actionClassName}
           type="button"
           onClick={() => send('CLOSE_QUESTION')}
         >
@@ -67,7 +78,7 @@ export function HostControls() {
         <Button
           data-testid="show-answers-button"
           variant="secondary"
-          className="w-full"
+          className={actionClassName}
           type="button"
           onClick={() => send('SHOW_ANSWERS')}
         >
@@ -80,7 +91,7 @@ export function HostControls() {
           <Button
             data-testid="show-winners-button"
             variant="secondary"
-            className="w-full"
+            className={actionClassName}
             type="button"
             onClick={() => send('SHOW_WINNERS')}
           >
@@ -90,7 +101,7 @@ export function HostControls() {
           <Button
             data-testid="next-question-button"
             variant="secondary"
-            className="w-full"
+            className={actionClassName}
             type="button"
             onClick={() => send('NEXT_QUESTION')}
           >
@@ -102,7 +113,12 @@ export function HostControls() {
         <Button
           data-testid="end-session-button"
           variant="outline"
-          className="w-full text-destructive hover:bg-destructive/10 hover:text-destructive"
+          className={cn(
+            'text-destructive hover:bg-destructive/10 hover:text-destructive',
+            horizontal
+              ? 'min-h-11 max-w-44 shrink-0 whitespace-normal'
+              : 'w-full',
+          )}
           onClick={handleEndSessionClick}
         >
           {isEndConfirming ? 'Confirm: end the session?' : 'End the session'}
@@ -112,7 +128,7 @@ export function HostControls() {
       {endReason && (
         <Link
           data-testid="home-link"
-          className={cn(buttonVariants({ variant: 'ghost' }), 'w-full')}
+          className={cn(buttonVariants({ variant: 'ghost' }), actionClassName)}
           to="/home"
         >
           Home

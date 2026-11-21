@@ -1,5 +1,5 @@
 import { Link } from 'react-router'
-import { useActiveGame, useQuestionCountdown } from '@/entities/active-game'
+import { useActiveGame } from '@/entities/active-game'
 import { Players, WinnersTable } from '@/entities/player'
 import { QuestionView } from '@/entities/question'
 import {
@@ -8,11 +8,17 @@ import {
   QuestionProgress,
 } from '@/features/active-game/control-game'
 import { SubmitAnswerForm } from '@/features/active-game/submit-answer'
-import { cn } from '@/shared/lib'
+import { cn, useMediaQuery } from '@/shared/lib'
 import { buttonVariants, Card, CardContent } from '@/shared/ui'
+import { HostScreenMobile } from './session.ui.host-mobile'
+import { QuestionTimer } from './session.ui.question-timer'
 
 export function SessionView() {
   const { role, session, endReason, standings } = useActiveGame()
+  // FR-93: below 768px the host gets the one-column "stage" layout (D-12); the
+  // layout is picked in JS so only one is mounted — duplicated test ids would
+  // break e2e locators
+  const isDesktop = useMediaQuery('(min-width: 768px)')
 
   if (endReason || standings) return <SessionEnded />
   if (!session) {
@@ -23,8 +29,9 @@ export function SessionView() {
     )
   }
   if (session.state === 'lobby') return <Lobby />
+  if (role === 'player') return <PlayerScreen />
 
-  return role === 'host' ? <HostScreen /> : <PlayerScreen />
+  return isDesktop ? <HostScreen /> : <HostScreenMobile />
 }
 
 function Lobby() {
@@ -142,27 +149,6 @@ function PlayerScreen() {
         }
       />
     </div>
-  )
-}
-
-/** Remaining seconds of the open question in server time; hidden outside question_open (BR-61, NFR-P6) */
-function QuestionTimer() {
-  const remaining = useQuestionCountdown()
-
-  if (remaining === null) return null
-
-  const seconds = Math.ceil(remaining / 1000)
-
-  return (
-    <p
-      data-testid="question-timer"
-      className={cn(
-        'rounded-full px-4 py-1 text-2xl font-extrabold tabular-nums',
-        seconds <= 5 ? 'bg-destructive/15 text-destructive' : 'bg-muted',
-      )}
-    >
-      {seconds}
-    </p>
   )
 }
 
