@@ -1,4 +1,9 @@
-import { type BrowserContext, test as base, type Page } from '@playwright/test'
+import {
+  type BrowserContext,
+  type BrowserContextOptions,
+  test as base,
+  type Page,
+} from '@playwright/test'
 import { type Api, createApi, type TestUser } from './api'
 
 export interface Actor {
@@ -10,8 +15,12 @@ interface Fixtures {
   api: Api
   /** A name unique across runs and workers; backend user names must be unique */
   uniqueName: (prefix: string) => string
-  /** A signed-in user in its own browser context, e.g. the host or a player */
-  signIn: (prefix: string) => Promise<Actor>
+  /** A signed-in user in its own browser context, e.g. the host or a player;
+      context options allow e.g. a mobile viewport for narrow-screen specs */
+  signIn: (
+    prefix: string,
+    contextOptions?: BrowserContextOptions,
+  ) => Promise<Actor>
 }
 
 let nameCounter = 0
@@ -35,9 +44,9 @@ export const test = base.extend<Fixtures>({
   signIn: async ({ browser, api, uniqueName }, use) => {
     const contexts: BrowserContext[] = []
 
-    await use(async (prefix) => {
+    await use(async (prefix, contextOptions) => {
       const user = await api.createUser(uniqueName(prefix))
-      const context = await browser.newContext()
+      const context = await browser.newContext(contextOptions)
       contexts.push(context)
 
       // The app's session: the bearer token and the remembered user id (seeded once per

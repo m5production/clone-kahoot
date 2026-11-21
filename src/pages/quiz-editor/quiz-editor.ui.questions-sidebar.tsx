@@ -12,12 +12,18 @@ type Props = React.ComponentProps<'aside'> &
     gameId: string
     selectedQuestion: SelectedQuestion | undefined
     onSelectQuestion: (question: SelectedQuestion) => void
+    /** extra classes for each list row, e.g. a taller touch target (NFR-U7) */
+    itemClassName?: string
+    /** extra classes for the move up/down buttons (NFR-U7) */
+    moveButtonClassName?: string
   }>
 
 export function QuestionsSidebar({
   gameId,
   selectedQuestion,
   onSelectQuestion,
+  itemClassName,
+  moveButtonClassName,
   children,
   ...props
 }: Props) {
@@ -47,6 +53,7 @@ export function QuestionsSidebar({
               'w-full rounded-lg px-3 py-2 text-sm font-medium cursor-pointer transition hover:bg-accent hover:text-accent-foreground flex items-center gap-1',
               selectedQuestion?.id === question.id &&
                 'bg-primary text-primary-foreground hover:bg-primary hover:text-primary-foreground',
+              itemClassName,
             )}
           >
             <span className="flex-1 truncate">Question {index + 1}</span>
@@ -61,6 +68,7 @@ export function QuestionsSidebar({
               gameId={gameId}
               questions={questions}
               index={index}
+              buttonClassName={moveButtonClassName}
             />
           </li>
         ))}

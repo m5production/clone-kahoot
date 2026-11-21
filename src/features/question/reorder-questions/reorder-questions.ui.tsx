@@ -1,5 +1,6 @@
 import { ChevronDown, ChevronUp } from 'lucide-react'
 import type { Question } from '@/entities/question'
+import { cn } from '@/shared/lib'
 import { Button } from '@/shared/ui'
 import { moveQuestion } from './reorder-questions.lib'
 import { useReorderQuestionsMutation } from './reorder-questions.mutation'
@@ -8,9 +9,16 @@ type Props = {
   gameId: string
   questions: Pick<Question, 'id'>[]
   index: number
+  /** extra classes for both buttons, e.g. a larger touch target (NFR-U7) */
+  buttonClassName?: string
 }
 
-export function MoveQuestionButtons({ gameId, questions, index }: Props) {
+export function MoveQuestionButtons({
+  gameId,
+  questions,
+  index,
+  buttonClassName,
+}: Props) {
   const { mutate: reorder, isPending } = useReorderQuestionsMutation(gameId)
 
   const handleMove = (direction: -1 | 1) => (event: React.MouseEvent) => {
@@ -28,7 +36,7 @@ export function MoveQuestionButtons({ gameId, questions, index }: Props) {
         variant="ghost"
         size="sm"
         aria-label="Move question up"
-        className="h-6 w-6 px-0"
+        className={cn('h-6 w-6 px-0', buttonClassName)}
         disabled={index === 0 || isPending}
         onClick={handleMove(-1)}
       >
@@ -40,7 +48,7 @@ export function MoveQuestionButtons({ gameId, questions, index }: Props) {
         variant="ghost"
         size="sm"
         aria-label="Move question down"
-        className="h-6 w-6 px-0"
+        className={cn('h-6 w-6 px-0', buttonClassName)}
         disabled={index === questions.length - 1 || isPending}
         onClick={handleMove(1)}
       >
