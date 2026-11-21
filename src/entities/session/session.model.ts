@@ -25,4 +25,8 @@ export const clearSession = () => {
  * Only in-app paths are honoured — anything else is treated as no return url.
  */
 export const getSafeReturnUrl = (value: string | null): string | null =>
-  value?.startsWith('/') && !value.startsWith('//') ? value : null
+  // '/\evil.com' passes the naive '/'+not-'//' check but browsers treat
+  // backslashes as slashes, turning it into protocol-relative '//evil.com'
+  value?.startsWith('/') && !value.startsWith('//') && !value.includes('\\')
+    ? value
+    : null
