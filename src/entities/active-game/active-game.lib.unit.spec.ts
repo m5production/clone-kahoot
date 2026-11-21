@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest'
 import { createSessionState } from './active-game.fixtures'
 import {
   buildJoinPath,
+  buildJoinUrl,
   extractSessionId,
   parseServerMessage,
 } from './active-game.lib'
@@ -58,5 +59,13 @@ describe('extractSessionId', () => {
 describe('buildJoinPath', () => {
   it('builds the join path', () => {
     expect(buildJoinPath('s1')).toBe('/join/s1')
+  })
+})
+
+describe('buildJoinUrl', () => {
+  it('builds an absolute join URL including the app base path', () => {
+    expect(buildJoinUrl('s1')).toBe(
+      `${window.location.origin}${import.meta.env.BASE_URL}join/s1`,
+    )
   })
 })

@@ -40,5 +40,7 @@ export const extractSessionId = (input: string): string => {
 
 export const buildJoinPath = (sessionId: string) => `/join/${sessionId}`
 
+// the app may be hosted under a base path (GitHub Pages: /clone-kahoot/);
+// BASE_URL keeps the trailing slash, buildJoinPath starts with one
 export const buildJoinUrl = (sessionId: string) =>
-  `${window.location.origin}${buildJoinPath(sessionId)}`
+  `${window.location.origin}${import.meta.env.BASE_URL}${buildJoinPath(sessionId).slice(1)}`
