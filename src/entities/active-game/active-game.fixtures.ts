@@ -24,6 +24,7 @@ export const createSessionQuestion = (
   number: 1,
   total: 2,
   endsAt: Date.now() + 20_000,
+  type: 'open',
   ...overrides,
 })
 

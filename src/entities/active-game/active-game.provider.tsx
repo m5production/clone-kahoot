@@ -25,6 +25,7 @@ export function ActiveGameProvider({ sessionId, children }: Props) {
   const [myAnswer, setMyAnswer] = useState<{
     questionId: string
     text: string
+    optionId?: string
   } | null>(null)
   const [standings, setStandings] = useState<Winner[] | null>(null)
   const [endReason, setEndReason] = useState<SessionEndReason | null>(null)
@@ -94,6 +95,7 @@ export function ActiveGameProvider({ sessionId, children }: Props) {
             setMyAnswer({
               questionId: message.payload.questionId,
               text: message.payload.text,
+              optionId: message.payload.optionId,
             })
             return
           case 'QUESTION_CLOSED':

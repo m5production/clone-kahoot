@@ -26,11 +26,13 @@ export const updateQuestion = async ({
   text,
   img,
   timeLimitSec,
-}: Pick<Question, 'id' | 'text' | 'img' | 'timeLimitSec'>) => {
+  type,
+}: Pick<Question, 'id' | 'text' | 'img' | 'timeLimitSec' | 'type'>) => {
   const { data } = await httpClient.put<Question>(`/questions/${id}`, {
     text,
     img,
     timeLimitSec,
+    type,
   })
 
   return data

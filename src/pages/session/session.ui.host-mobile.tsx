@@ -1,6 +1,7 @@
 import { ChevronDown, QrCode, X } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { useActiveGame } from '@/entities/active-game'
+import { AnswerOptionsList } from '@/entities/answer-option'
 import { PlayerAnswersList, PlayersList } from '@/entities/player'
 import { QuestionView } from '@/entities/question'
 import {
@@ -50,6 +51,17 @@ export function HostScreenMobile() {
       <div className="flex flex-1 flex-col items-center justify-center gap-4 p-6 text-center">
         <QuestionTimer />
         {question && <QuestionView text={question.text} img={question.img} />}
+        {question?.type === 'choice' && question.options && (
+          <AnswerOptionsList
+            className="w-full"
+            options={question.options.map((option) => ({
+              text: option.text,
+              correct:
+                state === 'answers_shown' &&
+                option.id === revealed?.correctOptionId,
+            }))}
+          />
+        )}
         {answers && (
           <PlayerAnswersList answers={answers} className="justify-center" />
         )}

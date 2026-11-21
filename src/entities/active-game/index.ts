@@ -26,6 +26,7 @@ export type {
   SessionEndReason,
   SessionPlayer,
   SessionQuestion,
+  SessionQuestionOption,
   SessionState,
   SessionStateMessage,
   SessionSummary,

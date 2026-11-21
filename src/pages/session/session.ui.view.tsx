@@ -1,7 +1,9 @@
 import { Link } from 'react-router'
 import { useActiveGame } from '@/entities/active-game'
+import { AnswerOptionsList } from '@/entities/answer-option'
 import { Players, WinnersTable } from '@/entities/player'
 import { QuestionView } from '@/entities/question'
+import { getSessionUserId } from '@/entities/session'
 import {
   HostControls,
   InviteLink,
@@ -87,6 +89,17 @@ function HostScreen() {
       <div className="flex flex-col items-center justify-center gap-4 p-8">
         <QuestionTimer />
         {question && <QuestionView text={question.text} img={question.img} />}
+        {question?.type === 'choice' && question.options && (
+          <AnswerOptionsList
+            className="w-full max-w-2xl"
+            options={question.options.map((option) => ({
+              text: option.text,
+              correct:
+                session?.state === 'answers_shown' &&
+                option.id === revealed?.correctOptionId,
+            }))}
+          />
+        )}
       </div>
 
       <Players
@@ -129,7 +142,7 @@ function PlayerScreen() {
           </p>
         )}
 
-        {state === 'answers_shown' && revealed && (
+        {state === 'answers_shown' && revealed?.acceptedAnswers && (
           <Card className="w-full max-w-md rounded-3xl border-0 shadow-xl">
             <CardContent className="flex flex-col gap-3 p-6">
               <h3 className="font-bold">Accepted answers</h3>
@@ -139,6 +152,28 @@ function PlayerScreen() {
             </CardContent>
           </Card>
         )}
+
+        {state === 'answers_shown' &&
+          revealed &&
+          question?.type === 'choice' &&
+          question.options && (
+            <Card className="w-full max-w-md rounded-3xl border-0 shadow-xl">
+              <CardContent className="flex flex-col gap-3 p-6">
+                <h3 className="font-bold">Answers</h3>
+                <AnswerOptionsList
+                  options={question.options.map((option) => ({
+                    text: option.text,
+                    correct: option.id === revealed.correctOptionId,
+                    selected:
+                      option.id ===
+                      revealed.answers.find(
+                        (answer) => answer.playerId === getSessionUserId(),
+                      )?.optionId,
+                  }))}
+                />
+              </CardContent>
+            </Card>
+          )}
       </section>
 
       <Players

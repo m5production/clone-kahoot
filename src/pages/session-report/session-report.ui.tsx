@@ -92,9 +92,29 @@ export function SessionReportPage() {
                 </CardHeader>
                 <CardContent className="flex flex-col gap-3">
                   <p className="font-medium">{question.text}</p>
-                  <p className="text-sm text-muted-foreground">
-                    Accepted: {question.acceptedAnswers.join(', ')}
-                  </p>
+                  {question.type === 'choice' && question.options ? (
+                    <ul className="flex flex-col gap-1 sm:grid sm:grid-cols-2">
+                      {question.options.map((option, index) => (
+                        <li
+                          // biome-ignore lint/suspicious/noArrayIndexKey: the order is the identity — options were stored in display order
+                          key={index}
+                          className={cn(
+                            'rounded-xl px-3 py-2 text-sm',
+                            option.isCorrect
+                              ? 'bg-success/15 text-success font-semibold'
+                              : 'bg-muted text-muted-foreground',
+                          )}
+                        >
+                          {option.isCorrect && '✓ '}
+                          {option.text}
+                        </li>
+                      ))}
+                    </ul>
+                  ) : (
+                    <p className="text-sm text-muted-foreground">
+                      Accepted: {question.acceptedAnswers.join(', ')}
+                    </p>
+                  )}
                   <ul className="flex flex-col gap-1">
                     {question.answers.map((answer) => (
                       <li

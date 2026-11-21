@@ -14,6 +14,11 @@ export interface SessionPlayer {
   answered: boolean
 }
 
+export interface SessionQuestionOption {
+  id: string
+  text: string
+}
+
 export interface SessionQuestion {
   id: string
   text: string
@@ -22,6 +27,10 @@ export interface SessionQuestion {
   total: number
   /** server timestamp (ms) when the question closes (BR-61) */
   endsAt: number
+  /** D-10: 'open' answers with text, 'choice' picks one of `options` */
+  type: 'open' | 'choice'
+  /** choice questions only; correctness is not revealed before ANSWERS_REVEALED (BR-88) */
+  options?: SessionQuestionOption[]
 }
 
 /** GET /api/sessions/:id — public data shown on the join page */
@@ -50,11 +59,16 @@ export interface RevealedAnswer {
   isCorrect: boolean
   /** speed-based points earned on this question (BR-70) */
   points: number
+  /** choice questions only: the picked option */
+  optionId?: string | null
 }
 
 export interface AnswersRevealed {
   questionId: string
-  acceptedAnswers: string[]
+  /** open questions only */
+  acceptedAnswers?: string[]
+  /** choice questions only */
+  correctOptionId?: string | null
   answers: RevealedAnswer[]
 }
 
@@ -81,7 +95,7 @@ export type ServerMessage =
   | { type: 'SESSION_STATE'; payload: SessionStateMessage }
   | {
       type: 'ANSWER_ACCEPTED'
-      payload: { questionId: string; text: string }
+      payload: { questionId: string; text: string; optionId?: string }
     }
   | { type: 'QUESTION_CLOSED'; payload: { questionId: string } }
   | { type: 'ANSWERS_REVEALED'; payload: AnswersRevealed }
@@ -99,7 +113,9 @@ export type ClientMessage =
   | { type: 'END_SESSION'; payload: null }
   | {
       type: 'ANSWER_QUESTION'
-      payload: { questionId: string; answer: string }
+      payload:
+        | { questionId: string; answer: string }
+        | { questionId: string; optionId: string }
     }
 
 export type SendMessage = (message: ClientMessage) => void
@@ -112,7 +128,7 @@ export interface ActiveGameState {
   /** answers of the current question, set on ANSWERS_REVEALED */
   revealed: AnswersRevealed | null
   /** the player's own answer to the open question, kept locally (echoed by ANSWER_ACCEPTED) */
-  myAnswer: { questionId: string; text: string } | null
+  myAnswer: { questionId: string; text: string; optionId?: string } | null
   standings: Winner[] | null
   endReason: SessionEndReason | null
   sendMessage: SendMessage | null

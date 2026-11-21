@@ -6,6 +6,11 @@ import {
   replaceAcceptedAnswers,
 } from '@/entities/accepted-answer'
 import {
+  ANSWER_OPTIONS_QUERY,
+  type AnswerOption,
+  replaceAnswerOptions,
+} from '@/entities/answer-option'
+import {
   QUESTION_QUERY,
   type Question,
   updateQuestion,
@@ -23,6 +28,10 @@ vi.mock('@/entities/accepted-answer', async (importOriginal) => ({
   ...(await importOriginal<typeof import('@/entities/accepted-answer')>()),
   replaceAcceptedAnswers: vi.fn(),
 }))
+vi.mock('@/entities/answer-option', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('@/entities/answer-option')>()),
+  replaceAnswerOptions: vi.fn(),
+}))
 
 const question: Question = {
   id: 'q1',
@@ -31,12 +40,27 @@ const question: Question = {
   text: '2+2?',
   img: null,
   timeLimitSec: 30,
+  type: 'open',
   answersCount: 1,
+  optionsCount: 0,
 }
 
-const renderForm = async (answers: AcceptedAnswer[]) => {
-  queryClient.setQueryData(QUESTION_QUERY.queryKey('q1'), question)
+const renderForm = async (
+  answers: AcceptedAnswer[],
+  overrides: {
+    question?: Partial<Question>
+    options?: AnswerOption[]
+  } = {},
+) => {
+  queryClient.setQueryData(QUESTION_QUERY.queryKey('q1'), {
+    ...question,
+    ...overrides.question,
+  })
   queryClient.setQueryData(ACCEPTED_ANSWERS_QUERY.queryKey('q1'), answers)
+  queryClient.setQueryData(
+    ANSWER_OPTIONS_QUERY.queryKey('q1'),
+    overrides.options ?? [],
+  )
 
   const screen = await renderWithProviders(
     <EditQuestionForm questionId="q1" questionNumber={3} />,
@@ -93,6 +117,7 @@ describe('EditQuestionForm', () => {
       text: 'Two plus two?',
       img: null,
       timeLimitSec: 60,
+      type: 'open',
     })
     expect(replaceAcceptedAnswers).toHaveBeenCalledWith('q1', [
       { text: '4', questionId: 'q1' },
@@ -174,5 +199,154 @@ describe('EditQuestionForm', () => {
       .fill('http://127.0.0.1:9/pic.png')
 
     await expect.element(form.getByRole('status')).toBeVisible()
+  })
+
+  it('shows a choice question with its options and the correct mark (FR-99)', async () => {
+    const form = await renderForm([], {
+      question: { type: 'choice', optionsCount: 3, answersCount: 0 },
+      options: [
+        { id: 'o1', questionId: 'q1', order: 0, text: '3', isCorrect: false },
+        { id: 'o2', questionId: 'q1', order: 1, text: '4', isCorrect: true },
+        { id: 'o3', questionId: 'q1', order: 2, text: '5', isCorrect: false },
+      ],
+    })
+
+    await expect.element(form.getByTestId('answer-options-list')).toBeVisible()
+    await expect
+      .element(form.getByTestId('accepted-answers-list'))
+      .not.toBeInTheDocument()
+    await expect
+      .element(
+        form
+          .getByTestId('answer-option-item-1')
+          .getByTestId('answer-option-input'),
+      )
+      .toHaveValue('4')
+    await expect
+      .element(
+        form
+          .getByTestId('answer-option-item-1')
+          .getByTestId('correct-option-input'),
+      )
+      .toBeChecked()
+  })
+
+  it('saves a choice question by replacing its options (FR-99)', async () => {
+    vi.mocked(updateQuestion).mockResolvedValue({
+      ...question,
+      type: 'choice',
+      optionsCount: 2,
+      answersCount: 0,
+    })
+    vi.mocked(replaceAnswerOptions).mockResolvedValue([])
+    const form = await renderForm([], {
+      question: { type: 'choice', optionsCount: 2, answersCount: 0 },
+      options: [
+        { id: 'o1', questionId: 'q1', order: 0, text: '3', isCorrect: true },
+        { id: 'o2', questionId: 'q1', order: 1, text: '4', isCorrect: false },
+      ],
+    })
+
+    // mark the second option as correct, then save
+    await form
+      .getByTestId('answer-option-item-1')
+      .getByTestId('correct-option-input')
+      .click()
+    await form.getByTestId('save-question-button').click()
+
+    await expect.poll(() => vi.mocked(toast.success).mock.calls.length).toBe(1)
+    expect(updateQuestion).toHaveBeenCalledWith(
+      expect.objectContaining({ id: 'q1', type: 'choice' }),
+    )
+    expect(replaceAnswerOptions).toHaveBeenCalledWith('q1', [
+      { text: '3', isCorrect: false },
+      { text: '4', isCorrect: true },
+    ])
+    expect(replaceAcceptedAnswers).not.toHaveBeenCalled()
+  })
+
+  it('flags duplicated options on save (FR-100, BR-86)', async () => {
+    const form = await renderForm([], {
+      question: { type: 'choice', optionsCount: 2, answersCount: 0 },
+      options: [
+        { id: 'o1', questionId: 'q1', order: 0, text: '3', isCorrect: true },
+        { id: 'o2', questionId: 'q1', order: 1, text: '4', isCorrect: false },
+      ],
+    })
+
+    await form
+      .getByTestId('answer-option-item-1')
+      .getByTestId('answer-option-input')
+      .fill(' 3 ')
+    await form.getByTestId('save-question-button').click()
+
+    await expect
+      .element(form.getByText('This option duplicates another one'))
+      .toBeVisible()
+    expect(updateQuestion).not.toHaveBeenCalled()
+  })
+
+  it('keeps the option count within 2-4 (FR-99, BR-86)', async () => {
+    const form = await renderForm([], {
+      question: { type: 'choice', optionsCount: 2, answersCount: 0 },
+      options: [
+        { id: 'o1', questionId: 'q1', order: 0, text: 'a', isCorrect: true },
+        { id: 'o2', questionId: 'q1', order: 1, text: 'b', isCorrect: false },
+      ],
+    })
+
+    // at two options the remove buttons are disabled, at four — the add button
+    for (const index of [0, 1]) {
+      await expect
+        .element(
+          form
+            .getByTestId(`answer-option-item-${index}`)
+            .getByTestId('remove-option-button'),
+        )
+        .toBeDisabled()
+    }
+    await form.getByTestId('add-option-button').click()
+    await form.getByTestId('add-option-button').click()
+    await expect.element(form.getByTestId('add-option-button')).toBeDisabled()
+    await expect
+      .element(
+        form
+          .getByTestId('answer-option-item-3')
+          .getByTestId('remove-option-button'),
+      )
+      .not.toBeDisabled()
+  })
+
+  it('asks to confirm a type switch when the other set has data (D-12)', async () => {
+    const form = await renderForm([{ id: 'a1', questionId: 'q1', text: '4' }])
+
+    await form.getByTestId('choice-tab').click()
+    await expect.element(form.getByTestId('type-switch-confirm')).toBeVisible()
+
+    // cancelling keeps the open form
+    await form.getByTestId('cancel-type-switch-button').click()
+    await expect
+      .element(form.getByTestId('accepted-answers-list'))
+      .toBeVisible()
+
+    // confirming swaps the answers list for the options editor
+    await form.getByTestId('choice-tab').click()
+    await form.getByTestId('confirm-type-switch-button').click()
+    await expect.element(form.getByTestId('answer-options-list')).toBeVisible()
+    await expect
+      .element(form.getByTestId('accepted-answers-list'))
+      .not.toBeInTheDocument()
+  })
+
+  it('switches the type without a confirm when the other set is empty (D-12)', async () => {
+    const form = await renderForm([])
+
+    // a new question has only the empty placeholder answer — the switch is direct
+    await form.getByTestId('choice-tab').click()
+
+    await expect
+      .element(form.getByTestId('type-switch-confirm'))
+      .not.toBeInTheDocument()
+    await expect.element(form.getByTestId('answer-options-list')).toBeVisible()
   })
 })

@@ -29,12 +29,20 @@ export interface ReportAnswer {
   points: number
 }
 
+export interface ReportOption {
+  text: string
+  isCorrect: boolean
+}
+
 export interface ReportQuestion {
   id: string
   position: number
   text: string
   img: string | null
   timeLimitSec: number
+  type: 'open' | 'choice'
+  /** choice questions only: the options snapshot taken at launch */
+  options: ReportOption[] | null
   acceptedAnswers: string[]
   answers: ReportAnswer[]
 }

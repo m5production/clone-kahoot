@@ -74,6 +74,41 @@ export const createApi = (request: APIRequestContext) => ({
 
     return question
   },
+
+  /** A choice question: type switch first (D-12), then the options set (BR-86) */
+  createChoiceQuestion: async (
+    user: TestUser,
+    gameId: string,
+    text: string,
+    options: { text: string; isCorrect: boolean }[],
+    timeLimitSec?: number,
+  ): Promise<TestQuestion> => {
+    const question = await createApi(request).createQuestion(
+      user,
+      gameId,
+      text,
+      [],
+      timeLimitSec,
+    )
+
+    const update = await request.put(
+      `${E2E_API_URL}/questions/${question.id}`,
+      {
+        headers: authHeaders(user.token),
+        data: { text, type: 'choice' },
+      },
+    )
+    await expect(update, await update.text()).toBeOK()
+
+    const set = await request.put(`${E2E_API_URL}/options/`, {
+      headers: authHeaders(user.token),
+      params: { questionId: question.id },
+      data: options,
+    })
+    await expect(set, await set.text()).toBeOK()
+
+    return question
+  },
 })
 
 export type Api = ReturnType<typeof createApi>
