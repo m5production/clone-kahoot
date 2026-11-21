@@ -56,7 +56,7 @@ export function SubmitAnswerForm() {
   }
 
   return (
-    <div className="flex flex-col gap-3">
+    <form className="flex flex-col gap-3" onSubmit={handleSubmit(handleSend)}>
       <Input
         data-testid="answer-input"
         className="h-12 text-lg"
@@ -67,7 +67,9 @@ export function SubmitAnswerForm() {
         type="text"
       />
       {errors.answer && (
-        <p className="text-destructive">{errors.answer.message}</p>
+        <p role="alert" className="text-destructive">
+          {errors.answer.message}
+        </p>
       )}
       <p className="text-sm text-muted-foreground">
         {timeUp && !answered
@@ -79,13 +81,12 @@ export function SubmitAnswerForm() {
       <Button
         data-testid="submit-answer-button"
         disabled={!isOpen || answered || timeUp}
-        type="button"
+        type="submit"
         size="lg"
         className="w-full font-bold"
-        onClick={handleSubmit(handleSend)}
       >
         Send
       </Button>
-    </div>
+    </form>
   )
 }

@@ -10,13 +10,18 @@ function ImgWithPlaceholder(
   // The loaded source, not a flag: a new `src` shows the placeholder again without an effect
   // that could run after a fast (cached) image has already loaded and hide it for good
   const [loadedSrc, setLoadedSrc] = useState<string>()
+  const [failedSrc, setFailedSrc] = useState<string>()
   const isShowImg = loadedSrc !== undefined && loadedSrc === props.src
+  const isFailed = failedSrc !== undefined && failedSrc === props.src
 
   return (
     <>
       {!isShowImg && (
-        <div className="bg-muted text-muted-foreground w-[400px] text-4xl rounded-4xl h-[400px] mx-auto flex justify-center items-center">
-          Image is loading...
+        <div
+          role="status"
+          className="bg-muted text-muted-foreground w-[400px] max-w-full text-4xl rounded-4xl h-[400px] mx-auto flex justify-center items-center"
+        >
+          {isFailed ? 'Image could not be loaded' : 'Image is loading...'}
         </div>
       )}
 
@@ -29,6 +34,13 @@ function ImgWithPlaceholder(
           }
 
           setLoadedSrc(props.src)
+        }}
+        onError={(e) => {
+          if (props.onError) {
+            props.onError(e)
+          }
+
+          setFailedSrc(props.src)
         }}
         className={cn(props.className, !isShowImg && 'hidden')}
       />

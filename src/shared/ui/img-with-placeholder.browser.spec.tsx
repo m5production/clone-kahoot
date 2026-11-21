@@ -13,6 +13,8 @@ const pixel = (color: string) => {
   return canvas.toDataURL()
 }
 
+// An unroutable address: the request either hangs or is refused quickly —
+// either way the image stays unloaded
 const NEVER_LOADS = 'http://127.0.0.1:9/never-loads.png'
 
 describe('ImgWithPlaceholder', () => {
@@ -21,7 +23,7 @@ describe('ImgWithPlaceholder', () => {
       <ImgWithPlaceholder alt="Pic" src={NEVER_LOADS} />,
     )
 
-    await expect.element(screen.getByText('Image is loading...')).toBeVisible()
+    await expect.element(screen.getByRole('status')).toBeVisible()
     // The image is hidden from the accessibility tree until it has loaded
     await expect
       .element(screen.getByRole('img', { name: 'Pic' }))
@@ -34,9 +36,17 @@ describe('ImgWithPlaceholder', () => {
     )
 
     await expect.element(screen.getByRole('img', { name: 'Pic' })).toBeVisible()
+    await expect.element(screen.getByRole('status')).not.toBeInTheDocument()
+  })
+
+  it('reports when the image cannot be loaded instead of loading forever', async () => {
+    const screen = await render(
+      <ImgWithPlaceholder alt="Pic" src={NEVER_LOADS} />,
+    )
+
     await expect
-      .element(screen.getByText('Image is loading...'))
-      .not.toBeInTheDocument()
+      .element(screen.getByText('Image could not be loaded'))
+      .toBeVisible()
   })
 
   it('shows the placeholder again for a new source and then the new image', async () => {
@@ -46,7 +56,7 @@ describe('ImgWithPlaceholder', () => {
     await expect.element(screen.getByRole('img', { name: 'Pic' })).toBeVisible()
 
     await screen.rerender(<ImgWithPlaceholder alt="Pic" src={NEVER_LOADS} />)
-    await expect.element(screen.getByText('Image is loading...')).toBeVisible()
+    await expect.element(screen.getByRole('status')).toBeVisible()
 
     await screen.rerender(<ImgWithPlaceholder alt="Pic" src={pixel('blue')} />)
     await expect.element(screen.getByRole('img', { name: 'Pic' })).toBeVisible()
