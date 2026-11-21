@@ -5,7 +5,6 @@ export {
   getSafeReturnUrl,
   getSessionToken,
   getSessionUserId,
-  isAuthenticated,
   saveSessionToken,
   saveSessionUserId,
 } from './session.model'

@@ -4,9 +4,6 @@ import { toast } from 'react-toastify'
 export const isNotFoundError = (error: unknown) =>
   isAxiosError(error) && error.response?.status === 404
 
-export const isUnauthorizedError = (error: unknown) =>
-  isAxiosError(error) && error.response?.status === 401
-
 interface ApiErrorBody {
   code?: string
   message?: string

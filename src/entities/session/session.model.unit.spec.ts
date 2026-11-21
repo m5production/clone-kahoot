@@ -4,7 +4,6 @@ import {
   clearSessionUserId,
   getSessionToken,
   getSessionUserId,
-  isAuthenticated,
   saveSessionToken,
   saveSessionUserId,
 } from './session.model'
@@ -28,12 +27,11 @@ describe('session user id', () => {
 })
 
 describe('session token', () => {
-  it('drives isAuthenticated', () => {
-    expect(isAuthenticated()).toBe(false)
+  it('is saved', () => {
+    expect(getSessionToken()).toBeNull()
 
     saveSessionToken('token-1')
     expect(getSessionToken()).toBe('token-1')
-    expect(isAuthenticated()).toBe(true)
   })
 })
 
@@ -45,6 +43,6 @@ describe('clearSession', () => {
     clearSession()
 
     expect(getSessionUserId()).toBeNull()
-    expect(isAuthenticated()).toBe(false)
+    expect(getSessionToken()).toBeNull()
   })
 })

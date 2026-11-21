@@ -1,7 +1,6 @@
 export {
   getApiErrorMessage,
   isNotFoundError,
-  isUnauthorizedError,
   notifyApiError,
 } from './api-error'
 export { httpClient } from './http-client'

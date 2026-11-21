@@ -16,8 +16,6 @@ export const saveSessionUserId = (userId: string) =>
 export const clearSessionUserId = () =>
   localStorage.removeItem(USER_ID_STORAGE_KEY)
 
-export const isAuthenticated = () => Boolean(getSessionToken())
-
 export const clearSession = () => {
   clearSessionUserId()
   clearSessionToken()
