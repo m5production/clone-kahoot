@@ -30,6 +30,7 @@ export function JoinGameForm() {
           data-testid="join-game-input"
           className="h-11"
           placeholder="Invitation link"
+          aria-label="Invitation link"
           {...register('link', { required: 'Enter a valid invitation link' })}
           aria-invalid={Boolean(errors.link)}
         />
@@ -43,7 +44,11 @@ export function JoinGameForm() {
         </Button>
       </form>
 
-      {errors.link && <p className="text-destructive">{errors.link.message}</p>}
+      {errors.link && (
+        <p role="alert" className="text-destructive">
+          {errors.link.message}
+        </p>
+      )}
     </>
   )
 }

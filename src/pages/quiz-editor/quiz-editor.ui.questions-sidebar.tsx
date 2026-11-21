@@ -41,22 +41,27 @@ export function QuestionsSidebar({
         className="w-full flex flex-col gap-1 flex-1 min-h-0 overflow-y-auto"
       >
         {questions?.map((question, index) => (
-          // biome-ignore lint/a11y/useKeyWithClickEvents lint/a11y/useAriaPropsSupportedByRole: a plain list item, selection is visual-only
+          // biome-ignore lint/a11y/useAriaPropsSupportedByRole: aria-selected is the documented e2e selection marker (test-ids.md); the inner button carries the interaction
           <li
             key={question.id}
             data-testid={`question-item-${question.id}`}
             aria-selected={selectedQuestion?.id === question.id}
-            onClick={() =>
-              onSelectQuestion({ id: question.id, number: index + 1 })
-            }
             className={cn(
-              'w-full rounded-lg px-3 py-2 text-sm font-medium cursor-pointer transition hover:bg-accent hover:text-accent-foreground flex items-center gap-1',
+              'w-full rounded-lg text-sm font-medium transition hover:bg-accent hover:text-accent-foreground flex items-center gap-1',
               selectedQuestion?.id === question.id &&
                 'bg-primary text-primary-foreground hover:bg-primary hover:text-primary-foreground',
               itemClassName,
             )}
           >
-            <span className="flex-1 truncate">Question {index + 1}</span>
+            <button
+              type="button"
+              className="min-w-0 flex-1 cursor-pointer self-stretch truncate px-3 py-2 text-left"
+              onClick={() =>
+                onSelectQuestion({ id: question.id, number: index + 1 })
+              }
+            >
+              Question {index + 1}
+            </button>
             {!isQuestionReady(question) && (
               <TriangleAlert
                 aria-label="incomplete"

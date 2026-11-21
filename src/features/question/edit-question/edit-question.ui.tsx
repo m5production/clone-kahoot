@@ -116,6 +116,7 @@ export function EditQuestionForm({
         data-testid="question-image-input"
         className="h-11"
         placeholder="Insert image url"
+        aria-label="Image url"
         {...register('img')}
       />
 
@@ -134,6 +135,7 @@ export function EditQuestionForm({
           data-testid="question-text-input"
           className="h-12 text-lg font-medium"
           placeholder="Type in question text"
+          aria-label="Question text"
           {...register('text', {
             required: 'Question text must present',
             maxLength: {
@@ -144,7 +146,9 @@ export function EditQuestionForm({
           aria-invalid={Boolean(errors.text)}
         />
         {errors.text && (
-          <p className="self-start text-destructive">{errors.text.message}</p>
+          <p role="alert" className="self-start text-destructive">
+            {errors.text.message}
+          </p>
         )}
       </Label>
 
@@ -167,7 +171,9 @@ export function EditQuestionForm({
         <h4 className="text-lg font-semibold">Accepted answers</h4>
 
         {errors.answers?.message && (
-          <p className="text-destructive">{errors.answers.message}</p>
+          <p role="alert" className="text-destructive">
+            {errors.answers.message}
+          </p>
         )}
 
         <ul data-testid="accepted-answers-list" className="flex flex-col gap-3">
@@ -182,6 +188,7 @@ export function EditQuestionForm({
                   data-testid="accepted-answer-input"
                   className="h-11"
                   placeholder="Accepted answer"
+                  aria-label={`Accepted answer ${index + 1}`}
                   {...register(`answers.${index}.answerText`, {
                     required: 'Empty answer is not accepted',
                     maxLength: {
@@ -194,7 +201,7 @@ export function EditQuestionForm({
                   aria-invalid={Boolean(errors.answers?.[index]?.answerText)}
                 />
                 {errors.answers?.[index]?.answerText && (
-                  <p className="self-start text-destructive">
+                  <p role="alert" className="self-start text-destructive">
                     {errors.answers[index].answerText.message}
                   </p>
                 )}

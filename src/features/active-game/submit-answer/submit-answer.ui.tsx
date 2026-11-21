@@ -62,6 +62,7 @@ export function SubmitAnswerForm() {
         className="h-12 text-lg"
         aria-invalid={Boolean(errors.answer)}
         placeholder="Type your answer here!"
+        aria-label="Your answer"
         disabled={!isOpen || answered || timeUp}
         {...register('answer', { required: "You can't submit empty answer" })}
         type="text"

@@ -129,6 +129,7 @@ function InviteOverlay({ onClose }: { onClose: () => void }) {
               size="icon"
               className="size-11 -mr-2"
               aria-label="Close"
+              autoFocus
               onClick={onClose}
             >
               <X />

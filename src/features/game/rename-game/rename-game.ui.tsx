@@ -65,6 +65,7 @@ export function RenameGameTitle({
         <Input
           data-testid="game-title-input"
           className="h-10 w-72 max-w-full text-xl font-bold"
+          aria-label="Quiz title"
           {...register('title', {
             required: 'Enter a quiz title',
             maxLength: {
@@ -77,7 +78,9 @@ export function RenameGameTitle({
           aria-invalid={Boolean(errors.title)}
         />
         {errors.title && (
-          <p className="text-sm text-destructive">{errors.title.message}</p>
+          <p role="alert" className="text-sm text-destructive">
+            {errors.title.message}
+          </p>
         )}
       </div>
       <Button

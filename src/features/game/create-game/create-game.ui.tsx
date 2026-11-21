@@ -31,6 +31,7 @@ export function CreateGameForm() {
           data-testid="create-game-title-input"
           className="h-11"
           placeholder="New quiz title"
+          aria-label="New quiz title"
           {...register('title', {
             required: 'Enter a quiz title',
             maxLength: {
@@ -53,7 +54,9 @@ export function CreateGameForm() {
         </Button>
       </form>
       {errors.title && (
-        <p className="text-destructive">{errors.title.message}</p>
+        <p role="alert" className="text-destructive">
+          {errors.title.message}
+        </p>
       )}
     </div>
   )
