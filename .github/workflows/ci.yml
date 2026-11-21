@@ -1,0 +1,104 @@
+name: CI
+
+on:
+  push:
+    branches: [master, main]
+  pull_request:
+
+jobs:
+  checks:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: 1.4.4
+
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+
+      - name: Biome check
+        run: bun run lint
+
+      - name: Circular dependency check
+        run: bun run lint:circular
+
+      - name: Install Playwright browsers (Vitest runs in browser mode)
+        run: bunx playwright install --with-deps chromium
+
+      - name: Typecheck and build
+        run: bun run build
+
+      - name: Unit and component tests
+        run: bun run test
+
+  e2e:
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: clone_kahoot_e2e
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+
+    env:
+      E2E_DB_HOST: localhost
+      E2E_DB_PORT: "5432"
+      E2E_DB_USER: postgres
+      E2E_DB_PASSWORD: postgres
+      E2E_DB_NAME: clone_kahoot_e2e
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          path: frontend
+
+      # playwright.config.ts resolves the backend at ../backend
+      - uses: actions/checkout@v4
+        with:
+          repository: m5production/clone-kahoot-backend
+          path: backend
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 26
+          cache: yarn
+          cache-dependency-path: backend/yarn.lock
+
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: 1.4.4
+
+      - name: Install yarn (node 26 ships neither yarn nor corepack)
+        run: npm install -g yarn@1.22.22
+
+      - name: Install backend dependencies
+        working-directory: backend
+        run: yarn install --frozen-lockfile
+
+      - name: Generate Prisma client
+        working-directory: backend
+        run: yarn prisma-generate
+
+      - name: Install frontend dependencies
+        working-directory: frontend
+        run: bun install --frozen-lockfile
+
+      - name: Install Playwright browsers
+        working-directory: frontend
+        run: bunx playwright install --with-deps chromium
+
+      - name: E2E tests
+        working-directory: frontend
+        run: bun run test:e2e

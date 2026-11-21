@@ -28,10 +28,10 @@ export function WinnersTable({ winners, className, ...props }: Props) {
             PLACE_STYLE[place] ?? 'bg-muted text-muted-foreground',
           )}
         >
-          <span>
+          <span className="min-w-0 truncate">
             {place}. {name}
           </span>
-          <span className="flex items-baseline gap-3">
+          <span className="flex shrink-0 items-baseline gap-3">
             <span className="text-sm font-normal">{correctCount} correct</span>
             <span>{score}</span>
           </span>

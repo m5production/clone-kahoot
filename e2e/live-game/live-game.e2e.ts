@@ -194,6 +194,32 @@ test.describe('live session', () => {
     await expect(host.page.getByTestId('host-controls')).toBeVisible()
   })
 
+  test('the player screen fits a 360 px viewport without scrolling (NFR-U5)', async ({
+    signIn,
+    api,
+  }) => {
+    const host = await signIn('host')
+    const game = await api.createGame(host.user)
+    await api.createQuestion(host.user, game.id, '2+2?', ['4'])
+    const player = await signIn('player')
+    await player.page.setViewportSize({ width: 360, height: 640 })
+
+    const sessionId = await startSession(host, game.id)
+    await joinSession(player, sessionId)
+    await host.page.getByTestId('start-game-button').click()
+
+    // question, timer and the answer form are reachable without horizontal scroll
+    await expect(player.page.getByTestId('question-view')).toBeVisible()
+    await expect(player.page.getByTestId('question-timer')).toBeVisible()
+    await expect(player.page.getByTestId('answer-input')).toBeVisible()
+    await expect(player.page.getByTestId('submit-answer-button')).toBeVisible()
+
+    const overflow = await player.page.evaluate(
+      'document.documentElement.scrollWidth - document.documentElement.clientWidth',
+    )
+    expect(overflow).toBe(0)
+  })
+
   test('the join form asks for an invitation link', async ({ signIn }) => {
     const { page } = await signIn('player')
     await page.goto('/home')

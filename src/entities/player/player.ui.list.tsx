@@ -37,7 +37,10 @@ export function Players({
       ) : (
         <>
           <h3 className="text-xl font-bold">Players ({players.length})</h3>
-          <ul data-testid="players-list" className="flex gap-4 items-start">
+          <ul
+            data-testid="players-list"
+            className="flex flex-wrap gap-4 items-start"
+          >
             {players.map((player) => (
               <li
                 key={player.id}

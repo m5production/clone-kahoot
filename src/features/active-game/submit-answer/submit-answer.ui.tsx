@@ -67,9 +67,7 @@ export function SubmitAnswerForm() {
         type="text"
       />
       {errors.answer && (
-        <p className="text-destructive">
-          "Please enter your answer. It is not allowed to submit empty answer"
-        </p>
+        <p className="text-destructive">{errors.answer.message}</p>
       )}
       <p className="text-sm text-muted-foreground">
         {timeUp && !answered

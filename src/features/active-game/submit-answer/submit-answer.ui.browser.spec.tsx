@@ -42,7 +42,7 @@ describe('SubmitAnswerForm', () => {
     await screen.getByTestId('submit-answer-button').click()
 
     await expect
-      .element(screen.getByText(/It is not allowed to submit empty answer/))
+      .element(screen.getByText("You can't submit empty answer"))
       .toBeVisible()
     await expect
       .element(screen.getByTestId('answer-input'))
