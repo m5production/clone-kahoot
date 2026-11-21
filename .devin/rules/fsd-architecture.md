@@ -67,7 +67,7 @@ kebab-case + dot suffix, flat inside the slice until it gets crowded (then `ui/`
 - WebSocket game state: `entities/active-game` (provider + typed `ServerMessage`/`ClientMessage`,
   pure parsing in `active-game.lib.ts`); host actions in `features/active-game/control-game`,
   player answer in `features/active-game/submit-answer`.
-- Player game and winners share one `ActiveGameProvider` via the `PlayerGameLayout` route
-  (`app/router`), so the winners screen keeps the game state.
+- Host, player and winners screens share one `ActiveGameProvider` mounted by
+  `SessionPage` (`/join/:sessionId`), so the winners screen keeps the game state.
 - Session (user id in localStorage, auth cookie) lives in `entities/session`; read it via its API,
   never `localStorage` directly. Other entities' UI gets the user id as a prop (`UserAvatar`).

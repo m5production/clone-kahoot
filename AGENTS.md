@@ -30,7 +30,8 @@ Code style: `.devin/rules/code-style.md`.
 
 ## Tests
 
-Three tiers, local only, no CI yet — rules: `.devin/rules/testing.md`, test ids: `.devin/rules/test-ids.md`:
+Three tiers — rules: `.devin/rules/testing.md`, test ids: `.devin/rules/test-ids.md`
+(CI runs all of them, including e2e against a Postgres service):
 - unit (`*.unit.spec.ts`, Vitest + happy-dom),
 - component (`*.browser.spec.tsx`, Vitest browser mode, Playwright provider),
 - e2e (`e2e/**/*.e2e.ts`, `@playwright/test` against the **real backend**).

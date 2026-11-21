@@ -5,7 +5,8 @@ trigger: model_decision
 
 # Testing
 
-Test at the lowest tier that gives confidence. All three tiers run **locally** (no CI yet).
+Test at the lowest tier that gives confidence. All three tiers also run in CI
+(`.github/workflows/ci.yml`: lint, dpdm, build, Vitest, e2e against a Postgres service).
 
 | Tier | Files | Runner | What |
 |---|---|---|---|
@@ -46,9 +47,11 @@ Commands: `bun run test` (unit + component), `test:unit`, `test:browser`, `test:
 
 - Prerequisites: `../backend` with installed deps (`npx yarn@1.22.22 install --frozen-lockfile`) and
   `bunx playwright install chromium` (Playwright >= 1.65 on Ubuntu 26.04).
-- `playwright.config.ts` `webServer` starts the backend on :3101 with a fresh SQLite DB in
-  `e2e/.tmp/e2e.db` (`prisma migrate reset` on every run, outside the backend repo) and Vite on
-  :5174 with `VITE_API_URL`/`VITE_WS_URL` pointing to it — so it doesn't clash with the dev servers.
+- `playwright.config.ts` `webServer` starts the backend on :3101 with a fresh
+  PostgreSQL database (`prisma migrate reset` on every run against
+  `postgres:postgres@localhost:5432/clone_kahoot_e2e`, overridable via `E2E_DB_*`)
+  and Vite on :5174 with `VITE_API_URL`/`VITE_WS_URL` pointing to it — so it
+  doesn't clash with the dev servers.
   Ports: `e2e/support/urls.ts`. Reports, traces, screenshots: `e2e/.tmp/` (gitignored).
 - Fixtures (`e2e/support/fixtures.ts`, import `test`/`expect` from there):
   - `api` — create users, games, questions with accepted answers via the backend API;
@@ -56,8 +59,9 @@ Commands: `bun run test` (unit + component), `test:unit`, `test:browser`, `test:
   - `signIn(prefix)` — a new user in its **own browser context** (session token + remembered user id),
     returns `{ user, page }`; use one per actor (host, each player).
 - Set test data up through `api`, not the UI; the UI flow itself is tested once in its own spec.
-- The backend keeps **one global active game** → live-game specs live in `e2e/live-game/` and run in
-  the `live-game` project with `workers: 1`. A test that needs "no game running" goes first in its file.
+- Live-game specs live in `e2e/live-game/` and run in the separate `live-game`
+  project. The backend supports concurrent game rooms, but specs still share one
+  backend instance — each spec creates its own game and players via `api`.
 - The question editor resets when the selected question loads: wait for
   `question-form` `aria-busy="false"` before typing. A new question shows one empty answer field.
 - Each game screen (`ActiveGameProvider`) opens its own WebSocket and closes it on unmount; the
