@@ -19,8 +19,12 @@ export function LoginPage() {
     <div className="min-h-full flex items-center justify-center bg-gradient-to-b from-primary to-primary-deep p-4">
       <Card className="w-full max-w-sm rounded-3xl border-0 shadow-2xl">
         <CardHeader className="text-center">
-          <CardTitle className="text-4xl font-extrabold tracking-tight text-primary">
-            Clone-Kahoot!
+          <CardTitle>
+            <img
+              src={`${import.meta.env.BASE_URL}piggies-quiz-logo.png`}
+              alt="piggies quiz"
+              className="mx-auto w-48"
+            />
           </CardTitle>
           <CardDescription>
             Please, enter your nickname and password

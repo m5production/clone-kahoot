@@ -11,8 +11,12 @@ export function WelcomePage() {
     <div className="min-h-full flex items-center justify-center bg-gradient-to-b from-primary to-primary-deep p-4">
       <div className="w-full max-w-md flex flex-col items-center gap-8 text-center">
         <div className="flex flex-col gap-3">
-          <h1 className="text-5xl font-extrabold tracking-tight text-primary-foreground drop-shadow-sm">
-            Clone-Kahoot!
+          <h1>
+            <img
+              src={`${import.meta.env.BASE_URL}piggies-quiz-logo.png`}
+              alt="piggies quiz"
+              className="mx-auto w-64 rounded-3xl bg-card p-6 shadow-2xl"
+            />
           </h1>
           <p className="text-lg text-primary-foreground/90">
             Run live quizzes: create your own quiz, share a link with the

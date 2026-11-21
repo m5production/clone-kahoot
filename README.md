@@ -1,10 +1,10 @@
-# Clone-Kahoot
+# piggies quiz
 
 A real-time quiz game inspired by Kahoot: a host builds a quiz and runs it live, players join from their devices, answer questions and see the winners table at the end.
 
 **[Live demo](https://m5production.github.io/clone-kahoot/)** · **[Backend repository](https://github.com/m5production/clone-kahoot-backend)**
 
-![Clone-Kahoot screenshot](https://github.com/user-attachments/assets/779f7d60-530c-487a-9875-cbadeec15e46)
+![piggies quiz screenshot](https://github.com/user-attachments/assets/779f7d60-530c-487a-9875-cbadeec15e46)
 
 ## Features
 

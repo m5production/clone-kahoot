@@ -34,8 +34,12 @@ export function HomePage() {
       </div>
 
       <div className="w-full max-w-md flex flex-col gap-8">
-        <h1 className="text-5xl font-extrabold tracking-tight text-primary-foreground drop-shadow-sm">
-          Clone-Kahoot!
+        <h1>
+          <img
+            src={`${import.meta.env.BASE_URL}piggies-quiz-logo.png`}
+            alt="piggies quiz"
+            className="mx-auto w-64 rounded-3xl bg-card p-6 shadow-2xl"
+          />
         </h1>
 
         <Card className="rounded-3xl border-0 shadow-2xl">
