@@ -8,7 +8,7 @@
     "build": "tsc -b && vite build",
     "lint": "biome check",
     "preview": "vite preview",
-    "deploy": "gh-pages -d dist",
+    "deploy": "cp dist/index.html dist/404.html && gh-pages -d dist",
     "lint:circular": "dpdm --no-warning --no-tree --tsconfig tsconfig.app.json --exit-code circular:1 src/main.tsx",
     "check": "bun run lint && bun run lint:circular && bun run build && bun run test",
     "test": "vitest run",
